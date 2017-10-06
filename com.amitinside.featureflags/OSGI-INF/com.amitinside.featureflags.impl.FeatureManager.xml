@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="com.amitinside.featureflags.impl.FeatureManager">
+   <service>
+      <provide interface="com.amitinside.featureflags.FeatureService"/>
+   </service>
+   <reference bind="bindFeature" cardinality="0..n" interface="com.amitinside.featureflags.Feature" name="Feature" policy="dynamic" unbind="unbindFeature"/>
+   <implementation class="com.amitinside.featureflags.impl.FeatureManager"/>
+</scr:component>
