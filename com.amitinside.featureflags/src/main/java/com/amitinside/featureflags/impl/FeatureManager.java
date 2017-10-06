@@ -12,11 +12,10 @@
  *******************************************************************************/
 package com.amitinside.featureflags.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Constants;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.Feature;
 import com.amitinside.featureflags.FeatureService;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -39,7 +39,7 @@ import com.google.common.collect.Maps;
 public final class FeatureManager implements FeatureService {
 
     /** Logger Instance */
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Map<String, List<FeatureDescription>> allFeatures = Maps.newHashMap();
     private Map<String, Feature> activeFeatures = Maps.newHashMap();
@@ -67,20 +67,20 @@ public final class FeatureManager implements FeatureService {
      * {@link Feature} service binding callback
      */
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
-    private void bindFeature(final Feature f, final Map<String, Object> props) {
+    private void bindFeature(final Feature feature, final Map<String, Object> props) {
         synchronized (allFeatures) {
-            final String name = f.name();
-            final FeatureDescription info = new FeatureDescription(f, props);
+            final String name = feature.name();
+            final FeatureDescription info = new FeatureDescription(feature, props);
 
             List<FeatureDescription> candidates = allFeatures.get(name);
             if (candidates == null) {
-                candidates = new ArrayList<>();
+                candidates = Lists.newArrayList();
                 allFeatures.put(name, candidates);
             }
             candidates.add(info);
             Collections.sort(candidates);
 
-            calculateActiveProviders();
+            calculateActiveFeatures();
         }
     }
 
@@ -88,10 +88,10 @@ public final class FeatureManager implements FeatureService {
      * {@link Feature} service unbinding callback
      */
     @SuppressWarnings("unused")
-    private void unbindFeature(final Feature f, final Map<String, Object> props) {
+    private void unbindFeature(final Feature feature, final Map<String, Object> props) {
         synchronized (allFeatures) {
-            final String name = f.name();
-            final FeatureDescription info = new FeatureDescription(f, props);
+            final String name = feature.name();
+            final FeatureDescription info = new FeatureDescription(feature, props);
 
             final List<FeatureDescription> candidates = allFeatures.get(name);
             if (candidates != null) { // sanity check
@@ -100,21 +100,21 @@ public final class FeatureManager implements FeatureService {
                     allFeatures.remove(name);
                 }
             }
-            calculateActiveProviders();
+            calculateActiveFeatures();
         }
     }
 
     /**
      * Calculates map of active features (eliminating Feature name
-     * collisions). Must be called while synchronized on this.allFeatures
+     * collisions)
      */
-    private void calculateActiveProviders() {
-        final Map<String, Feature> activeMap = new HashMap<>();
-        for (final Map.Entry<String, List<FeatureDescription>> entry : allFeatures.entrySet()) {
+    private void calculateActiveFeatures() {
+        final Map<String, Feature> activeMap = Maps.newHashMap();
+        for (final Entry<String, List<FeatureDescription>> entry : allFeatures.entrySet()) {
             final FeatureDescription desc = entry.getValue().get(0);
             activeMap.put(entry.getKey(), desc.feature);
             if (entry.getValue().size() > 1) {
-                logger.warn("More than one feature service for feature {}", entry.getKey());
+                logger.warn("More than one feature service for feature name {}", entry.getKey());
             }
         }
         activeFeatures = activeMap;
@@ -127,9 +127,7 @@ public final class FeatureManager implements FeatureService {
     private static final class FeatureDescription implements Comparable<FeatureDescription> {
 
         public final int ranking;
-
         public final long serviceId;
-
         public final Feature feature;
 
         public FeatureDescription(final Feature feature, final Map<String, Object> props) {
