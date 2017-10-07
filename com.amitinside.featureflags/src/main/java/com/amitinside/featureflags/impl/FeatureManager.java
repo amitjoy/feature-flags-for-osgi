@@ -12,7 +12,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.impl;
 
-import static com.amitinside.featureflags.ActivationStrategy.DEFAULT_STRATEGY;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.framework.Constants.*;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
@@ -33,9 +32,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amitinside.featureflags.ActivationStrategy;
-import com.amitinside.featureflags.Feature;
 import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.feature.Feature;
+import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -44,17 +43,18 @@ import com.google.common.collect.Maps;
  * This service implements the {@link FeatureService}. It keeps track of all
  * {@link Feature} services and {@link ActivationStrategy} services
  */
-@Component
+@Component(name = "FeatureManager")
 public final class FeatureManager implements FeatureService {
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Map<String, List<FeatureDescription>> allFeatures = Maps.newHashMap();
-    private Map<String, Feature> activeFeatures = Maps.newHashMap();
     private final Map<String, ActivationStrategy> allStrategies = Maps.newHashMap();
-    private final Lock monitorFeatures = new ReentrantLock(true);
-    private final Lock monitorStrategies = new ReentrantLock(true);
+    private Map<String, Feature> activeFeatures = Maps.newHashMap();
+
+    private final Lock featuresLock = new ReentrantLock(true);
+    private final Lock strategiesLock = new ReentrantLock(true);
 
     @Override
     public Stream<Feature> getFeatures() {
@@ -62,18 +62,29 @@ public final class FeatureManager implements FeatureService {
     }
 
     @Override
+    public Stream<ActivationStrategy> getStrategies() {
+        return allStrategies.values().stream();
+    }
+
+    @Override
     public Optional<Feature> getFeature(final String featureName) {
-        requireNonNull(featureName, "Name cannot be null");
+        requireNonNull(featureName, "Feature name cannot be null");
         return Optional.ofNullable(activeFeatures.get(featureName));
     }
 
     @Override
+    public Optional<ActivationStrategy> getStrategy(final String strategyName) {
+        requireNonNull(strategyName, "Strategy name cannot be null");
+        return Optional.ofNullable(allStrategies.get(strategyName));
+    }
+
+    @Override
     public boolean isEnabled(final String featureName) {
-        requireNonNull(featureName, "Name cannot be null");
+        requireNonNull(featureName, "Feature name cannot be null");
         final Feature feature = getFeature(featureName).orElse(null);
         if (feature != null) {
-            final String strategyId = feature.strategyId();
-            if (strategyId.equalsIgnoreCase(DEFAULT_STRATEGY)) {
+            final String strategyId = feature.strategy().orElse("");
+            if (strategyId.isEmpty()) {
                 return feature.isEnabled();
             } else {
                 final ActivationStrategy strategy = allStrategies.get(strategyId);
@@ -90,7 +101,7 @@ public final class FeatureManager implements FeatureService {
      */
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
     private void bindFeature(final Feature feature, final Map<String, Object> props) {
-        monitorFeatures.lock();
+        featuresLock.lock();
         try {
             final String name = feature.name();
             final FeatureDescription info = new FeatureDescription(feature, props);
@@ -105,7 +116,7 @@ public final class FeatureManager implements FeatureService {
 
             calculateActiveFeatures();
         } finally {
-            monitorFeatures.unlock();
+            featuresLock.unlock();
         }
     }
 
@@ -114,7 +125,7 @@ public final class FeatureManager implements FeatureService {
      */
     @SuppressWarnings("unused")
     private void unbindFeature(final Feature feature, final Map<String, Object> props) {
-        monitorFeatures.lock();
+        featuresLock.lock();
         try {
             final String name = feature.name();
             final FeatureDescription info = new FeatureDescription(feature, props);
@@ -128,7 +139,7 @@ public final class FeatureManager implements FeatureService {
             }
             calculateActiveFeatures();
         } finally {
-            monitorFeatures.unlock();
+            featuresLock.unlock();
         }
     }
 
@@ -143,7 +154,7 @@ public final class FeatureManager implements FeatureService {
             final FeatureDescription desc = value.get(0);
             activeMap.put(entry.getKey(), desc.feature);
             if (value.size() > 1) {
-                logger.warn("More than one feature of same name - [{}] are available.", entry.getKey());
+                logger.warn("More than one features with same name - [{}] are available.", entry.getKey());
             }
         }
         activeFeatures = activeMap;
@@ -154,11 +165,11 @@ public final class FeatureManager implements FeatureService {
      */
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
     private void bindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
-        monitorStrategies.lock();
+        strategiesLock.lock();
         try {
             allStrategies.put(strategy.name(), strategy);
         } finally {
-            monitorStrategies.unlock();
+            strategiesLock.unlock();
         }
     }
 
@@ -167,11 +178,11 @@ public final class FeatureManager implements FeatureService {
      */
     @SuppressWarnings("unused")
     private void unbindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
-        monitorStrategies.lock();
+        strategiesLock.lock();
         try {
             allStrategies.remove(strategy.name());
         } finally {
-            monitorStrategies.unlock();
+            strategiesLock.unlock();
         }
     }
 
@@ -187,11 +198,7 @@ public final class FeatureManager implements FeatureService {
         public FeatureDescription(final Feature feature, final Map<String, Object> props) {
             this.feature = feature;
             final Object sr = props.get(SERVICE_RANKING);
-            if (sr instanceof Integer) {
-                ranking = (int) sr;
-            } else {
-                ranking = 0;
-            }
+            ranking = Optional.ofNullable(sr).filter(e -> e instanceof Integer).map(Integer.class::cast).orElse(0);
             serviceId = (long) props.get(SERVICE_ID);
         }
 

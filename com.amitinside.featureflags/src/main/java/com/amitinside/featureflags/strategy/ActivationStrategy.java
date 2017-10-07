@@ -10,20 +10,26 @@
  *  Amit Kumar Mondal
  *
  *******************************************************************************/
-package com.amitinside.featureflags;
+package com.amitinside.featureflags.strategy;
+
+import java.util.Optional;
+
+import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.feature.Feature;
 
 /**
  * This interface represents a custom strategy for deciding whether
  * a feature is active or not.
+ * <p>
+ * Strategy names {@link #name()} should be globally unique.
+ * </p>
  *
  * This interface is intended to be implemented by feature providers.
+ *
+ * @see Feature
+ * @see FeatureService
  */
 public interface ActivationStrategy {
-
-    /**
-     * The name to be used if default strategy will be used
-     */
-    String DEFAULT_STRATEGY = "default";
 
     /**
      * The name of the strategy.
@@ -36,10 +42,10 @@ public interface ActivationStrategy {
     /**
      * The description of the strategy.
      *
-     * @return The optional description of this strategy, which may be
-     *         {@code null} or an empty string.
+     * @return The optional description of this strategy wrapped in {@link Optional}
+     *         or empty {@link Optional} instance
      */
-    String description();
+    Optional<String> description();
 
     /**
      * This method is responsible to decide whether a feature is active or not.
@@ -47,7 +53,7 @@ public interface ActivationStrategy {
      * strategy stored in the feature and information from the currently acting
      * user to find a decision.
      *
-     * @param feature The feature instance to check for enablement
+     * @param feature The {@link Feature} instance to check for enablement
      *
      * @return {@code true} if the feature should be enabled, otherwise {@code false}
      * @throws NullPointerException if the specified argument {@code feature} is {@code null}

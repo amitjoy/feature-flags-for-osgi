@@ -12,42 +12,36 @@
  *******************************************************************************/
 package com.amitinside.featureflags.impl;
 
-import static com.amitinside.featureflags.ActivationStrategy.DEFAULT_STRATEGY;
 import static com.amitinside.featureflags.impl.Config.*;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
-import com.amitinside.featureflags.Feature;
+import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.util.ConfigHelper;
 import com.google.common.base.Strings;
 
-@Component(configurationPolicy = REQUIRE, configurationPid = "com.amitinside.featureflags.feature")
+@Component(name = "ConfiguredFeature", configurationPolicy = REQUIRE, configurationPid = "com.amitinside.featureflags.feature")
 public final class ConfiguredFeature implements Feature {
 
     private String name;
     private String description;
-    private String strategyId;
+    private String strategy;
     private boolean enabled;
 
     @Activate
     private void activate(final Map<String, Object> properties) {
         final Map<Config, String> props = ConfigHelper.parseProperties(properties);
         name = props.get(NAME);
-        checkArgument(!Strings.isNullOrEmpty(name), "Name cannot be null or empty");
-        description = Strings.emptyToNull(props.get(DESCRIPTION));
-        if (description == null) {
-            description = name;
-        }
-        strategyId = Strings.emptyToNull(props.get(STRATEGY));
-        if (strategyId == null) {
-            strategyId = DEFAULT_STRATEGY;
-        }
-        enabled = Boolean.valueOf(props.get(ENABLED));
+        checkArgument(!Strings.isNullOrEmpty(name), "Feature name cannot be null or empty");
+        description = Optional.ofNullable(props.get(DESCRIPTION)).orElse(name);
+        strategy = Optional.ofNullable(props.get(STRATEGY)).filter(s -> !s.isEmpty()).orElse(null);
+        enabled = Optional.ofNullable(props.get(ENABLED)).map(Boolean::valueOf).orElse(false);
     }
 
     @Override
@@ -56,8 +50,8 @@ public final class ConfiguredFeature implements Feature {
     }
 
     @Override
-    public String description() {
-        return description;
+    public Optional<String> description() {
+        return Optional.of(description);
     }
 
     @Override
@@ -66,8 +60,8 @@ public final class ConfiguredFeature implements Feature {
     }
 
     @Override
-    public String strategyId() {
-        return strategyId;
+    public Optional<String> strategy() {
+        return Optional.ofNullable(strategy);
     }
 
 }

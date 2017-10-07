@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
 
-import com.amitinside.featureflags.Feature;
+import com.amitinside.featureflags.feature.Feature;
 
 /**
  * Represents configuration elements of a {@link Feature} service
