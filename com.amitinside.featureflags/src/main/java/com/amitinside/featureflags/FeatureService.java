@@ -17,6 +17,8 @@ import java.util.stream.Stream;
 /**
  * The {@link FeatureService} service is the applications access point to the Feature
  * Flag functionality. It can be used to query the available features.
+ *
+ * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface FeatureService {
 
@@ -26,6 +28,7 @@ public interface FeatureService {
      * Features are known if they are registered as {@link Feature} services or
      * are configured with OSGi configuration whose factory PID is
      * {@code org.apache.sling.featureflags.Feature}.
+     * </p>
      *
      * @return The known features
      */
@@ -37,6 +40,7 @@ public interface FeatureService {
      * Features are known if they are registered as {@link Feature} services or
      * are configured with OSGi configuration whose factory PID is
      * {@code org.apache.sling.featureflags.Feature}.
+     * </p>
      *
      * @param name The name of the feature.
      * @return The feature or <code>null</code> if not known or the name is an
@@ -51,6 +55,7 @@ public interface FeatureService {
      * Features are known if they are registered as {@link Feature} services or
      * are configured with OSGi configuration whose factory PID is
      * {@code org.apache.sling.featureflags.Feature}.
+     * </p>
      *
      * @param name The name of the feature to check for enablement.
      * @return {@code true} if the named feature is known and enabled.

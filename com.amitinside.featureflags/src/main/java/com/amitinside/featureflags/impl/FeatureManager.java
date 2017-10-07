@@ -12,22 +12,25 @@
  *******************************************************************************/
 package com.amitinside.featureflags.impl;
 
+import static org.osgi.framework.Constants.*;
+import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
+import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.Feature;
 import com.amitinside.featureflags.FeatureService;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -66,7 +69,7 @@ public final class FeatureManager implements FeatureService {
     /**
      * {@link Feature} service binding callback
      */
-    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
     private void bindFeature(final Feature feature, final Map<String, Object> props) {
         synchronized (allFeatures) {
             final String name = feature.name();
@@ -111,10 +114,11 @@ public final class FeatureManager implements FeatureService {
     private void calculateActiveFeatures() {
         final Map<String, Feature> activeMap = Maps.newHashMap();
         for (final Entry<String, List<FeatureDescription>> entry : allFeatures.entrySet()) {
-            final FeatureDescription desc = entry.getValue().get(0);
+            final List<FeatureDescription> value = entry.getValue();
+            final FeatureDescription desc = value.get(0);
             activeMap.put(entry.getKey(), desc.feature);
-            if (entry.getValue().size() > 1) {
-                logger.warn("More than one feature service for feature name {}", entry.getKey());
+            if (value.size() > 1) {
+                logger.warn("More than one feature of same name - [{}] are available.", entry.getKey());
             }
         }
         activeFeatures = activeMap;
@@ -126,46 +130,37 @@ public final class FeatureManager implements FeatureService {
      */
     private static final class FeatureDescription implements Comparable<FeatureDescription> {
 
-        public final int ranking;
-        public final long serviceId;
-        public final Feature feature;
+        private final int ranking;
+        private final long serviceId;
+        private final Feature feature;
 
         public FeatureDescription(final Feature feature, final Map<String, Object> props) {
             this.feature = feature;
-            final Object sr = props.get(Constants.SERVICE_RANKING);
+            final Object sr = props.get(SERVICE_RANKING);
             if (sr instanceof Integer) {
-                ranking = (Integer) sr;
+                ranking = (int) sr;
             } else {
                 ranking = 0;
             }
-            serviceId = (Long) props.get(Constants.SERVICE_ID);
+            serviceId = (long) props.get(SERVICE_ID);
         }
 
+        /**
+         * If service rankings are equal, then sort by service ID in descending order.
+         */
         @Override
         public int compareTo(final FeatureDescription o) {
-            if (ranking < o.ranking) {
-                return 1;
-            } else if (ranking > o.ranking) {
-                return -1;
-            }
-            // If ranks are equal, then sort by service id in descending order.
-            return serviceId < o.serviceId ? -1 : 1;
+            return ComparisonChain.start().compare(o.ranking, ranking).compare(serviceId, o.serviceId).result();
         }
 
         @Override
         public boolean equals(final Object obj) {
-            if (obj instanceof FeatureDescription) {
-                return ((FeatureDescription) obj).serviceId == serviceId;
-            }
-            return false;
+            return Objects.equals(serviceId, obj);
         }
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + (int) (serviceId ^ serviceId >>> 32);
-            return result;
+            return Objects.hashCode(serviceId);
         }
     }
 }

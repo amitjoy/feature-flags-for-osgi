@@ -12,17 +12,20 @@
  *******************************************************************************/
 package com.amitinside.featureflags.impl;
 
+import static com.amitinside.featureflags.impl.Config.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
+
 import java.util.Map;
 
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 import com.amitinside.featureflags.Feature;
 import com.amitinside.featureflags.util.ConfigHelper;
+import com.google.common.base.Strings;
 
-@Component(configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = "com.amitinside.featureflags.feature")
+@Component(configurationPolicy = REQUIRE, configurationPid = "com.amitinside.featureflags.feature")
 public final class ConfiguredFeature implements Feature {
 
     private String name;
@@ -32,20 +35,13 @@ public final class ConfiguredFeature implements Feature {
     @Activate
     private void activate(final Map<String, Object> properties) {
         final Map<Config, String> props = ConfigHelper.parseProperties(properties);
-        name = props.get(Config.NAME);
-        if (name == null) {
-            final Object pid = properties.get(Constants.SERVICE_PID);
-            if (pid == null) {
-                name = getClass().getName() + "$" + System.identityHashCode(this);
-            } else {
-                name = pid.toString();
-            }
-        }
-        description = props.get(Config.DESCRIPTION);
+        name = props.get(NAME);
+        checkArgument(Strings.isNullOrEmpty(name), "Name cannot be null or empty");
+        description = Strings.emptyToNull(props.get(DESCRIPTION));
         if (description == null) {
             description = name;
         }
-        enabled = Boolean.valueOf(props.get(Config.ENABLED));
+        enabled = Boolean.valueOf(props.get(ENABLED));
     }
 
     @Override

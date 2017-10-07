@@ -42,16 +42,10 @@ public final class ConfigHelper {
         requireNonNull(properties, "Properties cannot be null");
         final Map<Config, String> values = Maps.newEnumMap(Config.class);
         for (final Entry<String, Object> entry : properties.entrySet()) {
-            switch (entry.getKey()) {
-                case "name":
-                    values.put(Config.NAME, String.valueOf(entry.getValue()));
-                    break;
-                case "description":
-                    values.put(Config.DESCRIPTION, String.valueOf(entry.getValue()));
-                    break;
-                case "enabled":
-                    values.put(Config.ENABLED, String.valueOf(entry.getValue()));
-                    break;
+            final String propValue = String.valueOf(entry.getValue());
+            final Config value = Config.getIfPresent(propValue).orElse(null);
+            if (value != null) {
+                values.put(value, propValue);
             }
         }
         return values;

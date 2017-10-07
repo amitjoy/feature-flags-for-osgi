@@ -19,8 +19,9 @@ package com.amitinside.featureflags;
  * features have the same name, the feature with the highest service ranking is
  * accessible through the {@link FeatureService} service while those with lower
  * service rankings are ignored.
- * <p>
- * This interface is expected to be implemented by feature providers.
+ * </p>
+ *
+ * This interface is intended to be implemented by feature providers.
  */
 public interface Feature {
 

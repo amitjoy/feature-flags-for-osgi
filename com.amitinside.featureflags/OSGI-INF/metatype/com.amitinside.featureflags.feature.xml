@@ -3,8 +3,8 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.1.0">
           
-    <OCD id="com.amitinside.featureflags.feature" 
-         name="Configured Feature" 
+    <OCD id="com.amitinside.featureflags.feature"
+         name="Feature"
          description="Allows for the definition of statically configured features which are defined and enabled through OSGi configuration">
 
         <AD id="name"
@@ -12,19 +12,19 @@
             type="String"
             cardinality="0"
             required="true"
-            default=""
+            default="MyFeature"
             description="Short name of this feature" />
 
         <AD id="description"
             name="Description"
             type="String"
             cardinality="0"
-            required="true"
+            required="false"
             default=""
             description="Description for the feature" />
         
         <AD id="enabled"
-            name="Enabled"
+            name="isEnabled"
             type="Boolean"
             cardinality="0"
             required="true"
