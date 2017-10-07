@@ -15,8 +15,7 @@ package com.amitinside.featureflags;
 /**
  * Constants used with the {@link FeatureServcice} service.
  *
- * @noimplement This interface is not intended to be implemented by feature providers.
- * @noextend This interface is not intended to be extended by feature providers.
+ * @Immutable
  */
 public final class Constants {
 

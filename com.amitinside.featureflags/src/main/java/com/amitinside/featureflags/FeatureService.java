@@ -27,6 +27,8 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  *
  * @see Feature
  * @see ActivationStrategy
+ *
+ * @ThreadSafe
  */
 public interface FeatureService {
 
