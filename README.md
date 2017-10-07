@@ -8,6 +8,7 @@ This uses a small number of popular projects to work properly:
 
 * slf4j
 * Google Guava
+* GSON
 
 ### Installation
 
