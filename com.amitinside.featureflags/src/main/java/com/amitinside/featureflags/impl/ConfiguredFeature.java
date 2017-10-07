@@ -12,6 +12,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.impl;
 
+import static com.amitinside.featureflags.Constants.PID;
 import static com.amitinside.featureflags.impl.Config.*;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
@@ -26,7 +27,7 @@ import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.util.ConfigHelper;
 import com.google.common.base.Strings;
 
-@Component(name = "ConfiguredFeature", configurationPolicy = REQUIRE, configurationPid = "com.amitinside.featureflags.feature")
+@Component(name = "ConfiguredFeature", configurationPolicy = REQUIRE, configurationPid = PID)
 public final class ConfiguredFeature implements Feature {
 
     private String name;

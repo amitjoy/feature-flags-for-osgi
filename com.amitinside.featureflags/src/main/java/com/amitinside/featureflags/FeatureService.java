@@ -23,6 +23,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  * Flag functionality. It can be used to query the available features.
  *
  * @noimplement This interface is not intended to be implemented by feature providers.
+ * @noextend This interface is not intended to be extended by feature providers.
  *
  * @see Feature
  * @see ActivationStrategy

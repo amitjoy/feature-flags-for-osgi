@@ -12,6 +12,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.impl;
 
+import static com.amitinside.featureflags.Constants.PID;
 import static com.amitinside.featureflags.impl.Config.*;
 import static com.google.common.base.Charsets.UTF_8;
 import static org.osgi.framework.Bundle.*;
@@ -81,8 +82,6 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private static final String FACTORY_PID = "com.amitinside.featureflags.feature";
 
     private BundleTracker bundleTracker;
     private ConfigurationAdmin configurationAdmin;
@@ -176,7 +175,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
             // remove all null values
             Maps.filterValues(props, Objects::nonNull);
 
-            final Configuration configuration = configurationAdmin.createFactoryConfiguration(FACTORY_PID);
+            final Configuration configuration = configurationAdmin.createFactoryConfiguration(PID);
             configuration.update(new Hashtable<>(props));
             return Optional.of(configuration.getPid());
         } catch (final IOException e) {
