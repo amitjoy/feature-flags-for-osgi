@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ Copyright (c) 2017 Amit Kumar Mondal
+ 
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+ 
+  Contributors:
+   Amit Kumar Mondal
+-->
 <MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.1.0" localization="en_us"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.1.0">
@@ -13,7 +24,7 @@
             cardinality="0"
             required="true"
             default="MyFeature"
-            description="Short name of this feature" />
+            description="Short friendly name of this feature" />
 
         <AD id="description"
             name="Description"
@@ -21,15 +32,23 @@
             cardinality="0"
             required="false"
             default=""
-            description="Description for the feature" />
+            description="Description of the feature" />
         
         <AD id="enabled"
-            name="isEnabled"
+            name="Enabled"
             type="Boolean"
             cardinality="0"
             required="true"
             default="false"
             description="Boolean flag indicating whether the feature is enabled or not by this configuration" />
+            
+        <AD id="strategy"
+            name="Strategy ID"
+            type="String"
+            cardinality="0"
+            required="false"
+            default=""
+            description="Strategy ID of this feature required to check if the feature is enabled or not by this configuration" />
         
     </OCD>
     

@@ -42,10 +42,21 @@ public interface Feature {
     String description();
 
     /**
+     * The associated strategy identifier that will be used to check
+     * whether this feature is active or not
+     *
+     * @return The identifier of this feature which must not be {@code null} or an
+     *         empty string.
+     * @see {@link #isEnabled()}
+     */
+    String strategyId();
+
+    /**
      * Checks whether the feature is enabled.
      *
-     * @return {@code true} if this {@code Feature} is enabled in the given
-     *         {@link ExecutionContext}.
+     * @return {@code true} if this {@code Feature} is enabled for the associated
+     *         strategy
+     * @see {@link #strategyId()}
      */
     boolean isEnabled();
 }

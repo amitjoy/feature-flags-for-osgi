@@ -12,6 +12,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.impl;
 
+import static com.amitinside.featureflags.ActivationStrategy.DEFAULT_STRATEGY;
 import static com.amitinside.featureflags.impl.Config.*;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
@@ -30,16 +31,21 @@ public final class ConfiguredFeature implements Feature {
 
     private String name;
     private String description;
+    private String strategyId;
     private boolean enabled;
 
     @Activate
     private void activate(final Map<String, Object> properties) {
         final Map<Config, String> props = ConfigHelper.parseProperties(properties);
         name = props.get(NAME);
-        checkArgument(Strings.isNullOrEmpty(name), "Name cannot be null or empty");
+        checkArgument(!Strings.isNullOrEmpty(name), "Name cannot be null or empty");
         description = Strings.emptyToNull(props.get(DESCRIPTION));
         if (description == null) {
             description = name;
+        }
+        strategyId = Strings.emptyToNull(props.get(STRATEGY));
+        if (strategyId == null) {
+            strategyId = DEFAULT_STRATEGY;
         }
         enabled = Boolean.valueOf(props.get(ENABLED));
     }
@@ -58,4 +64,10 @@ public final class ConfiguredFeature implements Feature {
     public boolean isEnabled() {
         return enabled;
     }
+
+    @Override
+    public String strategyId() {
+        return strategyId;
+    }
+
 }

@@ -1,6 +1,6 @@
 package com.amitinside.featureflags.impl;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
 
@@ -13,7 +13,8 @@ public enum Config {
 
     NAME("name"),
     DESCRIPTION("description"),
-    ENABLED("enabled");
+    ENABLED("enabled"),
+    STRATEGY("strategy");
 
     final String value;
 
@@ -33,7 +34,7 @@ public enum Config {
      * @throws NullPointerException if the argument is {@code null}
      */
     public static Optional<Config> getIfPresent(final String value) {
-        checkNotNull(value);
+        requireNonNull(value, "Value cannot be null");
         try {
             return Optional.of(Enum.valueOf(Config.class, value));
         } catch (final IllegalArgumentException iae) {

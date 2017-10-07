@@ -12,6 +12,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -27,7 +28,7 @@ public interface FeatureService {
      * <p>
      * Features are known if they are registered as {@link Feature} services or
      * are configured with OSGi configuration whose factory PID is
-     * {@code org.apache.sling.featureflags.Feature}.
+     * {@code com.amitinside.featureflags.feature}.
      * </p>
      *
      * @return The known features
@@ -39,28 +40,33 @@ public interface FeatureService {
      * <p>
      * Features are known if they are registered as {@link Feature} services or
      * are configured with OSGi configuration whose factory PID is
-     * {@code org.apache.sling.featureflags.Feature}.
+     * {@code com.amitinside.featureflags.feature}.
      * </p>
      *
      * @param name The name of the feature.
-     * @return The feature or <code>null</code> if not known or the name is an
-     *         empty string or {@code null}.
+     * @return The feature wrapped in {@link Optional} or empty {@link Optional} instance
+     *         if not known or the name is an empty string or {@code null}.
+     * @throws NullPointerException if the specified argument {@code name} is {@code null}
      */
-    Feature getFeature(String name);
+    Optional<Feature> getFeature(String name);
 
     /**
      * Returns {@code true} if a feature with the given name is known and
-     * enabled under the current {@link ExecutionContext}.
+     * enabled under the feature associated strategy.
      * <p>
      * Features are known if they are registered as {@link Feature} services or
      * are configured with OSGi configuration whose factory PID is
-     * {@code org.apache.sling.featureflags.Feature}.
+     * {@code com.amitinside.featureflags.feature}.
      * </p>
+     * If a feature declares a valid strategy, the activation or the enablement would
+     * be validated against that activation strategy, otherwise the explicitly declared
+     * enabled flag in the feature would be used.
      *
      * @param name The name of the feature to check for enablement.
      * @return {@code true} if the named feature is known and enabled.
      *         Specifically {@code false} is also returned if the named feature
      *         is not known.
+     * @throws NullPointerException if the specified argument {@code name} is {@code null}
      */
     boolean isEnabled(String name);
 }

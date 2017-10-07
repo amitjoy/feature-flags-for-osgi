@@ -12,6 +12,8 @@
  *******************************************************************************/
 package com.amitinside.featureflags.impl;
 
+import static com.amitinside.featureflags.ActivationStrategy.DEFAULT_STRATEGY;
+import static java.util.Objects.requireNonNull;
 import static org.osgi.framework.Constants.*;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
@@ -21,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
@@ -28,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.amitinside.featureflags.ActivationStrategy;
 import com.amitinside.featureflags.Feature;
 import com.amitinside.featureflags.FeatureService;
 import com.google.common.collect.ComparisonChain;
@@ -36,7 +42,7 @@ import com.google.common.collect.Maps;
 
 /**
  * This service implements the {@link FeatureService}. It keeps track of all
- * {@link Feature} services.
+ * {@link Feature} services and {@link ActivationStrategy} services
  */
 @Component
 public final class FeatureManager implements FeatureService {
@@ -46,6 +52,9 @@ public final class FeatureManager implements FeatureService {
 
     private final Map<String, List<FeatureDescription>> allFeatures = Maps.newHashMap();
     private Map<String, Feature> activeFeatures = Maps.newHashMap();
+    private final Map<String, ActivationStrategy> allStrategies = Maps.newHashMap();
+    private final Lock monitorFeatures = new ReentrantLock(true);
+    private final Lock monitorStrategies = new ReentrantLock(true);
 
     @Override
     public Stream<Feature> getFeatures() {
@@ -53,15 +62,25 @@ public final class FeatureManager implements FeatureService {
     }
 
     @Override
-    public Feature getFeature(final String name) {
-        return activeFeatures.get(name);
+    public Optional<Feature> getFeature(final String featureName) {
+        requireNonNull(featureName, "Name cannot be null");
+        return Optional.ofNullable(activeFeatures.get(featureName));
     }
 
     @Override
     public boolean isEnabled(final String featureName) {
-        final Feature feature = getFeature(featureName);
+        requireNonNull(featureName, "Name cannot be null");
+        final Feature feature = getFeature(featureName).orElse(null);
         if (feature != null) {
-            return feature.isEnabled();
+            final String strategyId = feature.strategyId();
+            if (strategyId.equalsIgnoreCase(DEFAULT_STRATEGY)) {
+                return feature.isEnabled();
+            } else {
+                final ActivationStrategy strategy = allStrategies.get(strategyId);
+                if (strategy != null) {
+                    return strategy.isEnabled(feature);
+                }
+            }
         }
         return false;
     }
@@ -71,7 +90,8 @@ public final class FeatureManager implements FeatureService {
      */
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
     private void bindFeature(final Feature feature, final Map<String, Object> props) {
-        synchronized (allFeatures) {
+        monitorFeatures.lock();
+        try {
             final String name = feature.name();
             final FeatureDescription info = new FeatureDescription(feature, props);
 
@@ -84,6 +104,8 @@ public final class FeatureManager implements FeatureService {
             Collections.sort(candidates);
 
             calculateActiveFeatures();
+        } finally {
+            monitorFeatures.unlock();
         }
     }
 
@@ -92,7 +114,8 @@ public final class FeatureManager implements FeatureService {
      */
     @SuppressWarnings("unused")
     private void unbindFeature(final Feature feature, final Map<String, Object> props) {
-        synchronized (allFeatures) {
+        monitorFeatures.lock();
+        try {
             final String name = feature.name();
             final FeatureDescription info = new FeatureDescription(feature, props);
 
@@ -104,6 +127,8 @@ public final class FeatureManager implements FeatureService {
                 }
             }
             calculateActiveFeatures();
+        } finally {
+            monitorFeatures.unlock();
         }
     }
 
@@ -125,11 +150,36 @@ public final class FeatureManager implements FeatureService {
     }
 
     /**
+     * {@link ActivationStrategy} service binding callback
+     */
+    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
+    private void bindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
+        monitorStrategies.lock();
+        try {
+            allStrategies.put(strategy.name(), strategy);
+        } finally {
+            monitorStrategies.unlock();
+        }
+    }
+
+    /**
+     * {@link ActivationStrategy} service unbinding callback
+     */
+    @SuppressWarnings("unused")
+    private void unbindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
+        monitorStrategies.lock();
+        try {
+            allStrategies.remove(strategy.name());
+        } finally {
+            monitorStrategies.unlock();
+        }
+    }
+
+    /**
      * Internal class caching some feature meta data like service id and
      * ranking.
      */
     private static final class FeatureDescription implements Comparable<FeatureDescription> {
-
         private final int ranking;
         private final long serviceId;
         private final Feature feature;
