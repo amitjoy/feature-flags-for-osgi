@@ -50,7 +50,7 @@ EPL-1.0
    },
    {
        "name": "feature3",
-       "description": "My Feature 3"
+       "description": "My Feature 3",
        "enabled": false,
        "strategy": "MyStrategy2"
    },
