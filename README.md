@@ -26,6 +26,10 @@ Want to contribute? Great!
 ### TODOs
 
  - Write Tests
+
+### License
+
+EPL-1.0
  
 ### Usage
 
@@ -74,8 +78,3 @@ void unsetFeatureService(FeatureService featureService) {
   this.featureService = null;
 }
 ```
-
-License
-----
-
-EPL-1.0
