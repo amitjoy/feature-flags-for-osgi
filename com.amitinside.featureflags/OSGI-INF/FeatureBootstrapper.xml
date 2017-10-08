@@ -12,8 +12,8 @@
 -->
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="FeatureBootstrapper">
    <service>
-      <provide interface="com.amitinside.featureflags.impl.FeatureBootstrapper"/>
+      <provide interface="com.amitinside.featureflags.internal.FeatureBootstrapper"/>
    </service>
    <reference bind="setConfigurationAdmin" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" unbind="unsetConfigurationAdmin"/>
-   <implementation class="com.amitinside.featureflags.impl.FeatureBootstrapper"/>
+   <implementation class="com.amitinside.featureflags.internal.FeatureBootstrapper"/>
 </scr:component>

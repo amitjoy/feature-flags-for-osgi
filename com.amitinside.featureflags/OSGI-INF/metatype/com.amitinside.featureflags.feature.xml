@@ -32,7 +32,7 @@
             cardinality="0"
             required="false"
             default=""
-            description="Description of the feature" />
+            description="Description of this feature" />
         
         <AD id="enabled"
             name="Enabled"
@@ -40,7 +40,7 @@
             cardinality="0"
             required="true"
             default="false"
-            description="Boolean flag indicating whether the feature is enabled or not by this configuration" />
+            description="Boolean flag indicating whether this feature is enabled or not by this configuration" />
             
         <AD id="strategy"
             name="Strategy ID"
@@ -48,7 +48,7 @@
             cardinality="0"
             required="false"
             default=""
-            description="Strategy ID of this feature required to check if the feature is enabled or not by this configuration" />
+            description="Strategy ID of this feature to check if the feature is enabled or not by this configuration" />
         
     </OCD>
     

@@ -20,7 +20,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
 /**
  * A feature is defined by its name. Features are registered as OSGi services.
  * <p>
- * Feature names {@link #name()} should be globally unique. If multiple
+ * Feature names {@link #getName()} should be globally unique. If multiple
  * features have the same name, the feature with the highest service ranking is
  * accessible through the {@link FeatureService} service while those with lower
  * service rankings are ignored.
@@ -41,7 +41,7 @@ public interface Feature {
      * @return The name of this feature which must not be {@code null} or an
      *         empty string.
      */
-    String name();
+    String getName();
 
     /**
      * The description of the feature.
@@ -49,7 +49,7 @@ public interface Feature {
      * @return The optional description of this feature wrapped in {@link Optional}
      *         or empty {@link Optional} instance
      */
-    Optional<String> description();
+    Optional<String> getDescription();
 
     /**
      * The associated strategy identifier that will be used to check
@@ -60,14 +60,14 @@ public interface Feature {
      * @see {@link #isEnabled()}
      * @see ActivationStrategy
      */
-    Optional<String> strategy();
+    Optional<String> getStrategy();
 
     /**
      * Checks whether the feature is enabled.
      *
      * @return {@code true} if this {@code Feature} is enabled for the associated
      *         strategy
-     * @see {@link #strategy()}
+     * @see {@link #getStrategy()}
      * @see ActivationStrategy
      */
     boolean isEnabled();

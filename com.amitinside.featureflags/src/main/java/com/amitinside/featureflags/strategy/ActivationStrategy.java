@@ -12,6 +12,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.strategy;
 
+import java.util.Map;
 import java.util.Optional;
 
 import com.amitinside.featureflags.FeatureService;
@@ -19,9 +20,9 @@ import com.amitinside.featureflags.feature.Feature;
 
 /**
  * This interface represents a custom strategy for deciding whether
- * a feature is active or not.
+ * a feature will be active or not.
  * <p>
- * Strategy names {@link #name()} should be globally unique.
+ * Strategy names {@link #getName()} should be globally unique.
  * </p>
  *
  * This interface is intended to be implemented by feature providers.
@@ -39,7 +40,7 @@ public interface ActivationStrategy {
      * @return The name of this strategy which must not be {@code null} or an
      *         empty string.
      */
-    String name();
+    String getName();
 
     /**
      * The description of the strategy.
@@ -47,7 +48,7 @@ public interface ActivationStrategy {
      * @return The optional description of this strategy wrapped in {@link Optional}
      *         or empty {@link Optional} instance
      */
-    Optional<String> description();
+    Optional<String> getDescription();
 
     /**
      * This method is responsible to decide whether a feature is active or not.
@@ -56,10 +57,11 @@ public interface ActivationStrategy {
      * user to find a decision.
      *
      * @param feature The {@link Feature} instance to check for enablement
+     * @param properties The service properties of the specified {@link Feature} instance
      *
      * @return {@code true} if the feature should be enabled, otherwise {@code false}
      * @throws NullPointerException if the specified argument {@code feature} is {@code null}
      */
-    boolean isEnabled(Feature feature);
+    boolean isEnabled(Feature feature, Map<String, Object> properties);
 
 }

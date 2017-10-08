@@ -16,5 +16,5 @@
    </service>
    <reference bind="bindFeature" cardinality="0..n" interface="com.amitinside.featureflags.feature.Feature" name="Feature" policy="dynamic" unbind="unbindFeature"/>
    <reference bind="bindStrategy" cardinality="0..n" interface="com.amitinside.featureflags.strategy.ActivationStrategy" name="Strategy" policy="dynamic" unbind="unbindStrategy"/>
-   <implementation class="com.amitinside.featureflags.impl.FeatureManager"/>
+   <implementation class="com.amitinside.featureflags.internal.FeatureManager"/>
 </scr:component>

@@ -2,8 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Flags for OSGi
 Bundle-SymbolicName: com.amitinside.featureflags;singleton:=true
-Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: Amit Kumar Mondal
+Bundle-Version: 1.0.0
+Bundle-License: https://www.eclipse.org/legal/epl-v10.html
+Bundle-Copyright: Copyright (c) 2017 Amit Kumar Mondal
+Bundle-SCM: https://github.com/amitjoy/feature-flags-osgi
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Service-Component: OSGI-INF/*.xml
 Bundle-ActivationPolicy: lazy

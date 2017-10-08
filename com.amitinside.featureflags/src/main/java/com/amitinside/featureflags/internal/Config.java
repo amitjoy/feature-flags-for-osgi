@@ -1,4 +1,4 @@
-package com.amitinside.featureflags.impl;
+package com.amitinside.featureflags.internal;
 
 import static java.util.Objects.requireNonNull;
 

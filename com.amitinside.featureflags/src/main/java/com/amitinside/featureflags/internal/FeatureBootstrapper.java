@@ -10,10 +10,10 @@
  *  Amit Kumar Mondal
  *
  *******************************************************************************/
-package com.amitinside.featureflags.impl;
+package com.amitinside.featureflags.internal;
 
 import static com.amitinside.featureflags.Constants.PID;
-import static com.amitinside.featureflags.impl.Config.*;
+import static com.amitinside.featureflags.internal.Config.*;
 import static com.google.common.base.Charsets.UTF_8;
 import static org.osgi.framework.Bundle.*;
 
