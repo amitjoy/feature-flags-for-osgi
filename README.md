@@ -23,9 +23,57 @@ Want to contribute? Great!
 1. Add slf4j, Google Guava and GSON to your Eclipse IDE Installation's Target Platform
 2. Import this project
 
-### Todos
+### TODOs
 
  - Write Tests
+ 
+### Usage
+
+1. Create a features.json in your bundle's root directory
+2. The features must be specified in this file in the following way
+
+```json
+[
+   {
+       "name": "feature1",
+       "description": "My Feature 1",
+       "enabled": false
+   },
+   {
+       "name": "feature2",
+       "description": "My Feature 2",
+       "strategy": "MyStrategy1"
+   },
+   {
+       "name": "feature3",
+       "description": "My Feature 3"
+       "enabled": false,
+       "strategy": "MyStrategy2"
+   },
+ ]
+```
+3. In your DS Component, use FeatureService to check if the feature is enabled
+
+```java
+private FeatureService featureService;
+
+public myMethod() {
+ if (featureService.isEnabled("feature2")) {
+    // do this
+ } else {
+   // do something else
+ }
+}
+
+@Reference
+void setFeatureService(FeatureService featureService) {
+  this.featureService = featureService;
+}
+    
+void unsetFeatureService(FeatureService featureService) {
+  this.featureService = null;
+}
+```
 
 License
 ----
