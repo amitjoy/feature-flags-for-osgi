@@ -56,7 +56,8 @@ EPL-1.0
    },
  ]
 ```
-3. In your DS Component, use *FeatureService* interface to check if the feature is enabled
+3. This will create *Feature* service instances that will be configured with OSGi configuration whose factory PID is *com.amitinside.featureflags.feature*
+4. In your DS Component, use *FeatureService* interface to check if the feature is enabled
 
 ```java
 private FeatureService featureService;
@@ -78,5 +79,5 @@ void unsetFeatureService(FeatureService featureService) {
   this.featureService = null;
 }
 ```
-4. Instead of providing *features.json*, you can also implement *Feature* interface and expose it as an OSGi service
-5. The strategy must be privided by implementing *ActivationStrategy* interface and exposing as an OSGi service
+5. Instead of providing *features.json*, you can also implement *Feature* interface and expose it as an OSGi service
+6. The strategy must be privided by implementing *ActivationStrategy* interface and exposing as an OSGi service
