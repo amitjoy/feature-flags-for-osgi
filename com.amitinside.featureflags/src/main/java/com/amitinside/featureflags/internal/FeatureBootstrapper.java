@@ -69,7 +69,7 @@ import com.google.gson.Gson;
  *   },
  *   {
  *       "name": "feature3",
- *       "description": "My Feature 3"
+ *       "description": "My Feature 3",
  *       "enabled": false,
  *       "strategy": "MyStrategy2"
  *   },
