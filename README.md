@@ -33,8 +33,8 @@ EPL-1.0
  
 ### Usage
 
-1. Create a features.json in your bundle's root directory
-2. The features must be specified in features.json in the following way
+1. Create a *features.json* in your bundle's root directory
+2. The features must be specified in *features.json* in the following way
 
 ```json
 [
@@ -78,3 +78,5 @@ void unsetFeatureService(FeatureService featureService) {
   this.featureService = null;
 }
 ```
+4. Instead of providing *features.json*, you can also implement *Feature* interface and expose it as an OSGi service
+5. The strategy must be privided by implementing *ActivationStrategy* interface and exposing as an OSGi service
