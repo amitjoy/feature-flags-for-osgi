@@ -20,7 +20,7 @@ Want to contribute? Great!
 
 #### Building for source
 
-1. Add slf4j and Google Guava to your Eclipse IDE Installation's Target Platform
+1. Add slf4j, Google Guava and GSON to your Eclipse IDE Installation's Target Platform
 2. Import this project
 
 ### Todos
