@@ -30,7 +30,7 @@ Want to contribute? Great!
 ### Usage
 
 1. Create a features.json in your bundle's root directory
-2. The features must be specified in this file in the following way
+2. The features must be specified in features.json in the following way
 
 ```json
 [
