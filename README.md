@@ -56,7 +56,7 @@ EPL-1.0
    },
  ]
 ```
-3. In your DS Component, use FeatureService to check if the feature is enabled
+3. In your DS Component, use *FeatureService* interface to check if the feature is enabled
 
 ```java
 private FeatureService featureService;
