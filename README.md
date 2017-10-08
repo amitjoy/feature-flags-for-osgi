@@ -61,7 +61,7 @@ EPL-1.0
 ```java
 private FeatureService featureService;
 
-public myMethod() {
+public void myMethod() {
  if (featureService.isEnabled("feature2")) {
     // do this
  } else {
