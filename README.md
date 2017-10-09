@@ -24,7 +24,7 @@ Just install this bundle including all the dependencies it requires.
 
 ### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/feature-flags-osgi/issues)
 
-Want to contribute? Great!
+Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/feature-flags-osgi/blob/master/CONTRIBUTING.md)
 
 #### Building for source
 
