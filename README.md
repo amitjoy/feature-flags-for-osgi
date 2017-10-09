@@ -28,12 +28,8 @@ Want to contribute? Great!
 
 #### Building for source
 
-1. Add SLF4J, Google Guava and GSON to your Eclipse IDE Installation's Target Platform
+1. Add `SLF4J`, `Google Guava` and `GSON` to your Eclipse IDE Installation's Target Platform
 2. Import this project
-
-### TODOs
-
- - Write Tests
 
 ### License
 
@@ -69,7 +65,7 @@ EPL-1.0
    },
  ]
 ```
-3. This will create `Feature` service instances that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`
+3. This will create `Feature` service instances that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties.
 4. In your DS Component, use `FeatureService` interface to check if the feature is enabled
 
 ```java
@@ -94,3 +90,11 @@ void unsetFeatureService(FeatureService featureService) {
 ```
 5. Instead of providing `features.json`, you can also implement `Feature` interface and expose it as an OSGi service
 6. The strategy must be privided by implementing `ActivationStrategy` interface and exposing as an OSGi service
+
+----------------------- ------------------------------------
+
+If a strategy is provided for one or more features, the strategy will be used to determine which feature(s) will be active in the runtime. If you don't provide any strategy, the `enabled` (`Feature#isEnabled(Boolean)` method) flag will be used for enablement of the feature. That is, a strategy always overrides any value explicitly set to `enabled` flag.
+
+Examples of strategy: IP Based Strategy in which based on specific IP Addresses of some features would be enabled or time based strategy in which some group of features are enabled at a certain time of a day.
+
+----------------------------------------------------------------
