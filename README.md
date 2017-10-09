@@ -95,6 +95,6 @@ void unsetFeatureService(FeatureService featureService) {
 
 If a strategy is provided for one or more features, the strategy will be used to determine which feature(s) will be active in the runtime. If you don't provide any strategy, the `enabled` (`Feature#isEnabled(Boolean)` method) flag will be used for enablement of the feature. That is, a strategy always overrides any value explicitly set to `enabled` flag.
 
-Examples of strategy: IP Based Strategy in which based on specific IP Addresses of some features would be enabled or time based strategy in which some group of features are enabled at a certain time of a day.
+`Examples of strategy`: `IP Based Strategy` in which based on specific IP Addresses of some features would be enabled or `Time Based Strategy` in which some group of features are enabled at a certain time of a day.
 
 ----------------------------------------------------------------
