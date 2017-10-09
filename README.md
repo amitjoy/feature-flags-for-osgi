@@ -80,12 +80,12 @@ public void myMethod() {
 }
 
 @Reference
-void setFeatureService(FeatureService featureService) {
-  this.featureService = featureService;
+void setFeatureService(final FeatureService featureService) {
+   this.featureService = featureService;
 }
     
-void unsetFeatureService(FeatureService featureService) {
-  this.featureService = null;
+void unsetFeatureService(final FeatureService featureService) {
+   this.featureService = null;
 }
 ```
 5. Instead of providing `features.json`, you can also implement `Feature` interface and expose it as an OSGi service
