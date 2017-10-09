@@ -15,12 +15,13 @@ package com.amitinside.featureflags.internal;
 import static com.amitinside.featureflags.Constants.PID;
 import static com.amitinside.featureflags.internal.Config.*;
 import static com.google.common.base.Charsets.UTF_8;
-import static org.osgi.framework.Bundle.*;
+import static org.osgi.framework.Bundle.ACTIVE;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
@@ -42,8 +43,10 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 
@@ -73,8 +76,22 @@ import com.google.gson.Gson;
  *       "enabled": false,
  *       "strategy": "MyStrategy2"
  *   },
+ *   {
+ *       "name": "feature3",
+ *       "description": "My Feature 3",
+ *       "enabled": false,
+ *       "strategy": "MyStrategy2",
+ *       "properties": {
+ *           "p1": 1,
+ *           "p2": "test",
+ *           "p3": [1, 2, 3, 4]
+ *       }
+ *   }
  * ]
  * </pre>
+ *
+ * <b>N.B:</b> You can also add extra properties to your feature as shown in the above example.
+ * These properties will be added as your feature's service properties.
  */
 @SuppressWarnings({ "rawtypes", "unused", "unchecked" })
 @Component(service = FeatureBootstrapper.class, name = "FeatureBootstrapper")
@@ -88,17 +105,16 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
     private final Gson gson = new Gson();
 
     // configuration PIDs associated with the bundle instance that contains the features
-    private final Map<Bundle, List<String>> allFeatures = Maps.newHashMap();
+    private final Multimap<Bundle, String> allFeatures = ArrayListMultimap.create();
 
     @Activate
-    protected void activate(final BundleContext context) {
-        final int trackStates = ACTIVE | STOPPING;
-        bundleTracker = new BundleTracker(context, trackStates, this);
+    private void activate(final BundleContext context) {
+        bundleTracker = new BundleTracker(context, ACTIVE, this);
         bundleTracker.open();
     }
 
     @Deactivate
-    protected void deactivate(final BundleContext context) {
+    private void deactivate(final BundleContext context) {
         if (bundleTracker != null) {
             bundleTracker.close();
         }
@@ -124,12 +140,8 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
         final List<Feature> features = getFeatures(bundle);
         for (final Feature feature : features) {
             registerFeature(feature).ifPresent(x -> {
-                final List<String> registeredPids = allFeatures.get(bundle);
-                if (registeredPids == null) {
-                    allFeatures.put(bundle, Lists.newArrayList(x));
-                } else {
-                    registeredPids.add(x);
-                }
+                final Collection<String> registeredPids = allFeatures.get(bundle);
+                registeredPids.add(x);
             });
         }
         return bundle;
@@ -143,18 +155,19 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
 
     @Override
     public void removedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
-        final List<String> features = allFeatures.get(bundle);
-        if (features != null) {
-            for (final String pid : features) {
-                try {
-                    final Configuration config = configurationAdmin.getConfiguration(pid);
-                    config.delete();
-                } catch (final IOException e) {
-                    logger.trace("Cannot delete feature configuration instance", e);
-                }
-            }
-            allFeatures.remove(bundle);
+        final Collection<String> features = allFeatures.get(bundle);
+        if (features.isEmpty()) {
+            return;
         }
+        for (final String pid : features) {
+            try {
+                final Configuration config = configurationAdmin.getConfiguration(pid);
+                config.delete();
+            } catch (final IOException e) {
+                logger.trace("Cannot delete feature configuration instance", e);
+            }
+        }
+        allFeatures.removeAll(bundle);
     }
 
     /**
@@ -171,10 +184,12 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
             props.put(DESCRIPTION.value(), feature.getDescription());
             props.put(STRATEGY.value(), feature.getStrategy());
             props.put(ENABLED.value(), Optional.ofNullable(feature.isEnabled()).orElse(false));
-
+            final Map<String, Object> properties = feature.getProperties();
+            if (properties != null) {
+                props.putAll(properties);
+            }
             // remove all null values
             Maps.filterValues(props, Objects::nonNull);
-
             final Configuration configuration = configurationAdmin.createFactoryConfiguration(PID);
             configuration.update(new Hashtable<>(props));
             return Optional.of(configuration.getPid());
@@ -194,8 +209,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
     private List<Feature> getFeatures(final Bundle bundle) {
         final URL featuresFileURL = bundle.getEntry("/features.json");
         if (featuresFileURL != null) {
-            try {
-                final InputStream inputStream = featuresFileURL.openConnection().getInputStream();
+            try (final InputStream inputStream = featuresFileURL.openConnection().getInputStream()) {
                 final String resource = CharStreams.toString(new InputStreamReader(inputStream, UTF_8));
                 return Lists.newArrayList(gson.fromJson(resource, Feature[].class));
             } catch (final IOException e) {
@@ -205,17 +219,23 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
         return Collections.emptyList();
     }
 
+    /**
+     * Internal class used to represent JSON data
+     */
     protected static final class Feature {
         private final String name;
         private final String description;
         private final String strategy;
-        private final boolean enabled;
+        private final boolean isEnabled;
+        private final Map<String, Object> properties;
 
-        public Feature(final String name, final String description, final String strategy, final boolean enabled) {
+        public Feature(final String name, final String description, final String strategy, final boolean isEnabled,
+                final Map<String, Object> properties) {
             this.name = name;
             this.description = description;
             this.strategy = strategy;
-            this.enabled = enabled;
+            this.isEnabled = isEnabled;
+            this.properties = properties;
         }
 
         public String getName() {
@@ -230,8 +250,12 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
             return strategy;
         }
 
+        public Map<String, Object> getProperties() {
+            return properties;
+        }
+
         public boolean isEnabled() {
-            return enabled;
+            return isEnabled;
         }
     }
 
