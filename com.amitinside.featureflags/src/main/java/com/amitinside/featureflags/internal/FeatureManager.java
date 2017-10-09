@@ -93,6 +93,7 @@ public final class FeatureManager implements FeatureService {
                 if (strategy != null) {
                     //@formatter:off
                     final Map<String, Object> properties = allFeatures.values().stream()
+                            .sorted()
                             .filter(x -> x.feature == feature)
                             .findFirst()
                             .map(f -> f.props)
@@ -121,7 +122,6 @@ public final class FeatureManager implements FeatureService {
             }
             final FeatureDescription info = new FeatureDescription(feature, props);
             allFeatures.put(name, info);
-
             calculateActiveFeatures();
         } finally {
             featuresLock.unlock();
