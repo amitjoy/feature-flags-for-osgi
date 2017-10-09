@@ -1,4 +1,4 @@
-# Feature Flags for OSGi
+<img width="666" alt="logo" src="https://user-images.githubusercontent.com/13380182/31361797-71ae770e-ad55-11e7-902c-a9ebf4c1fa89.png">
 
 ## Why? [![start with what and why](https://img.shields.io/badge/start%20with-why%3F-brightgreen.svg?style=flat)](http://featureflags.io/feature-flags/)
 
