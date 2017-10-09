@@ -1,6 +1,6 @@
 # How to contribute
 
-First of all, thanks for considering to contribute to Eclipse Kura. We really appreciate the time and effort you want to
+First of all, thanks for considering to contribute. We really appreciate the time and effort you want to
 spend helping to improve things around here. And help we can use :-)
 
 Here is a (non-exclusive, non-prioritized) list of things you might be able to help us with:
@@ -8,31 +8,12 @@ Here is a (non-exclusive, non-prioritized) list of things you might be able to h
 * bug reports
 * bug fixes
 * improvements regarding code quality e.g. improving readability, performance, modularity etc.
-* documentation (Getting Started guide, Examples, Deployment instructions ni cloud environments)
+* documentation
 * features (both ideas and code are welcome)
 * tests
 
-In order to get you started as fast as possible we need to go through some organizational issues first.
-
-## Legal Requirements
-
-Kura is an [Eclipse IoT](http://iot.eclipse.org) project and as such is governed by the Eclipse Development process.
-This process helps us in creating great open source software within a safe legal framework.
-
-### First Steps
-For you as a contributor, the following preliminary steps are required in order for us to be able to accept your contribution:
-
-* Sign the [Eclipse Foundation Contributor License Agreement](http://www.eclipse.org/legal/CLA.php).
-In order to do so:
-
-  * Obtain an Eclipse Foundation user ID. Anyone who currently uses Eclipse Bugzilla or Gerrit systems already has one of those.
-If you don't already have an account simply [register on the Eclipse web site](https://dev.eclipse.org/site_login/createaccount.php).
-  * Once you have your account, log in to the [projects portal](https://projects.eclipse.org/), select *My Account* and then the *Contributor License Agreement* tab.
-
-* Add your GiHub username to your Eclipse Foundation account. Log in to Eclipse and go to [Edit my account](https://dev.eclipse.org/site_login/myaccount.php).
-
 ### File Headers
-A proper header must be in place for any file contributed to Eclipse Kura. For a new contribution, please add the below header:
+A proper header must be in place for any file contributed to the project. For a new contribution, please add the below header:
 
 ```
 /*******************************************************************************
