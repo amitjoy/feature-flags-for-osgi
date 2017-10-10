@@ -11,7 +11,7 @@
  *
  *******************************************************************************/
 /**
- * Provides API to represent {@link Feature} activation strategy
+ * Provides API to represent {@link com.amitinside.featureflags.feature.Feature} activation strategy
  *
  * @since 1.0
  */

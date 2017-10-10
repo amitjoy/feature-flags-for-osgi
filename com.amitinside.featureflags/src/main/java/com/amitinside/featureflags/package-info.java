@@ -11,7 +11,7 @@
  *
  *******************************************************************************/
 /**
- * Provides API for managing all {@link Feature} instances
+ * Provides API for managing all {@link com.amitinside.featureflags.feature.Feature} instances
  *
  * @since 1.0
  */

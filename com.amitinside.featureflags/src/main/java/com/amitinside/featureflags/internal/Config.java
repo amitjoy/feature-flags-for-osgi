@@ -31,7 +31,10 @@ public enum Config {
      * Returns an optional enum constant for the given type, using {@link Enum#valueOf}. If the
      * constant does not exist, {@link Optional#empty()} is returned.
      *
+     * @param value the value to check for existence in {@link Config} enumeration
+     *
      * @throws NullPointerException if the argument is {@code null}
+     * @return {@link Config} instance wrapped in {@link Optional}
      */
     public static Optional<Config> getIfPresent(final String value) {
         requireNonNull(value, "Value cannot be null");

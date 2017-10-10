@@ -7,7 +7,6 @@ Bundle-License: https://www.eclipse.org/legal/epl-v10.html
 Bundle-Copyright: Copyright (c) 2017 Amit Kumar Mondal
 Bundle-SCM: https://github.com/amitjoy/feature-flags-osgi
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Service-Component: OSGI-INF/*.xml
 Bundle-ActivationPolicy: lazy
 Import-Package: com.google.common.base;version="15.0.0",
  com.google.common.collect;version="15.0.0",

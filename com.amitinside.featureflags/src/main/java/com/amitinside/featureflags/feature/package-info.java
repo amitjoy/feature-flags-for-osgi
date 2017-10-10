@@ -11,7 +11,7 @@
  *
  *******************************************************************************/
 /**
- * Provides API to represent {@link Feature} instance
+ * Provides API to represent {@link com.amitinside.featureflags.feature.Feature} instance
  *
  * @since 1.0
  */

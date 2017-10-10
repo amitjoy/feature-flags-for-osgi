@@ -54,8 +54,8 @@ import com.google.gson.Gson;
  * {@link FeatureBootstrapper} is used to track all installed bundles. It looks for
  * {@code features.json} in the bundle and if found, it registers the specified features
  * as services whose factory PID is {@code com.amitinside.featureflags.feature}.
- * <br/>
- * <br/>
+ * <br>
+ * <br>
  * The features are specified in the resource file in the following way:
  *
  * <pre>

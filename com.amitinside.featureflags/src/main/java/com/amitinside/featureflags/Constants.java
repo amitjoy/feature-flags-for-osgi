@@ -13,7 +13,7 @@
 package com.amitinside.featureflags;
 
 /**
- * Constants used with the {@link FeatureServcice} service.
+ * Constants used with the {@link FeatureService} service.
  *
  * @Immutable
  */
@@ -24,7 +24,7 @@ public final class Constants {
         throw new IllegalAccessError("Non-Instantiable");
     }
 
-    /** Factory PID of {@link Feature} configuration instances */
+    /** Factory PID of {@code Feature} configuration instances */
     public static final String PID = "com.amitinside.featureflags.feature";
 
 }

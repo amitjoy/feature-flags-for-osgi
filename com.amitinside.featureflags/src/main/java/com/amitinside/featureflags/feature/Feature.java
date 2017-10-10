@@ -23,7 +23,9 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  * Feature names {@link #getName()} should be globally unique. If multiple
  * features have the same name, the feature with the highest service ranking is
  * accessible through the {@link FeatureService} service while those with lower
- * service rankings are ignored.
+ * service rankings are ignored. If service rankings are equal, sort by service ID
+ * in descending order. That is, services with lower service IDs will be accessible
+ * whereas those with higher service IDs are ignored.
  * </p>
  *
  * This interface is intended to be implemented by feature providers.
@@ -57,8 +59,6 @@ public interface Feature {
      *
      * @return The identifier of this feature wrapped in {@link Optional}
      *         or empty {@link Optional} instance
-     * @see {@link #isEnabled()}
-     * @see ActivationStrategy
      */
     Optional<String> getStrategy();
 
@@ -67,8 +67,6 @@ public interface Feature {
      *
      * @return {@code true} if this {@code Feature} is enabled for the associated
      *         strategy
-     * @see {@link #getStrategy()}
-     * @see ActivationStrategy
      */
     boolean isEnabled();
 }
