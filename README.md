@@ -1,7 +1,4 @@
 <img width="652" alt="logo" src="https://user-images.githubusercontent.com/13380182/31362169-6914a210-ad57-11e7-80e6-541cd3f0d034.png"> 
-<br/>
-
-[![Build Status](https://travis-ci.org/amitjoy/feature-flags-osgi.svg?branch=master)]
 
 ## Why? [![start with what and why](https://img.shields.io/badge/start%20with-why%3F-brightgreen.svg?style=flat)](http://featureflags.io/feature-flags/)
 
@@ -12,6 +9,8 @@ This is an implementation of the Feature Toggles pattern for OSGi. Feature Toggl
 “A feature toggle, (also feature switch, feature flag, feature flipper, conditional feature, etc.) is a technique in software development that attempts to provide an alternative to maintaining multiple source-code branches (known as feature branches).  Continuous release and continuous deployment provide developers with rapid feedback about their coding. This requires the integration of their code changes as early as possible. Feature branches introduce a bypass to this process. Feature toggles bring developers back to the track, but the execution paths of their features are still “dead” if a toggle is “off”. But the effort is low to enable the new execution paths just by setting a toggle to on.”
 
 ---
+
+**Continuous Integration** - [![Build Status](https://travis-ci.org/amitjoy/feature-flags-osgi.svg?branch=master)]
 
 ### Dependencies
 
