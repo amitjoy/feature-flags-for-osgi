@@ -28,10 +28,14 @@ Just install this bundle including all the dependencies it requires.
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/feature-flags-osgi/blob/master/CONTRIBUTING.md)
 
-#### Building for source
+#### Project Import
 
 1. Add `SLF4J`, `Google Guava` and `GSON` to your Eclipse IDE Installation's Target Platform
-2. Import this project
+2. Import this project as Existing Project (`General -> Existing Project into Workspace`)
+
+#### Building from Source
+
+1. Run `mvn clean install -Dgpg.skip=true` in the project folder
 
 ### License
 
