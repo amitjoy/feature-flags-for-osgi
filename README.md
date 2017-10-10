@@ -10,7 +10,7 @@ This is an implementation of the Feature Toggles pattern for OSGi. Feature Toggl
 
 ---
 
-**Continuous Integration** - [![Build Status](https://travis-ci.org/amitjoy/feature-flags-osgi.svg?branch=master)]
+**Continuous Integration** ![Build Status](https://travis-ci.org/amitjoy/feature-flags-osgi.svg?branch=master)
 
 ### Dependencies
 
@@ -28,10 +28,14 @@ Just install this bundle including all the dependencies it requires.
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/feature-flags-osgi/blob/master/CONTRIBUTING.md)
 
-#### Building for source
+#### Project Import
 
 1. Add `SLF4J`, `Google Guava` and `GSON` to your Eclipse IDE Installation's Target Platform
-2. Import this project
+2. Import this project as Existing Project (`General -> Existing Project into Workspace`)
+
+#### Building from Source
+
+1. Run `mvn clean install -Dgpg.skip=true` in the project folder
 
 ### License
 
@@ -40,7 +44,7 @@ EPL-1.0
 ### Usage
 
 1. Create a `features.json` in your bundle's root directory
-2. The features must be specified in `features.json` in the following way
+2. The features can be specified in `features.json` in the following way
 
 ```json
 [
@@ -68,7 +72,7 @@ EPL-1.0
  ]
 ```
 3. This will create `Feature` service instances that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties.
-4. In your DS Component, use `FeatureService` interface to check if the feature is enabled
+4. In your DS Component, use `FeatureService` to check if the feature is enabled
 
 ```java
 private FeatureService featureService;
@@ -95,8 +99,8 @@ void unsetFeatureService(final FeatureService featureService) {
 
 ----------------------- ------------------------------------
 
-If a strategy is provided for one or more features, the strategy will be used to determine which feature(s) will be active in the runtime. If you don't provide any strategy, the `enabled` (`Feature#isEnabled(Boolean)` method) flag will be used for enablement of the feature. That is, a strategy always overrides any value explicitly set to `enabled` flag.
+If a strategy is provided for one or more features, the strategy will be used to determine which feature(s) will be active in the runtime. If you don't provide any strategy, the `enabled` property (`Feature#isEnabled()` method) will be used for enablement of the feature. That is, a strategy always overrides any value explicitly set to `enabled` flag.
 
-*Examples of strategy*: `IP Based Strategy` by which some features would be enabled based on specific IP Addresses or `Time Based Strategy` by which some group of features are enabled at a certain time of a day.
+*Examples of strategies*: `IP Based Strategy` by which some features would be enabled based on specific IP Addresses or `Time Based Strategy` by which a group of features are enabled at a certain time of a day.
 
 ----------------------------------------------------------------
