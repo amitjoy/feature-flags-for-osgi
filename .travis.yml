@@ -1,0 +1,18 @@
+sudo: required
+
+language: java
+
+jdk:
+  - oraclejdk8
+
+branches:
+  only:
+    - master
+
+env:
+    - MAVEN_OPTS="-Xms2048m -Xmx=2048m"
+    
+before_install:
+    - "cd com.amitinside.featureflags"
+  
+install: mvn install -DskipTests=true -Dgpg.skip -e -X
