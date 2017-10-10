@@ -10,7 +10,7 @@ branches:
     - master
 
 env:
-    - MAVEN_OPTS="-Xms2048m -Xmx=2048m"
+    - MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m"
     
 before_install:
     - "cd com.amitinside.featureflags"
