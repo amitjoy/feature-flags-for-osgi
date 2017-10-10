@@ -43,7 +43,7 @@ import com.google.common.collect.TreeMultimap;
 
 /**
  * This service implements the {@link FeatureService}. It keeps track of all
- * {@link Feature} services and {@link ActivationStrategy} services
+ * {@link Feature} services and {@link ActivationStrategy} services.
  */
 @Component(name = "FeatureManager")
 public final class FeatureManager implements FeatureService {
@@ -51,9 +51,11 @@ public final class FeatureManager implements FeatureService {
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Multimap<String, FeatureDescription> allFeatures = TreeMultimap.create();
-    private final Map<String, ActivationStrategy> allStrategies = Maps.newHashMap();
-    private Map<String, Feature> activeFeatures = Maps.newHashMap();
+    private final Multimap<String, Description<Feature>> allFeatures = TreeMultimap.create();
+    private final Multimap<String, Description<ActivationStrategy>> allStrategies = TreeMultimap.create();
+
+    private final Map<String, Feature> activeFeatures = Maps.newHashMap();
+    private final Map<String, ActivationStrategy> activeStrategies = Maps.newHashMap();
 
     private final Lock featuresLock = new ReentrantLock(true);
     private final Lock strategiesLock = new ReentrantLock(true);
@@ -65,7 +67,7 @@ public final class FeatureManager implements FeatureService {
 
     @Override
     public Stream<ActivationStrategy> getStrategies() {
-        return allStrategies.values().stream();
+        return activeStrategies.values().stream();
     }
 
     @Override
@@ -77,7 +79,7 @@ public final class FeatureManager implements FeatureService {
     @Override
     public Optional<ActivationStrategy> getStrategy(final String strategyName) {
         requireNonNull(strategyName, "Strategy name cannot be null");
-        return Optional.ofNullable(allStrategies.get(strategyName));
+        return Optional.ofNullable(activeStrategies.get(strategyName));
     }
 
     @Override
@@ -89,12 +91,12 @@ public final class FeatureManager implements FeatureService {
             if (strategyId.isEmpty()) {
                 return feature.isEnabled();
             } else {
-                final ActivationStrategy strategy = allStrategies.get(strategyId);
+                final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
                 if (strategy != null) {
                     //@formatter:off
                     final Map<String, Object> properties = allFeatures.values().stream()
                             .sorted()
-                            .filter(x -> x.feature == feature)
+                            .filter(x -> x.instance == feature)
                             .findFirst()
                             .map(f -> f.props)
                             .orElse(ImmutableMap.of());
@@ -120,9 +122,7 @@ public final class FeatureManager implements FeatureService {
             if (Strings.isNullOrEmpty(name)) {
                 return;
             }
-            final FeatureDescription info = new FeatureDescription(feature, props);
-            allFeatures.put(name, info);
-            calculateActiveFeatures();
+            bindInstance(feature, name, props, allFeatures, activeFeatures);
         } finally {
             featuresLock.unlock();
         }
@@ -136,29 +136,10 @@ public final class FeatureManager implements FeatureService {
         featuresLock.lock();
         try {
             final String name = feature.getName();
-            final FeatureDescription info = new FeatureDescription(feature, props);
-            allFeatures.remove(name, info);
-            calculateActiveFeatures();
+            unbindInstance(feature, name, props, allFeatures, activeFeatures);
         } finally {
             featuresLock.unlock();
         }
-    }
-
-    /**
-     * Calculates map of active features (eliminating Feature name
-     * collisions)
-     */
-    private void calculateActiveFeatures() {
-        final Map<String, Feature> activeMap = Maps.newHashMap();
-        for (final Entry<String, FeatureDescription> entry : allFeatures.entries()) {
-            final String key = entry.getKey();
-            final SortedSet<FeatureDescription> value = (SortedSet<FeatureDescription>) allFeatures.get(key);
-            activeMap.put(key, value.first().feature);
-            if (value.size() > 1) {
-                logger.warn("More than one features with same name - [{}] are available.", key);
-            }
-        }
-        activeFeatures = activeMap;
     }
 
     /**
@@ -173,7 +154,7 @@ public final class FeatureManager implements FeatureService {
             if (Strings.isNullOrEmpty(name)) {
                 return;
             }
-            allStrategies.put(strategy.getName(), strategy);
+            bindInstance(strategy, name, props, allStrategies, activeStrategies);
         } finally {
             strategiesLock.unlock();
         }
@@ -186,24 +167,59 @@ public final class FeatureManager implements FeatureService {
     private void unbindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
         strategiesLock.lock();
         try {
-            allStrategies.remove(strategy.getName());
+            final String name = strategy.getName();
+            unbindInstance(strategy, name, props, allStrategies, activeStrategies);
         } finally {
             strategiesLock.unlock();
         }
     }
 
+    private <T> void bindInstance(final T instance, final String name, final Map<String, Object> props,
+            final Multimap<String, Description<T>> allInstances, final Map<String, T> activeInstances) {
+        final Description<T> info = new Description<>(instance, props);
+        allInstances.put(name, info);
+        calculateActiveInstances(allInstances, activeInstances);
+    }
+
+    private <T> void unbindInstance(final T instance, final String name, final Map<String, Object> props,
+            final Multimap<String, Description<T>> allInstances, final Map<String, T> activeInstances) {
+        final Description<T> info = new Description<>(instance, props);
+        allInstances.remove(name, info);
+        calculateActiveInstances(allInstances, activeInstances);
+    }
+
     /**
-     * Internal class caching some feature meta data like service id and
+     * Calculates map of active elements (Strategy or Feature) (eliminating name
+     * collisions)
+     */
+    private <T> void calculateActiveInstances(final Multimap<String, Description<T>> allElements,
+            Map<String, T> refInstance) {
+        final Map<String, T> activeMap = Maps.newHashMap();
+        for (final Entry<String, Description<T>> entry : allElements.entries()) {
+            final String key = entry.getKey();
+            final SortedSet<Description<T>> value = (SortedSet<Description<T>>) allElements.get(key);
+            final T instance = value.first().instance;
+            activeMap.put(key, instance);
+            if (value.size() > 1) {
+                logger.warn("More than one " + instance.getClass().getSimpleName()
+                        + " services with same name - [{}] are available.", key);
+            }
+        }
+        refInstance = activeMap;
+    }
+
+    /**
+     * Internal class caching some feature or strategy meta data like service ID and
      * ranking.
      */
-    private static final class FeatureDescription implements Comparable<FeatureDescription> {
+    private static final class Description<T> implements Comparable<Description<T>> {
         private final int ranking;
         private final long serviceId;
-        private final Feature feature;
+        private final T instance;
         private final Map<String, Object> props;
 
-        public FeatureDescription(final Feature feature, final Map<String, Object> props) {
-            this.feature = feature;
+        public Description(final T instance, final Map<String, Object> props) {
+            this.instance = instance;
             this.props = ImmutableMap.copyOf(props);
             final Object sr = props.get(SERVICE_RANKING);
             ranking = Optional.ofNullable(sr).filter(e -> e instanceof Integer).map(Integer.class::cast).orElse(0);
@@ -215,7 +231,7 @@ public final class FeatureManager implements FeatureService {
          * then sort by service ID in descending order.
          */
         @Override
-        public int compareTo(final FeatureDescription o) {
+        public int compareTo(final Description<T> o) {
             return ComparisonChain.start().compare(o.ranking, ranking).compare(serviceId, o.serviceId).result();
         }
 
