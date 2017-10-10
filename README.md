@@ -1,6 +1,7 @@
 <img width="652" alt="logo" src="https://user-images.githubusercontent.com/13380182/31362169-6914a210-ad57-11e7-80e6-541cd3f0d034.png"> 
 <br/>
 <br/>
+
 [![Build Status](https://travis-ci.org/amitjoy/feature-flags-osgi.svg?branch=master)]
 
 ## Why? [![start with what and why](https://img.shields.io/badge/start%20with-why%3F-brightgreen.svg?style=flat)](http://featureflags.io/feature-flags/)
