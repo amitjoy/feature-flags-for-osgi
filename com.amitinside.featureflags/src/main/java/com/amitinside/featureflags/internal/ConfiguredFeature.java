@@ -54,12 +54,21 @@ public final class ConfiguredFeature implements Feature {
     private void extractProperties(final Map<String, Object> properties) {
         lock.lock();
         try {
-            final Map<Config, String> props = ConfigHelper.parseProperties(properties);
-            name = props.get(NAME);
+            final Map<Config, Object> props = ConfigHelper.parseProperties(properties);
+
+            name = (String) props.get(NAME);
             checkArgument(!Strings.isNullOrEmpty(name), "Feature name cannot be null or empty");
-            description = Optional.ofNullable(props.get(DESCRIPTION)).orElse(name);
-            strategy = Optional.ofNullable(props.get(STRATEGY)).filter(s -> !s.isEmpty()).orElse(null);
-            isEnabled = Optional.ofNullable(props.get(ENABLED)).map(Boolean::valueOf).orElse(false);
+
+            //@formatter:off
+            description = Optional.ofNullable(props.get(DESCRIPTION)).map(String.class::cast)
+                                                                     .orElse(name);
+            strategy = Optional.ofNullable(props.get(STRATEGY)).map(String.class::cast)
+                                                               .filter(s -> !s.isEmpty())
+                                                               .orElse(null);
+            isEnabled = Optional.ofNullable(props.get(ENABLED)).map(String.class::cast)
+                                                               .map(Boolean::valueOf)
+                                                               .orElse(false);
+            //@formatter:on
         } finally {
             lock.unlock();
         }

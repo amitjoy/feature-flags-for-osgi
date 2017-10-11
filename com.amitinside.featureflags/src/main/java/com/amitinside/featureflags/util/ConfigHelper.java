@@ -32,21 +32,20 @@ public final class ConfigHelper {
     }
 
     /**
-     * Parse the specified properties to a more suitable and easy to use {@link EnumMap} instance
+     * Parse the specified properties to a more suitable and easy to use {@link EnumMap} instance.
      *
      * @param properties the properties to parse
-     * @return {@link EnumMap} instance
+     * @return Returns an {@link EnumMap} instance or empty (not {@code null}) if specified properties
+     *         cannot be parsed.
      * @throws NullPointerException if the argument is {@code null}
      */
-    public static Map<Config, String> parseProperties(final Map<String, Object> properties) {
+    public static Map<Config, Object> parseProperties(final Map<String, Object> properties) {
         requireNonNull(properties, "Properties cannot be null");
-        final Map<Config, String> values = Maps.newEnumMap(Config.class);
+        final Map<Config, Object> values = Maps.newEnumMap(Config.class);
         for (final Entry<String, Object> entry : properties.entrySet()) {
-            final String propValue = String.valueOf(entry.getValue());
-            final Config value = Config.getIfPresent(propValue).orElse(null);
-            if (value != null) {
-                values.put(value, propValue);
-            }
+            final String propKey = entry.getKey();
+            final Object propValue = entry.getValue();
+            Config.getIfPresent(propKey).ifPresent(x -> values.put(x, propValue));
         }
         return values;
     }
