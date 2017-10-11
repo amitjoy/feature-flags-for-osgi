@@ -129,7 +129,7 @@ valid strategy has been associated to a feature group, the strategy will be used
 
 The flowchart for the determination of feature enablement:
 
-
+![feature flags](https://user-images.githubusercontent.com/13380182/31469700-117a9f18-aee3-11e7-8b0a-507d11f65b08.png)
 
 *Examples of strategies*: `IP Based Strategy` by which some features would be enabled based on specific IP Addresses or `Time Based Strategy` by which a group of features are enabled at a certain time of a day.
 
