@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.feature.Feature;
+import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
@@ -45,7 +46,7 @@ import com.google.common.collect.TreeMultimap;
  * This service implements the {@link FeatureService}. It keeps track of all
  * {@link Feature} services and {@link ActivationStrategy} services.
  */
-@Component(name = "FeatureManager")
+@Component(name = "FeatureManager", immediate = true)
 public final class FeatureManager implements FeatureService {
 
     /** Logger Instance */
@@ -53,12 +54,15 @@ public final class FeatureManager implements FeatureService {
 
     private final Multimap<String, Description<Feature>> allFeatures = TreeMultimap.create();
     private final Multimap<String, Description<ActivationStrategy>> allStrategies = TreeMultimap.create();
+    private final Multimap<String, Description<FeatureGroup>> allFeatureGroups = TreeMultimap.create();
 
     private final Map<String, Feature> activeFeatures = Maps.newHashMap();
     private final Map<String, ActivationStrategy> activeStrategies = Maps.newHashMap();
+    private final Map<String, FeatureGroup> activeFeatureGroups = Maps.newHashMap();
 
     private final Lock featuresLock = new ReentrantLock(true);
     private final Lock strategiesLock = new ReentrantLock(true);
+    private final Lock featureGroupsLock = new ReentrantLock(true);
 
     @Override
     public Stream<Feature> getFeatures() {
@@ -68,6 +72,11 @@ public final class FeatureManager implements FeatureService {
     @Override
     public Stream<ActivationStrategy> getStrategies() {
         return activeStrategies.values().stream();
+    }
+
+    @Override
+    public Stream<FeatureGroup> getGroups() {
+        return activeFeatureGroups.values().stream();
     }
 
     @Override
@@ -83,31 +92,63 @@ public final class FeatureManager implements FeatureService {
     }
 
     @Override
+    public Optional<FeatureGroup> getGroup(final String groupName) {
+        requireNonNull(groupName, "Group name cannot be null");
+        return Optional.ofNullable(activeFeatureGroups.get(groupName));
+    }
+
+    @Override
     public boolean isEnabled(final String featureName) {
         requireNonNull(featureName, "Feature name cannot be null");
         final Feature feature = getFeature(featureName).orElse(null);
         if (feature != null) {
-            final String strategyId = feature.getStrategy().orElse("");
-            if (strategyId.isEmpty()) {
-                return feature.isEnabled();
-            } else {
-                final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
-                if (strategy != null) {
-                    //@formatter:off
-                    final Map<String, Object> properties = allFeatures.values().stream()
-                            .sorted()
-                            .filter(x -> x.instance == feature)
-                            .findFirst()
-                            .map(f -> f.props)
-                            .orElse(ImmutableMap.of());
-                    //@formatter:on
-                    return strategy.isEnabled(feature, properties);
-                } else {
-                    return feature.isEnabled();
+            return checkEnablement(feature);
+        }
+        return false;
+    }
+
+    private boolean checkEnablement(final Feature feature) {
+        final String groupId = feature.getGroup().orElse("");
+        if (!groupId.isEmpty()) {
+            final FeatureGroup group = getGroup(groupId).orElse(null);
+            if (group != null) {
+                final String strategyId = group.getStrategy().orElse("");
+                if (!strategyId.isEmpty()) {
+                    final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
+                    if (strategy != null) {
+                        //@formatter:off
+                        final Map<String, Object> properties = allFeatureGroups.values().stream()
+                                .sorted()
+                                .filter(x -> x.instance == feature)
+                                .findFirst()
+                                .map(f -> f.props)
+                                .orElse(ImmutableMap.of());
+                        //@formatter:on
+                        return strategy.isEnabled(feature, properties);
+                    }
                 }
             }
         }
-        return false;
+        return checkFeatureStrategyEnablement(feature);
+    }
+
+    private boolean checkFeatureStrategyEnablement(final Feature feature) {
+        final String strategyId = feature.getStrategy().orElse("");
+        if (!strategyId.isEmpty()) {
+            final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
+            if (strategy != null) {
+                //@formatter:off
+                final Map<String, Object> properties = allFeatures.values().stream()
+                        .sorted()
+                        .filter(x -> x.instance == feature)
+                        .findFirst()
+                        .map(f -> f.props)
+                        .orElse(ImmutableMap.of());
+                //@formatter:on
+                return strategy.isEnabled(feature, properties);
+            }
+        }
+        return feature.isEnabled();
     }
 
     /**
@@ -171,6 +212,38 @@ public final class FeatureManager implements FeatureService {
             unbindInstance(strategy, name, props, allStrategies, activeStrategies);
         } finally {
             strategiesLock.unlock();
+        }
+    }
+
+    /**
+     * {@link FeatureGroup} service binding callback
+     */
+    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
+    private void bindFeatrueGroup(final FeatureGroup group, final Map<String, Object> props) {
+        featureGroupsLock.lock();
+        try {
+            final String name = group.getName();
+            // ignore if null or empty
+            if (Strings.isNullOrEmpty(name)) {
+                return;
+            }
+            bindInstance(group, name, props, allFeatureGroups, activeFeatureGroups);
+        } finally {
+            featureGroupsLock.unlock();
+        }
+    }
+
+    /**
+     * {@link ActivationStrategy} service unbinding callback
+     */
+    @SuppressWarnings("unused")
+    private void unbindStrategy(final FeatureGroup group, final Map<String, Object> props) {
+        featureGroupsLock.lock();
+        try {
+            final String name = group.getName();
+            unbindInstance(group, name, props, allFeatureGroups, activeFeatureGroups);
+        } finally {
+            featureGroupsLock.unlock();
         }
     }
 

@@ -12,7 +12,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.internal;
 
-import static com.amitinside.featureflags.Constants.FEATURE_FACTORY_PID;
+import static com.amitinside.featureflags.Constants.FEATURE_GROUP_FACTORY_PID;
 import static com.amitinside.featureflags.internal.Config.*;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
@@ -26,18 +26,17 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
-import com.amitinside.featureflags.feature.Feature;
+import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.util.ConfigHelper;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
-@Component(name = "ConfiguredFeature", immediate = true, configurationPolicy = REQUIRE, configurationPid = FEATURE_FACTORY_PID)
-public final class ConfiguredFeature implements Feature {
+@Component(name = "ConfiguredFeatureGroup", immediate = true, configurationPolicy = REQUIRE, configurationPid = FEATURE_GROUP_FACTORY_PID)
+public final class ConfiguredFeatureGroup implements FeatureGroup {
 
     private String name;
     private String description;
     private String strategy;
-    private String group;
     private volatile boolean isEnabled;
 
     private final Lock lock = new ReentrantLock(true);
@@ -58,17 +57,14 @@ public final class ConfiguredFeature implements Feature {
             final Map<Config, Object> props = ConfigHelper.parseProperties(properties);
 
             name = (String) props.get(NAME);
-            checkArgument(!Strings.isNullOrEmpty(name), "Feature name cannot be null or empty");
+            checkArgument(!Strings.isNullOrEmpty(name), "Feature Group name cannot be null or empty");
 
             //@formatter:off
             description = Optional.ofNullable(props.get(DESCRIPTION)).map(String.class::cast)
                                                                      .orElse(name);
             strategy = Optional.ofNullable(props.get(STRATEGY)).map(String.class::cast)
-                                                               .filter(s -> !s.isEmpty())
-                                                               .orElse(null);
-            group = Optional.ofNullable(props.get(GROUP)).map(String.class::cast)
-                                                               .filter(s -> !s.isEmpty())
-                                                               .orElse(null);
+                    .filter(s -> !s.isEmpty())
+                    .orElse(null);
             isEnabled = Optional.ofNullable(props.get(ENABLED)).map(String.class::cast)
                                                                .map(Boolean::valueOf)
                                                                .orElse(false);
@@ -89,18 +85,13 @@ public final class ConfiguredFeature implements Feature {
     }
 
     @Override
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    @Override
     public Optional<String> getStrategy() {
         return Optional.ofNullable(strategy);
     }
 
     @Override
-    public Optional<String> getGroup() {
-        return Optional.ofNullable(group);
+    public boolean isEnabled() {
+        return isEnabled;
     }
 
     @Override

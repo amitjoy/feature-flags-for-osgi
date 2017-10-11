@@ -25,6 +25,9 @@ public final class Constants {
     }
 
     /** Factory PID of {@code Feature} configuration instances */
-    public static final String PID = "com.amitinside.featureflags.feature";
+    public static final String FEATURE_FACTORY_PID = "com.amitinside.featureflags.feature";
+
+    /** Factory PID of {@code FeatureGroup} configuration instances */
+    public static final String FEATURE_GROUP_FACTORY_PID = "com.amitinside.featureflags.feature.group";
 
 }

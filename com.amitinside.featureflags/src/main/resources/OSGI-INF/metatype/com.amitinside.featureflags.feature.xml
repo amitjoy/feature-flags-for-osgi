@@ -43,12 +43,20 @@
             description="Boolean flag indicating whether this feature is enabled or not by this configuration" />
             
         <AD id="strategy"
-            name="Strategy ID"
+            name="Strategy"
             type="String"
             cardinality="0"
             required="false"
             default=""
             description="Strategy ID of this feature to check if the feature is enabled or not by this configuration" />
+       
+        <AD id="group"
+            name="Group"
+            type="String"
+            cardinality="0"
+            required="false"
+            default=""
+            description="Group ID of this feature to check if the feature belongs to any group" />
         
     </OCD>
     

@@ -14,7 +14,8 @@ public enum Config {
     NAME("name"),
     DESCRIPTION("description"),
     ENABLED("enabled"),
-    STRATEGY("strategy");
+    STRATEGY("strategy"),
+    GROUP("group");
 
     final String value;
 
@@ -34,7 +35,7 @@ public enum Config {
      * @param value the value to check for existence in {@link Config} enumeration
      *
      * @throws NullPointerException if the argument is {@code null}
-     * @return {@link Config} instance wrapped in {@link Optional}
+     * @return {@link Config} instance wrapped in {@link Optional} or empty {@link Optional} if not present
      */
     public static Optional<Config> getIfPresent(final String value) {
         requireNonNull(value, "Value cannot be null");

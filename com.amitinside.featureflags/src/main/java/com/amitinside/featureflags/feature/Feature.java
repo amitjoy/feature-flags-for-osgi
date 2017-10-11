@@ -15,6 +15,7 @@ package com.amitinside.featureflags.feature;
 import java.util.Optional;
 
 import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 
 /**
@@ -30,6 +31,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  *
  * This interface is intended to be implemented by feature providers.
  *
+ * @see FeatureGroup
  * @see FeatureService
  * @see ActivationStrategy
  *
@@ -55,18 +57,32 @@ public interface Feature {
 
     /**
      * The associated strategy identifier that will be used to check
-     * whether this feature is active or not
+     * whether this feature will be enabled or not.
      *
-     * @return The identifier of this feature wrapped in {@link Optional}
+     * @return The strategy identifier of this feature wrapped in {@link Optional}
      *         or empty {@link Optional} instance
      */
     Optional<String> getStrategy();
 
     /**
-     * Checks whether the feature is enabled.
+     * The associated group identifier that will be used to check
+     * whether this feature belongs to any group.
      *
-     * @return {@code true} if this {@code Feature} is enabled for the associated
-     *         strategy
+     * @return The group identifier of this feature wrapped in {@link Optional}
+     *         or empty {@link Optional} instance
+     */
+    Optional<String> getGroup();
+
+    /**
+     * Checks whether the feature is enabled in its configuration. This only shows
+     * the configuration provided to the feature. If a feature belongs to a valid
+     * feature group or it specifies any valid activation strategy, this would not
+     * return the actual enablement value.
+     * <p>
+     * To check enablement of any feature, use {@link FeatureService#isEnabled(String)}.
+     * </p>
+     *
+     * @return {@code true} if this {@code Feature} is enabled in its configuration
      */
     boolean isEnabled();
 }
