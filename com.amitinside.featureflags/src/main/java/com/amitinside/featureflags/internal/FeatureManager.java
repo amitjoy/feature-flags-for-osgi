@@ -234,10 +234,10 @@ public final class FeatureManager implements FeatureService {
     }
 
     /**
-     * {@link ActivationStrategy} service unbinding callback
+     * {@link FeatureGroup} service unbinding callback
      */
     @SuppressWarnings("unused")
-    private void unbindStrategy(final FeatureGroup group, final Map<String, Object> props) {
+    private void unbindFeatrueGroup(final FeatureGroup group, final Map<String, Object> props) {
         featureGroupsLock.lock();
         try {
             final String name = group.getName();
