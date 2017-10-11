@@ -12,6 +12,11 @@ This is an implementation of the Feature Toggles pattern for OSGi. Feature Toggl
 
 **Continuous Integration** ![Build Status](https://travis-ci.org/amitjoy/feature-flags-osgi.svg?branch=master)
 
+**Static Code Analysis** <a href="https://scan.coverity.com/projects/amitjoy-feature-flags-osgi">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/13990/badge.svg"/>
+</a>
+
 ### Dependencies
 
 This uses a small number of popular projects to work properly:
