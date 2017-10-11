@@ -105,7 +105,10 @@
 				<configuration>
 					<instructions>
 						<_include>META-INF/MANIFEST.MF</_include>
-						<_removeheaders>Require-Capability, Provide-Capability, Private-Package</_removeheaders>
+						<_removeheaders>
+						Require-Capability, Provide-Capability, Private-Package, Include-Resource, 
+						Tool, Created-By, Built-By, Bnd-LastModified
+						</_removeheaders>
 					</instructions>
 				</configuration>
 			</plugin>
