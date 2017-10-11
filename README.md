@@ -78,11 +78,11 @@ EPL-1.0
 private FeatureService featureService;
 
 public void myMethod() {
- if (featureService.isEnabled("feature2")) {
-    // do this
- } else {
-   // do something else
- }
+   if (featureService.isEnabled("feature2")) {
+         // do this
+   } else {
+         // do something else
+   }
 }
 
 @Reference
