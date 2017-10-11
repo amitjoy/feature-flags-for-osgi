@@ -126,6 +126,8 @@ public final class FeatureManager implements FeatureService {
                         //@formatter:on
                         return strategy.isEnabled(feature, properties);
                     }
+                } else {
+                    return group.isEnabled();
                 }
             }
         }
