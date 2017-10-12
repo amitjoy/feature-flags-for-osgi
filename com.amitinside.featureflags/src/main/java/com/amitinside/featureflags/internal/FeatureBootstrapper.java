@@ -108,7 +108,7 @@ import com.google.gson.Gson;
  * These properties will be added as your feature's service properties. You can also create feature
  * groups by specifying groups in the JSON resource.
  */
-@SuppressWarnings({ "rawtypes", "unused", "unchecked" })
+@SuppressWarnings("unused")
 @Component(service = FeatureBootstrapper.class, name = "FeatureBootstrapper", immediate = true)
 public final class FeatureBootstrapper implements BundleTrackerCustomizer {
 
@@ -126,13 +126,13 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
     private final Multimap<Bundle, String> allFeatureGroups = ArrayListMultimap.create();
 
     @Activate
-    private void activate(final BundleContext context) {
+    protected void activate(final BundleContext context) {
         bundleTracker = new BundleTracker(context, ACTIVE, this);
         bundleTracker.open();
     }
 
     @Deactivate
-    private void deactivate(final BundleContext context) {
+    protected void deactivate(final BundleContext context) {
         if (bundleTracker != null) {
             bundleTracker.close();
         }
@@ -142,14 +142,14 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
      * {@link ConfigurationAdmin} service binding callback
      */
     @Reference
-    private void setConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
+    protected void setConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
         this.configurationAdmin = configurationAdmin;
     }
 
     /**
      * {@link ConfigurationAdmin} service unbinding callback
      */
-    private void unsetConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
+    protected void unsetConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
         this.configurationAdmin = null;
     }
 
@@ -163,32 +163,30 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
         return bundle;
     }
 
-    private void addGroups(final Bundle bundle, final Data data) {
-        final List<Group> groups = data.getGroups();
-        if (groups == null) {
-            return;
-        }
-        //@formatter:off
-        groups.stream().map(this::registerFeatureGroup)
-                                           .filter(Optional::isPresent)
-                                           .map(Optional::get)
-                                           .findAny()
-                                           .ifPresent(x -> allFeatureGroups.put(bundle, x));
-        //@formatter:on
-    }
-
     private void addFeatures(final Bundle bundle, final Data data) {
         final List<Feature> features = data.getFeatures();
         if (features == null) {
             return;
         }
-        //@formatter:off
-        features.stream().map(this::registerFeature)
-                                           .filter(Optional::isPresent)
-                                           .map(Optional::get)
-                                           .findAny()
-                                           .ifPresent(x -> allFeatures.put(bundle, x));
-        //@formatter:on
+        for (final Feature feature : features) {
+            final Optional<String> pid = registerFeature(feature);
+            if (pid.isPresent()) {
+                allFeatures.put(bundle, pid.get());
+            }
+        }
+    }
+
+    private void addGroups(final Bundle bundle, final Data data) {
+        final List<Group> groups = data.getGroups();
+        if (groups == null) {
+            return;
+        }
+        for (final Group group : groups) {
+            final Optional<String> pid = registerFeatureGroup(group);
+            if (pid.isPresent()) {
+                allFeatureGroups.put(bundle, pid.get());
+            }
+        }
     }
 
     @Override
@@ -255,9 +253,9 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
                 props.putAll(properties);
             }
             // remove all null values
-            Maps.filterValues(props, Objects::nonNull);
+            final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
             final Configuration configuration = configurationAdmin.createFactoryConfiguration(FEATURE_FACTORY_PID);
-            configuration.update(new Hashtable<>(props));
+            configuration.update(new Hashtable<>(filteredProps));
             return Optional.of(configuration.getPid());
         } catch (final IOException e) {
             logger.trace("Cannot create feature configuration instance", e);
@@ -295,7 +293,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
      * Retrieves the data specified in the bundle's {@code feature.json}
      * resource
      *
-     * @param bundle the bundle to look into
+     * @param bundle the bundle to look in
      * @return the data or {@code null}
      */
     private Data getData(final Bundle bundle) {

@@ -12,7 +12,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -129,17 +128,134 @@ public interface FeatureService {
      * would be validated against a valid activation strategy if specified, otherwise
      * the explicitly declared enabled flag in the feature would be used.
      *
+     * @see <a href=
+     *      "https://user-images.githubusercontent.com/13380182/31471988-37e71132-aeec-11e7-8f14-45230c69b713.png">Control
+     *      flow for the determination of feature enablement</a>
+     *
      * @param name The name of the feature to check for enablement.
      * @return {@code true} if the named feature is known and enabled.
      *         Specifically {@code false} is also returned if the named feature
      *         is not known.
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
      */
-    boolean isEnabled(String name);
+    boolean isFeatureEnabled(String name);
+
+    /**
+     * Returns {@code true} if a feature group with the given name is known and
+     * enabled under the associated strategy.
+     * <p>
+     * Feature Groups are known if they are registered as {@link FeatureGroup} services
+     * or are configured with OSGi configuration whose factory PID is
+     * {@code com.amitinside.featureflags.feature.group}.
+     * </p>
+     * The activation or the enablement of a feature group would be validated against a
+     * valid activation strategy if specified, otherwise he explicitly declared enabled flag
+     * in the feature group would be used.
+     *
+     * @see <a href=
+     *      "https://user-images.githubusercontent.com/13380182/31471988-37e71132-aeec-11e7-8f14-45230c69b713.png">Control
+     *      flow for the determination of feature enablement</a>
+     *
+     * @param name The name of the feature group to check for enablement.
+     * @return {@code true} if the named feature group is known and enabled.
+     *         Specifically {@code false} is also returned if the named feature group
+     *         is not known.
+     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     */
+    boolean isGroupEnabled(String name);
+
+    /**
+     * Changes the specified feature's enabled property to {@code true}.
+     * <p>
+     * If the feature belongs to a feature group, enabling the feature explicitly
+     * would not be taken into consideration as its enablement solely depends on
+     * the feature group. Likewise, if the feature doesn't belong to a feature
+     * goupd rather it associates a strategy, its enablements would be solely
+     * dependent on the associated strategy.
+     * </p>
+     *
+     * @see <a href=
+     *      "https://user-images.githubusercontent.com/13380182/31471988-37e71132-aeec-11e7-8f14-45230c69b713.png">Control
+     *      flow for the determination of feature enablement</a>
+     *
+     * @param name the name of the feature
+     * @return {@code true} if the named feature is known and the operation succeeded.
+     *         Specifically {@code false} is also returned if the named feature
+     *         is not known or the operation is unsuccessful
+     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     */
+    boolean enableFeature(String name);
+
+    /**
+     * Changes the specified feature's enabled property to {@code false}.
+     * <p>
+     * If the feature belongs to a feature group, enabling the feature explicitly
+     * would not be taken into consideration as its enablement solely depends on
+     * the feature group. Likewise, if the feature doesn't belong to a feature
+     * group rather it associates a strategy, its enablement would be solely
+     * dependent on the associated strategy.
+     * </p>
+     *
+     * @see <a href=
+     *      "https://user-images.githubusercontent.com/13380182/31471988-37e71132-aeec-11e7-8f14-45230c69b713.png">Control
+     *      flow for the determination of feature enablement</a>
+     *
+     * @param name the name of the feature
+     * @return {@code true} if the named feature is known and the operation succeeded.
+     *         Specifically {@code false} is also returned if the named feature
+     *         is not known or the operation is unsuccessful
+     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     */
+    boolean disableFeature(String name);
+
+    /**
+     * Changes the specified feature group's enabled property to {@code true}.
+     * <p>
+     * If the feature group associates a strategy, its enablement would be solely
+     * dependent on the associated strategy.
+     * </p>
+     *
+     * @see <a href=
+     *      "https://user-images.githubusercontent.com/13380182/31471988-37e71132-aeec-11e7-8f14-45230c69b713.png">Control
+     *      flow for the determination of feature enablement</a>
+     *
+     * @param name the name of the feature group
+     * @return {@code true} if the named feature is known and the operation succeeded.
+     *         Specifically {@code false} is also returned if the named feature
+     *         is not known or the operation is unsuccessful
+     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     */
+    boolean enableGroup(String name);
+
+    /**
+     * Changes the specified feature group's enabled property to {@code false}.
+     * <p>
+     * If the feature group associates a strategy, its enablement would be solely
+     * dependent on the associated strategy.
+     * </p>
+     *
+     * @see <a href=
+     *      "https://user-images.githubusercontent.com/13380182/31471988-37e71132-aeec-11e7-8f14-45230c69b713.png">Control
+     *      flow for the determination of feature enablement</a>
+     *
+     * @param name the name of the feature group
+     * @return {@code true} if the named feature group is known and the operation succeeded.
+     *         Specifically {@code false} is also returned if the named feature group
+     *         is not known or the operation is unsuccessful
+     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     */
+    boolean disableGroup(String name);
+
+    /*
+     * ========================================================
+     * Default Utility Methods (Not required to be implemented)
+     * ========================================================
+     */
 
     /**
      * Retrieve all (known) {@link Feature}s associated with the specified group
      *
+     * @param name the group name
      * @return The known {@link Feature}s
      */
     default Stream<Feature> getFeaturesByGroup(final String name) {
@@ -148,13 +264,25 @@ public interface FeatureService {
     }
 
     /**
-     * Retrieve all (known) {@link Feature}s associated with the specified group
+     * Retrieve all (known) {@link Feature}s associated with the specified strategy
      *
+     * @param name the strategy name
      * @return The known {@link Feature}s
      */
-    default Stream<Feature> getFeaturesByGroup(final FeatureGroup group) {
-        return Objects.isNull(group) ? Stream.empty()
-                : getFeatures().filter(f -> f.getGroup().orElse("").equalsIgnoreCase(group.getName()));
+    default Stream<Feature> getFeaturesByStrategy(final String name) {
+        return Strings.isNullOrEmpty(name) ? Stream.empty()
+                : getFeatures().filter(f -> f.getStrategy().orElse("").equalsIgnoreCase(name));
+    }
+
+    /**
+     * Retrieve all (known) {@link FeatureGroup}s associated with the specified strategy
+     *
+     * @param name the strategy name
+     * @return The known {@link FeatureGroup}s
+     */
+    default Stream<FeatureGroup> getGroupsByStrategy(final String name) {
+        return Strings.isNullOrEmpty(name) ? Stream.empty()
+                : getGroups().filter(f -> f.getStrategy().orElse("").equalsIgnoreCase(name));
     }
 
 }

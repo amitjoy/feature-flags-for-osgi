@@ -42,12 +42,12 @@ public final class ConfiguredFeatureGroup implements FeatureGroup {
     private final Lock lock = new ReentrantLock(true);
 
     @Activate
-    private void activate(final Map<String, Object> properties) {
+    protected void activate(final Map<String, Object> properties) {
         extractProperties(properties);
     }
 
     @Modified
-    private void updated(final Map<String, Object> properties) {
+    protected void updated(final Map<String, Object> properties) {
         extractProperties(properties);
     }
 
@@ -63,10 +63,9 @@ public final class ConfiguredFeatureGroup implements FeatureGroup {
             description = Optional.ofNullable(props.get(DESCRIPTION)).map(String.class::cast)
                                                                      .orElse(name);
             strategy = Optional.ofNullable(props.get(STRATEGY)).map(String.class::cast)
-                    .filter(s -> !s.isEmpty())
-                    .orElse(null);
-            isEnabled = Optional.ofNullable(props.get(ENABLED)).map(String.class::cast)
-                                                               .map(Boolean::valueOf)
+                                                               .filter(s -> !s.isEmpty())
+                                                               .orElse(null);
+            isEnabled = Optional.ofNullable(props.get(ENABLED)).map(Boolean.class::cast)
                                                                .orElse(false);
             //@formatter:on
         } finally {

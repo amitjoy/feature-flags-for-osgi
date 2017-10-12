@@ -40,7 +40,7 @@ public enum Config {
     public static Optional<Config> getIfPresent(final String value) {
         requireNonNull(value, "Value cannot be null");
         try {
-            return Optional.of(Enum.valueOf(Config.class, value));
+            return Optional.of(Enum.valueOf(Config.class, value.toUpperCase()));
         } catch (final IllegalArgumentException iae) {
             return Optional.empty();
         }

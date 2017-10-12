@@ -15,6 +15,7 @@ package com.amitinside.featureflags.feature.group;
 import java.util.Optional;
 
 import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 
@@ -22,11 +23,11 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  * A feature group is defined by its name. Feature Groups are registered as OSGi
  * services.
  * <p>
- * Feature Group names {@link #getName()} should be globally unique. If multiple
- * feature groups have the same name, the feature group with the highest service ranking
- * is accessible through the {@link FeatureService} service while those with lower
- * service rankings are ignored. If service rankings are equal, sort by service ID
- * in descending order. That is, services with lower service IDs will be accessible
+ * Feature Group names {@link #getName()} should be globally unique (case-insensitive).
+ * If multiple feature groups have the same name, the feature group with the highest
+ * service ranking is accessible through the {@link FeatureService} service while those
+ * with lower service rankings are ignored. If service rankings are equal, sort by service
+ * ID in descending order. That is, services with lower service IDs will be accessible
  * whereas those with higher service IDs are ignored.
  * </p>
  *
@@ -38,7 +39,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  *
  * @ThreadSafe
  */
-public interface FeatureGroup {
+public interface FeatureGroup extends Strategizable {
 
     /**
      * The name of the feature group.

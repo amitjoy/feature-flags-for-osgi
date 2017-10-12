@@ -43,12 +43,12 @@ public final class ConfiguredFeature implements Feature {
     private final Lock lock = new ReentrantLock(true);
 
     @Activate
-    private void activate(final Map<String, Object> properties) {
+    protected void activate(final Map<String, Object> properties) {
         extractProperties(properties);
     }
 
     @Modified
-    private void updated(final Map<String, Object> properties) {
+    protected void updated(final Map<String, Object> properties) {
         extractProperties(properties);
     }
 
@@ -69,8 +69,7 @@ public final class ConfiguredFeature implements Feature {
             group = Optional.ofNullable(props.get(GROUP)).map(String.class::cast)
                                                                .filter(s -> !s.isEmpty())
                                                                .orElse(null);
-            isEnabled = Optional.ofNullable(props.get(ENABLED)).map(String.class::cast)
-                                                               .map(Boolean::valueOf)
+            isEnabled = Optional.ofNullable(props.get(ENABLED)).map(Boolean.class::cast)
                                                                .orElse(false);
             //@formatter:on
         } finally {

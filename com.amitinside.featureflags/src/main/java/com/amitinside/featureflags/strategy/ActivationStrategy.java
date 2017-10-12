@@ -16,23 +16,30 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
+import com.amitinside.featureflags.feature.group.FeatureGroup;
 
 /**
  * This interface represents a custom strategy for deciding whether
- * a feature will be active or not.
+ * a {@link Strategizable} instance will be active or not.
  * <p>
- * Strategy names {@link #getName()} should be globally unique. If multiple
- * strategies have the same name, the strategy with the highest service ranking is
- * accessible through the {@link FeatureService} service while those with lower
- * service rankings are ignored. If service rankings are equal, sort by service ID
- * in descending order. That is, services with lower service IDs will be accessible
+ * Currently {@link Feature} and {@link FeatureGroup} instances are
+ * {@link Strategizable}.
+ * </p>
+ * <p>
+ * Strategy names {@link #getName()} should be globally unique (case-insensitive).
+ * If multiple strategies have the same name, the strategy with the highest service
+ * ranking is accessible through the {@link FeatureService} service while those with
+ * lower service rankings are ignored. If service rankings are equal, sort by service
+ * ID in descending order. That is, services with lower service IDs will be accessible
  * whereas those with higher service IDs are ignored.
  * </p>
  *
  * This interface is intended to be implemented by feature providers.
  *
  * @see Feature
+ * @see FeatureGroup
  * @see FeatureService
  *
  * @ThreadSafe
@@ -61,12 +68,13 @@ public interface ActivationStrategy {
      * strategy stored in the feature and information from the currently acting
      * user to find a decision.
      *
-     * @param feature The {@link Feature} instance to check for enablement
-     * @param properties The service properties of the specified {@link Feature} instance
+     * @param strategizable The {@link Strategizable} instance to check for enablement
+     * @param properties The service properties of the specified {@link Strategizable}
+     *            instance
      *
-     * @return {@code true} if the feature should be enabled, otherwise {@code false}
-     * @throws NullPointerException if the specified argument {@code feature} is {@code null}
+     * @return {@code true} if the strategizable should be enabled, otherwise {@code false}
+     * @throws NullPointerException if any of the specified arguments is {@code null}
      */
-    boolean isEnabled(Feature feature, Map<String, Object> properties);
+    boolean isEnabled(Strategizable strategizable, Map<String, Object> properties);
 
 }

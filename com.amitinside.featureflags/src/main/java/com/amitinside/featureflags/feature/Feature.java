@@ -15,18 +15,19 @@ package com.amitinside.featureflags.feature;
 import java.util.Optional;
 
 import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 
 /**
  * A feature is defined by its name. Features are registered as OSGi services.
  * <p>
- * Feature names {@link #getName()} should be globally unique. If multiple
- * features have the same name, the feature with the highest service ranking is
- * accessible through the {@link FeatureService} service while those with lower
- * service rankings are ignored. If service rankings are equal, sort by service ID
- * in descending order. That is, services with lower service IDs will be accessible
- * whereas those with higher service IDs are ignored.
+ * Feature names {@link #getName()} should be globally unique (case-insensitive).
+ * If multiple features have the same name, the feature with the highest service
+ * ranking is accessible through the {@link FeatureService} service while those
+ * with lower service rankings are ignored. If service rankings are equal, sort
+ * by service ID in descending order. That is, services with lower service IDs
+ * will be accessible whereas those with higher service IDs are ignored.
  * </p>
  *
  * This interface is intended to be implemented by feature providers.
@@ -37,7 +38,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  *
  * @ThreadSafe
  */
-public interface Feature {
+public interface Feature extends Strategizable {
 
     /**
      * The name of the feature.
