@@ -10,14 +10,14 @@ branches:
     - master
 
 env:
-    - MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m"
   global:
-    - secure: "XUajV4Gpi67wZXU4a7vlqBn7RQHpm6QVZkD280lhgZxm9TR0Jm526RjsmAppYx1WYSejH0qu4GHjKG/Wypa/OqTmGpv3aMj3KofSAU6ygIyAz4ck2yDy9UAkMo9d4phhbsJ+Iw9/QfNk1ApAuX6+rVPYmnRXlo3imZYqBcBj7u7xJgQjbX6HCteSsPStealceMoh5MxuXFv8tRZ2quC5nnIu9EiibtS8mRd7vXdp8acM3xzoV+RyIYoiHgqR8stdwNTqOmzlT/oKvgHlA8UWQzauYyLDjDkfFlkzyZvn3F1zpPkW2L1q56WnUBdUEE08fHuRCvYJGMPwzMcwbm6YmJmTsFP8KArBF98H2lvqUC8ST1HZp2Gw4QGFnw/Mn4hRY2hJFJH2eOfu1TzLC3rZjA45uK97QQePXGkhvQUViZn1mOyVu/ENtJNiR7Kc/37PHlJGrgA/7WEQlD+fmlGk+3swTkXDn2apoN7emj41m+l5LwpggnlvWYJ2smjLTNFeoCq5TsfyS4sy7edG7hgrB7BibPaNYyhnyh+fDCz4BTzTui6WjFRzQvTkOSGEwO3V9GGzn8HAop2+cfF32AMgEJEcJWM3e9XWzMo5ks4zUg3FZtARkT+yI7hZ8HD0VdkIWx7euIHUiDtlrTzPIWri3W+YiRRaxFiMU8Z9Dl7GkgY="
-    
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "XUajV4Gpi67wZXU4a7vlqBn7RQHpm6QVZkD280lhgZxm9TR0Jm526RjsmAppYx1WYSejH0qu4GHjKG/Wypa/OqTmGpv3aMj3KofSAU6ygIyAz4ck2yDy9UAkMo9d4phhbsJ+Iw9/QfNk1ApAuX6+rVPYmnRXlo3imZYqBcBj7u7xJgQjbX6HCteSsPStealceMoh5MxuXFv8tRZ2quC5nnIu9EiibtS8mRd7vXdp8acM3xzoV+RyIYoiHgqR8stdwNTqOmzlT/oKvgHlA8UWQzauYyLDjDkfFlkzyZvn3F1zpPkW2L1q56WnUBdUEE08fHuRCvYJGMPwzMcwbm6YmJmTsFP8KArBF98H2lvqUC8ST1HZp2Gw4QGFnw/Mn4hRY2hJFJH2eOfu1TzLC3rZjA45uK97QQePXGkhvQUViZn1mOyVu/ENtJNiR7Kc/37PHlJGrgA/7WEQlD+fmlGk+3swTkXDn2apoN7emj41m+l5LwpggnlvWYJ2smjLTNFeoCq5TsfyS4sy7edG7hgrB7BibPaNYyhnyh+fDCz4BTzTui6WjFRzQvTkOSGEwO3V9GGzn8HAop2+cfF32AMgEJEcJWM3e9XWzMo5ks4zUg3FZtARkT+yI7hZ8HD0VdkIWx7euIHUiDtlrTzPIWri3W+YiRRaxFiMU8Z9Dl7GkgY="
+
 before_install:
-    - "cd com.amitinside.featureflags"
-    - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-  
+      - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
 addons:
   coverity_scan:
     project:
