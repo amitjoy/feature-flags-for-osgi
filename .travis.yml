@@ -26,4 +26,4 @@ addons:
     notification_email: admin@amitinside.com
     build_command_prepend: "mvn clean"
     build_command:   "mvn compile -DskipTests=true -Dgpg.skip=true"
-    branch_pattern: coverity_scan
+    branch_pattern: master
