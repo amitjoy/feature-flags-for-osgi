@@ -14,6 +14,8 @@ This is an implementation of the Feature Toggles pattern for OSGi. Feature Toggl
 
 **Static Code Analysis** [![Codacy Badge](https://api.codacy.com/project/badge/Grade/90918f9f84b64b14ac9ea1ed7f8ac041)](https://www.codacy.com/app/admin_62/feature-flags-osgi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=amitjoy/feature-flags-osgi&amp;utm_campaign=Badge_Grade)
 
+**Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/template-populator.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-osgi/)
+
 ### Dependencies
 
 This requires a small number of dependencies to work properly:
