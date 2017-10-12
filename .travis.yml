@@ -27,5 +27,3 @@ addons:
     build_command_prepend: "mvn clean"
     build_command:   "mvn compile -DskipTests=true -Dgpg.skip"
     branch_pattern: coverity_scan
-
-install: mvn install -DskipTests=true -Dgpg.skip -e -X
