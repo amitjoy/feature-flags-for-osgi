@@ -1,4 +1,4 @@
-<img width="652" alt="logo" src="https://user-images.githubusercontent.com/13380182/31362169-6914a210-ad57-11e7-80e6-541cd3f0d034.png"> 
+![logo](https://user-images.githubusercontent.com/13380182/31515221-a8f76dd8-af94-11e7-802b-75dc46666ee6.png) 
 
 ## Why? [![start with what and why](https://img.shields.io/badge/start%20with-why%3F-brightgreen.svg?style=flat)](http://featureflags.io/feature-flags/)
 
@@ -12,13 +12,17 @@ This is an implementation of the Feature Toggles pattern for OSGi. Feature Toggl
 
 **Continuous Integration** ![Build Status](https://travis-ci.org/amitjoy/feature-flags-osgi.svg?branch=master)
 
+**Static Code Analysis** [![Codacy Badge](https://api.codacy.com/project/badge/Grade/90918f9f84b64b14ac9ea1ed7f8ac041)](https://www.codacy.com/app/admin_62/feature-flags-osgi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=amitjoy/feature-flags-osgi&amp;utm_campaign=Badge_Grade)
+
 ### Dependencies
 
-This uses a small number of popular projects to work properly:
+This requires a small number of dependencies to work properly:
 
-* SLF4J
-* Google Guava
-* GSON
+* Java 8+
+* OSGi R4+
+* SLF4J 1.7.2+
+* Google Guava 15+
+* GSON 2.2.5+
 
 ### Installation
 
@@ -39,7 +43,7 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 ### License
 
-EPL-1.0
+This project is licensed under EPL-1.0
 
 ### Usage
 
@@ -101,7 +105,7 @@ EPL-1.0
 private FeatureService featureService;
 
 public void myMethod() {
-   if (featureService.isEnabled("feature2")) {
+   if (featureService.isFeatureEnabled("feature2")) {
          // do this
    } else {
          // do something else
