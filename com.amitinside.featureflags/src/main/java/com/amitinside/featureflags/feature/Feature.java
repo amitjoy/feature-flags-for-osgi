@@ -80,7 +80,7 @@ public interface Feature extends Strategizable {
      * feature group or it specifies any valid activation strategy, this would not
      * return the actual enablement value.
      * <p>
-     * To check enablement of any feature, use {@link FeatureService#isEnabled(String)}.
+     * To check enablement of any feature, use {@link FeatureService#isFeatureEnabled(String)}.
      * </p>
      *
      * @return {@code true} if this {@code Feature} is enabled in its configuration

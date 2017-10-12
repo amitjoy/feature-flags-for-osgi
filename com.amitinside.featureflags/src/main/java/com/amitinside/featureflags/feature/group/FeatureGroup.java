@@ -70,6 +70,9 @@ public interface FeatureGroup extends Strategizable {
      * Checks whether the feature group is enabled. If the feature group is enabled, all
      * the features belonging to it, will by default be enabled. Hence, no associated
      * strategy would be effective on belonging {@link Feature}s.
+     * <p>
+     * To check enablement of any feature group, use {@link FeatureService#isGroupEnabled(String)}.
+     * </p>
      *
      * @return {@code true} if this {@code FeatureGroup} is enabled
      */
