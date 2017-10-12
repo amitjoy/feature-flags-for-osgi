@@ -106,8 +106,8 @@
 					<instructions>
 						<_include>META-INF/MANIFEST.MF</_include>
 						<_removeheaders>
-						Require-Capability, Provide-Capability, Private-Package, Include-Resource, 
-						Tool, Created-By, Built-By, Bnd-LastModified
+							Require-Capability, Provide-Capability, Private-Package, Include-Resource,
+							Tool, Created-By, Built-By, Bnd-LastModified
 						</_removeheaders>
 					</instructions>
 				</configuration>
@@ -125,6 +125,7 @@
 				<version>3.0.0-M1</version>
 				<configuration>
 					<additionalparam>-Xdoclint:none</additionalparam>
+					<excludePackageNames>com.amitinside.featureflags.internal:com.amitinside.featureflags.util</excludePackageNames>
 				</configuration>
 				<executions>
 					<execution>
