@@ -99,7 +99,7 @@ This project is licensed under EPL-1.0
   ]
 }
 ```
-3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.amitinside.featureflags.feature.group`.
+3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.qivicon.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.qivicon.featureflags.feature.group`.
 
 4. In your DS Component, use `FeatureService` to check if the feature is enabled
 
