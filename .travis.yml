@@ -10,6 +10,6 @@ branches:
     - master
 
 before_install:
-      - "cd com.amitinside.featureflags"
+      - "cd com.qivicon.featureflags"
       
 install: mvn compile -DskipTests=true -Dgpg.skip 
