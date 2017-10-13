@@ -12,6 +12,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.internal;
 
+import static com.amitinside.featureflags.ConfigurationEvent.Type.*;
 import static com.amitinside.featureflags.internal.Config.ENABLED;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.framework.Constants.*;
@@ -20,6 +21,7 @@ import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -29,6 +31,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Component;
@@ -36,13 +40,18 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.amitinside.featureflags.ConfigurationEvent;
+import com.amitinside.featureflags.ConfigurationEvent.Type;
 import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
+import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
@@ -52,7 +61,7 @@ import com.google.common.collect.TreeMultimap;
  * {@link Feature} services and {@link ActivationStrategy} services.
  */
 @Component(name = "FeatureManager", immediate = true)
-public final class FeatureManager implements FeatureService {
+public final class FeatureManager implements FeatureService, org.osgi.service.cm.ConfigurationListener {
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -62,14 +71,17 @@ public final class FeatureManager implements FeatureService {
     private final Multimap<String, Description<FeatureGroup>> allFeatureGroups = TreeMultimap.create();
 
     private final Map<String, Feature> activeFeatures = Maps.newHashMap();
-    private final Map<String, ActivationStrategy> activeStrategies = Maps.newHashMap();
     private final Map<String, FeatureGroup> activeFeatureGroups = Maps.newHashMap();
+    private final Map<String, ActivationStrategy> activeStrategies = Maps.newHashMap();
+
+    private final List<ConfigurationListener> listeners = Lists.newCopyOnWriteArrayList();
 
     private final Lock featuresLock = new ReentrantLock(true);
     private final Lock strategiesLock = new ReentrantLock(true);
     private final Lock featureGroupsLock = new ReentrantLock(true);
 
     private ConfigurationAdmin configurationAdmin;
+    private BundleContext context;
 
     @Override
     public Stream<Feature> getFeatures() {
@@ -142,6 +154,35 @@ public final class FeatureManager implements FeatureService {
         return toggleFeatureGroup(groupName, false);
     }
 
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void configurationEvent(final org.osgi.service.cm.ConfigurationEvent event) {
+        final ServiceReference reference = event.getReference();
+        try {
+            final Object service = context.getService(reference);
+            if (service instanceof Feature || service instanceof FeatureGroup) {
+                final Strategizable instance = (Strategizable) service;
+                listeners.forEach(l -> l.onEvent(getEvent(instance, event.getType())));
+            }
+        } finally {
+            context.ungetService(reference);
+        }
+    }
+
+    private ConfigurationEvent getEvent(final Strategizable instance, final int type) {
+        Map<String, Object> properties = null;
+        if (instance instanceof Feature) {
+            properties = getFeatureProperties((Feature) instance);
+        } else {
+            properties = ImmutableMap.of();
+        }
+        if (instance instanceof FeatureGroup) {
+            properties = getFeatureGroupProperties((FeatureGroup) instance);
+        }
+        final Type eventType = type == 1 ? UPDATED : DELETED;
+        return new ConfigurationEvent(eventType, instance, properties);
+    }
+
     private boolean toggleFeature(final String featureName, final boolean status) {
         //@formatter:off
         final String pid = allFeatures.values().stream()
@@ -197,15 +238,7 @@ public final class FeatureManager implements FeatureService {
         if (!strategyId.isEmpty()) {
             final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
             if (strategy != null) {
-                //@formatter:off
-                    final Map<String, Object> properties = allFeatureGroups.values().stream()
-                            .sorted()
-                            .filter(x -> x.instance == group)
-                            .findFirst()
-                            .map(f -> f.props)
-                            .orElse(ImmutableMap.of());
-                    //@formatter:on
-                return strategy.isEnabled(group, properties);
+                return strategy.isEnabled(group, getFeatureGroupProperties(group));
             }
         } else {
             return group.isEnabled();
@@ -218,18 +251,32 @@ public final class FeatureManager implements FeatureService {
         if (!strategyId.isEmpty()) {
             final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
             if (strategy != null) {
-                //@formatter:off
-                final Map<String, Object> properties = allFeatures.values().stream()
-                        .sorted()
-                        .filter(x -> x.instance == feature)
-                        .findFirst()
-                        .map(f -> f.props)
-                        .orElse(ImmutableMap.of());
-                //@formatter:on
-                return strategy.isEnabled(feature, properties);
+                return strategy.isEnabled(feature, getFeatureProperties(feature));
             }
         }
         return feature.isEnabled();
+    }
+
+    private Map<String, Object> getFeatureProperties(final Feature feature) {
+        //@formatter:off
+        return allFeatures.values().stream()
+                .sorted()
+                .filter(x -> x.instance == feature)
+                .findFirst()
+                .map(f -> f.props)
+                .orElse(ImmutableMap.of());
+        //@formatter:on
+    }
+
+    private Map<String, Object> getFeatureGroupProperties(final FeatureGroup group) {
+        //@formatter:off
+        return allFeatureGroups.values().stream()
+                .sorted()
+                .filter(x -> x.instance == group)
+                .findFirst()
+                .map(f -> f.props)
+                .orElse(ImmutableMap.of());
+        //@formatter:on
     }
 
     /**
@@ -340,6 +387,21 @@ public final class FeatureManager implements FeatureService {
         }
     }
 
+    /**
+     * {@link ConfigurationListener} service binding callback
+     */
+    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
+    protected void bindConfigurationListener(final ConfigurationListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * {@link ConfigurationListener} service unbinding callback
+     */
+    protected void unbindConfigurationListener(final ConfigurationListener listener) {
+        listeners.remove(listener);
+    }
+
     private <T> void bindInstance(final T instance, final String name, final Map<String, Object> props,
             final Multimap<String, Description<T>> allInstances, final Map<String, T> activeInstances) {
         final Description<T> info = new Description<>(instance, props);
@@ -412,4 +474,5 @@ public final class FeatureManager implements FeatureService {
             return Objects.hashCode(serviceId);
         }
     }
+
 }
