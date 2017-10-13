@@ -1,4 +1,5 @@
-com.amitinside.featureflags
-com.amitinside.featureflags.feature
-com.amitinside.featureflags.feature.group
-com.amitinside.featureflags.strategy
+com.qivicon.featureflags
+com.qivicon.featureflags.feature
+com.qivicon.featureflags.feature.group
+com.qivicon.featureflags.listener
+com.qivicon.featureflags.strategy
