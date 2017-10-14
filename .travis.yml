@@ -13,3 +13,6 @@ before_install:
       - "cd com.qivicon.featureflags"
       
 install: mvn install -Dgpg.skip
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
