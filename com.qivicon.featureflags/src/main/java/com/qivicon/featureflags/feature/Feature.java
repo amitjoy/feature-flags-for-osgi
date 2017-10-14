@@ -29,6 +29,14 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
  * by service ID in descending order. That is, services with lower service IDs
  * will be accessible whereas those with higher service IDs are ignored.
  * </p>
+ * <p>
+ * If a feature belongs to a valid
+ * feature group or it specifies any valid activation strategy, this would not
+ * return the actual enablement value.
+ * <p>
+ * To check enablement of any feature, use {@link FeatureService#isFeatureEnabled(String)}.
+ * </p>
+ * </p>
  *
  * This interface is intended to be implemented by feature providers.
  *
@@ -41,31 +49,6 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
 public interface Feature extends Strategizable {
 
     /**
-     * The name of the feature.
-     *
-     * @return The name of this feature which must not be {@code null} or an
-     *         empty string.
-     */
-    String getName();
-
-    /**
-     * The description of the feature.
-     *
-     * @return The optional description of this feature wrapped in {@link Optional}
-     *         or empty {@link Optional} instance
-     */
-    Optional<String> getDescription();
-
-    /**
-     * The associated strategy identifier that will be used to check
-     * whether this feature will be enabled or not.
-     *
-     * @return The strategy identifier of this feature wrapped in {@link Optional}
-     *         or empty {@link Optional} instance
-     */
-    Optional<String> getStrategy();
-
-    /**
      * The associated group identifier that will be used to check
      * whether this feature belongs to any group.
      *
@@ -74,16 +57,4 @@ public interface Feature extends Strategizable {
      */
     Optional<String> getGroup();
 
-    /**
-     * Checks whether the feature is enabled in its configuration. This only shows
-     * the configuration provided to the feature. If a feature belongs to a valid
-     * feature group or it specifies any valid activation strategy, this would not
-     * return the actual enablement value.
-     * <p>
-     * To check enablement of any feature, use {@link FeatureService#isFeatureEnabled(String)}.
-     * </p>
-     *
-     * @return {@code true} if this {@code Feature} is enabled in its configuration
-     */
-    boolean isEnabled();
 }

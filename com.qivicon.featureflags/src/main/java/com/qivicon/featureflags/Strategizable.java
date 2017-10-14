@@ -12,6 +12,8 @@
  *******************************************************************************/
 package com.qivicon.featureflags;
 
+import java.util.Optional;
+
 import com.qivicon.featureflags.feature.Feature;
 import com.qivicon.featureflags.feature.group.FeatureGroup;
 import com.qivicon.featureflags.strategy.ActivationStrategy;
@@ -33,4 +35,37 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
  * @ThreadSafe
  */
 public interface Strategizable {
+
+    /**
+     * The name of the strategizable.
+     *
+     * @return The name of this strategizable which must not be {@code null} or an
+     *         empty string.
+     */
+    String getName();
+
+    /**
+     * The description of the strategizable.
+     *
+     * @return The optional description of this feature wrapped in {@link Optional}
+     *         or empty {@link Optional} instance
+     */
+    Optional<String> getDescription();
+
+    /**
+     * The associated strategy identifier that will be used to check
+     * whether this strategizable will be enabled or not.
+     *
+     * @return The strategy identifier of this strategizable wrapped in {@link Optional}
+     *         or empty {@link Optional} instance
+     */
+    Optional<String> getStrategy();
+
+    /**
+     * Checks whether the strategizable is enabled in its configuration. This only shows
+     * the configuration provided to the strategizable.
+     *
+     * @return {@code true} if this {@code Strategizable} is enabled in its configuration
+     */
+    boolean isEnabled();
 }

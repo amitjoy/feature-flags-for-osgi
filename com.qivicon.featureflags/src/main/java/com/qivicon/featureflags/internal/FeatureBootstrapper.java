@@ -16,12 +16,12 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.qivicon.featureflags.Constants.*;
 import static com.qivicon.featureflags.internal.Config.*;
 import static org.osgi.framework.Bundle.ACTIVE;
+import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +31,7 @@ import java.util.Optional;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.Constants;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
@@ -47,6 +48,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
+import com.qivicon.featureflags.ConfigurationEvent;
+import com.qivicon.featureflags.ConfigurationEvent.Type;
+import com.qivicon.featureflags.listener.ConfigurationListener;
+import com.qivicon.featureflags.storage.StorageService;
 
 /**
  * {@link FeatureBootstrapper} is used to track all installed bundles. It looks for
@@ -112,13 +117,14 @@ import com.google.gson.Gson;
  */
 @SuppressWarnings("unused")
 @Component(service = FeatureBootstrapper.class, name = "FeatureBootstrapper", immediate = true)
-public final class FeatureBootstrapper implements BundleTrackerCustomizer {
+public final class FeatureBootstrapper implements BundleTrackerCustomizer, ConfigurationListener {
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private BundleTracker bundleTracker;
     private ConfigurationAdmin configurationAdmin;
+    private StorageService storageService;
     private final Gson gson = new Gson();
 
     // configuration PIDs associated with the bundle instance that contains the features
@@ -131,6 +137,9 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
     protected void activate(final BundleContext context) {
         bundleTracker = new BundleTracker(context, ACTIVE, this);
         bundleTracker.open();
+        if (storageService == null) {
+            storageService = new DefaultStorage();
+        }
     }
 
     @Deactivate
@@ -155,6 +164,21 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
         this.configurationAdmin = null;
     }
 
+    /**
+     * {@link StorageService} service binding callback
+     */
+    @Reference(cardinality = OPTIONAL)
+    protected void setStorageService(final StorageService storageService) {
+        this.storageService = storageService;
+    }
+
+    /**
+     * {@link StorageService} service unbinding callback
+     */
+    protected void unsetStorageService(final StorageService storageService) {
+        this.storageService = null;
+    }
+
     @Override
     public Object addingBundle(final Bundle bundle, final BundleEvent event) {
         final Data data = getData(bundle);
@@ -163,6 +187,25 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
             addGroups(bundle, data);
         }
         return bundle;
+    }
+
+    @Override
+    public void modifiedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
+        removedBundle(bundle, event, object);
+        addingBundle(bundle, event);
+    }
+
+    @Override
+    public void removedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
+        // do not remove any registered feature or feature group
+    }
+
+    @Override
+    public void onEvent(final ConfigurationEvent event) {
+        final String name = event.getType().name();
+        if (event.getType() == Type.UPDATED) {
+            storageService.put(name, (String) event.getProperties().get(Constants.SERVICE_PID));
+        }
     }
 
     private void addFeatures(final Bundle bundle, final Data data) {
@@ -191,50 +234,6 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
         }
     }
 
-    @Override
-    public void modifiedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
-        removedBundle(bundle, event, object);
-        addingBundle(bundle, event);
-    }
-
-    @Override
-    public void removedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
-        removeAllFeatures(bundle);
-        removeAllFeatureGroups(bundle);
-    }
-
-    private void removeAllFeatures(final Bundle bundle) {
-        final Collection<String> features = allFeatures.get(bundle);
-        if (features.isEmpty()) {
-            return;
-        }
-        for (final String pid : features) {
-            try {
-                final Configuration config = configurationAdmin.getConfiguration(pid);
-                config.delete();
-            } catch (final IOException e) {
-                logger.trace("Cannot delete feature configuration instance", e);
-            }
-        }
-        allFeatures.removeAll(bundle);
-    }
-
-    private void removeAllFeatureGroups(final Bundle bundle) {
-        final Collection<String> groups = allFeatureGroups.get(bundle);
-        if (groups.isEmpty()) {
-            return;
-        }
-        for (final String pid : groups) {
-            try {
-                final Configuration config = configurationAdmin.getConfiguration(pid);
-                config.delete();
-            } catch (final IOException e) {
-                logger.trace("Cannot delete feature group configuration instance", e);
-            }
-        }
-        allFeatureGroups.removeAll(bundle);
-    }
-
     /**
      * Registers the specified feature properties as a configurable
      * {@link com.qivicon.featureflags.feature.Feature} service
@@ -244,8 +243,13 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
      */
     private Optional<String> registerFeature(final Feature feature) {
         try {
+            final String name = feature.getName();
+            final Optional<String> value = storageService.get(name);
+            if (value.isPresent()) {
+                return Optional.empty();
+            }
             final Map<String, Object> props = Maps.newHashMap();
-            props.put(NAME.value(), feature.getName());
+            props.put(NAME.value(), name);
             props.put(DESCRIPTION.value(), feature.getDescription());
             props.put(STRATEGY.value(), feature.getStrategy());
             props.put(GROUP.value(), feature.getGroup());
@@ -274,6 +278,11 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer {
      */
     private Optional<String> registerFeatureGroup(final Group group) {
         try {
+            final String name = group.getName();
+            final Optional<String> value = storageService.get(name);
+            if (value.isPresent()) {
+                return Optional.empty();
+            }
             final Map<String, Object> props = Maps.newHashMap();
             props.put(NAME.value(), group.getName());
             props.put(DESCRIPTION.value(), group.getDescription());

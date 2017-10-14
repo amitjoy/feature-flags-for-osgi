@@ -30,6 +30,7 @@ import com.qivicon.featureflags.ConfigurationEvent;
  *
  * @ThreadSafe
  */
+@FunctionalInterface
 public interface ConfigurationListener {
     /**
      * Receives notification of a Configuration that has changed.

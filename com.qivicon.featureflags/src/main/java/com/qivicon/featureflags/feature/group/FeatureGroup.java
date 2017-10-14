@@ -12,8 +12,6 @@
  *******************************************************************************/
 package com.qivicon.featureflags.feature.group;
 
-import java.util.Optional;
-
 import com.qivicon.featureflags.FeatureService;
 import com.qivicon.featureflags.Strategizable;
 import com.qivicon.featureflags.feature.Feature;
@@ -30,6 +28,14 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
  * ID in descending order. That is, services with lower service IDs will be accessible
  * whereas those with higher service IDs are ignored.
  * </p>
+ * <p>
+ * If the feature group is enabled, all
+ * the features belonging to it, will by default be enabled. Hence, no associated
+ * strategy would be effective on belonging {@link Feature}s.
+ * <p>
+ * To check enablement of any feature group, use {@link FeatureService#isGroupEnabled(String)}.
+ * </p>
+ * </p>
  *
  * This interface is intended to be implemented by feature providers.
  *
@@ -40,42 +46,4 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
  * @ThreadSafe
  */
 public interface FeatureGroup extends Strategizable {
-
-    /**
-     * The name of the feature group.
-     *
-     * @return The name of this feature group which must not be {@code null} or an
-     *         empty string.
-     */
-    String getName();
-
-    /**
-     * The description of the feature group.
-     *
-     * @return The optional description of this feature group wrapped in {@link Optional}
-     *         or empty {@link Optional} instance
-     */
-    Optional<String> getDescription();
-
-    /**
-     * The associated strategy identifier that will be used to check
-     * whether this feature group will be enabled or not.
-     *
-     * @return The strategy identifier of this feature wrapped in {@link Optional}
-     *         or empty {@link Optional} instance
-     */
-    Optional<String> getStrategy();
-
-    /**
-     * Checks whether the feature group is enabled. If the feature group is enabled, all
-     * the features belonging to it, will by default be enabled. Hence, no associated
-     * strategy would be effective on belonging {@link Feature}s.
-     * <p>
-     * To check enablement of any feature group, use {@link FeatureService#isGroupEnabled(String)}.
-     * </p>
-     *
-     * @return {@code true} if this {@code FeatureGroup} is enabled
-     */
-    boolean isEnabled();
-
 }
