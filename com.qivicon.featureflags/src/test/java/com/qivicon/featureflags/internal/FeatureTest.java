@@ -19,14 +19,13 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
-import com.qivicon.featureflags.internal.ConfiguredFeature;
 
 public final class FeatureTest {
 
     private Map<String, Object> featureProperties;
 
     @Test
-    public void testAllPropertiesAvailability() {
+    public void testAllPropertiesAvailabilityOnActivate() {
         featureProperties = Maps.newHashMap();
         featureProperties.put("name", "feature1");
         featureProperties.put("description", "My Feature");
@@ -36,6 +35,27 @@ public final class FeatureTest {
 
         final ConfiguredFeature feature = new ConfiguredFeature();
         feature.activate(featureProperties);
+
+        assertEquals(feature.getName(), "feature1");
+        assertEquals(feature.getDescription().get(), "My Feature");
+        assertEquals(feature.isEnabled(), true);
+        assertEquals(feature.getGroup().get(), "group1");
+        assertEquals(feature.getStrategy().get(), "strategy1");
+    }
+
+    @Test
+    public void testAllPropertiesAvailabilityOnUpdate() {
+        featureProperties = Maps.newHashMap();
+        featureProperties.put("name", "feature1");
+        featureProperties.put("description", "My Feature");
+        featureProperties.put("enabled", true);
+        featureProperties.put("group", "group1");
+        featureProperties.put("strategy", "strategy1");
+
+        final ConfiguredFeature feature = new ConfiguredFeature();
+        feature.updated(featureProperties);
+
+        System.out.println("<<>>" + feature);
 
         assertEquals(feature.getName(), "feature1");
         assertEquals(feature.getDescription().get(), "My Feature");
@@ -100,6 +120,65 @@ public final class FeatureTest {
         assertEquals(feature.isEnabled(), true);
         assertEquals(feature.getDescription().get(), "My Feature");
         assertEquals(feature.getGroup().get(), "group1");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNameNull() {
+        featureProperties = Maps.newHashMap();
+        featureProperties.put("name", null);
+        featureProperties.put("description", "My Feature");
+        featureProperties.put("enabled", true);
+        featureProperties.put("group", "group1");
+        featureProperties.put("strategy", "strategy1");
+
+        final ConfiguredFeature feature = new ConfiguredFeature();
+        feature.activate(featureProperties);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNameEmpty() {
+        featureProperties = Maps.newHashMap();
+        featureProperties.put("name", "");
+        featureProperties.put("description", "My Feature");
+        featureProperties.put("enabled", true);
+        featureProperties.put("group", "group1");
+        featureProperties.put("strategy", "strategy1");
+
+        final ConfiguredFeature feature = new ConfiguredFeature();
+        feature.activate(featureProperties);
+    }
+
+    @Test
+    public void testToString() {
+        featureProperties = Maps.newHashMap();
+        featureProperties.put("name", "feature1");
+        featureProperties.put("description", "My Feature");
+        featureProperties.put("enabled", true);
+        featureProperties.put("group", "group1");
+        featureProperties.put("strategy", "strategy1");
+
+        final ConfiguredFeature feature = new ConfiguredFeature();
+        feature.activate(featureProperties);
+
+        assertEquals(feature.toString(),
+                "ConfiguredFeature{Name=feature1, Description=My Feature, Strategy=strategy1, Group=group1, Enabled=true}");
+    }
+
+    @Test
+    public void testEmptyToNull() {
+        featureProperties = Maps.newHashMap();
+        featureProperties.put("name", "feature1");
+        featureProperties.put("description", "My Feature");
+        featureProperties.put("enabled", true);
+        featureProperties.put("group", "");
+        featureProperties.put("strategy", "");
+
+        final ConfiguredFeature feature = new ConfiguredFeature();
+        feature.activate(featureProperties);
+
+        assertFalse(feature.getStrategy().isPresent());
+        assertFalse(feature.getGroup().isPresent());
+
     }
 
 }

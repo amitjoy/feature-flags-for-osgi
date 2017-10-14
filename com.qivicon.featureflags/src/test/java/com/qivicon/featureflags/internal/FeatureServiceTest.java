@@ -12,22 +12,16 @@
  *******************************************************************************/
 package com.qivicon.featureflags.internal;
 
+import static com.qivicon.featureflags.internal.TestUtil.*;
 import static org.junit.Assert.*;
 
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Maps;
-import com.qivicon.featureflags.Strategizable;
 import com.qivicon.featureflags.feature.Feature;
 import com.qivicon.featureflags.feature.group.FeatureGroup;
-import com.qivicon.featureflags.internal.ConfiguredFeature;
-import com.qivicon.featureflags.internal.ConfiguredFeatureGroup;
-import com.qivicon.featureflags.internal.FeatureManager;
 import com.qivicon.featureflags.strategy.ActivationStrategy;
 
 public final class FeatureServiceTest {
@@ -140,6 +134,9 @@ public final class FeatureServiceTest {
         manager.bindStrategy(strategy1, createServiceProperties(2, 5, "pid4"));
 
         assertEquals(manager.getFeaturesByStrategy("strategy1").count(), 2);
+
+        assertEquals(manager.getFeaturesByStrategy("").count(), 0);
+        assertEquals(manager.getFeaturesByStrategy(null).count(), 0);
     }
 
     @Test
@@ -156,6 +153,9 @@ public final class FeatureServiceTest {
         manager.bindStrategy(strategy1, createServiceProperties(2, 5, "pid4"));
 
         assertEquals(manager.getGroupsByStrategy("strategy1").count(), 2);
+
+        assertEquals(manager.getGroupsByStrategy("").count(), 0);
+        assertEquals(manager.getGroupsByStrategy(null).count(), 0);
     }
 
     @Test
@@ -308,6 +308,9 @@ public final class FeatureServiceTest {
         manager.bindFeatureGroup(group1, createServiceProperties(2, 5, "pid4"));
 
         assertEquals(manager.getFeaturesByGroup("group1").count(), 2);
+
+        assertEquals(manager.getFeaturesByGroup("").count(), 0);
+        assertEquals(manager.getFeaturesByGroup(null).count(), 0);
     }
 
     @Test
@@ -376,100 +379,118 @@ public final class FeatureServiceTest {
         assertEquals(manager.getStrategy("strategy1").get().getDescription().get(), "My Strategy 2");
     }
 
-    private Feature createFeature(final String name, final String description, final boolean enabled,
-            final String group, final String strategy) {
-        final Map<String, Object> featureProperties = Maps.newHashMap();
-        featureProperties.put("name", name);
-        featureProperties.put("description", description);
-        featureProperties.put("enabled", enabled);
-        featureProperties.put("group", group);
-        featureProperties.put("strategy", strategy);
-
-        final ConfiguredFeature feature = new ConfiguredFeature();
-        feature.activate(featureProperties);
-        return feature;
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentGetFeature() {
+        manager.getFeature(null);
     }
 
-    private FeatureGroup createFeatureGroup(final String name, final String description, final boolean enabled,
-            final String strategy) {
-        final Map<String, Object> groupProperties = Maps.newHashMap();
-        groupProperties.put("name", name);
-        groupProperties.put("description", description);
-        groupProperties.put("enabled", enabled);
-        groupProperties.put("strategy", strategy);
-
-        final ConfiguredFeatureGroup featureGroup = new ConfiguredFeatureGroup();
-        featureGroup.activate(groupProperties);
-        return featureGroup;
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentGetStrategy() {
+        manager.getStrategy(null);
     }
 
-    private ActivationStrategy createStrategy(final String name, final boolean isEnabled, final String description) {
-        final ActivationStrategy strategy = new ActivationStrategy() {
-
-            @Override
-            public boolean isEnabled(final Strategizable strategizable, final Map<String, Object> properties) {
-                return isEnabled;
-            }
-
-            @Override
-            public String getName() {
-                return name;
-            }
-
-            @Override
-            public Optional<String> getDescription() {
-                return Optional.ofNullable(description);
-            }
-        };
-        return strategy;
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentGetGroup() {
+        manager.getGroup(null);
     }
 
-    private Map<String, Object> createServiceProperties(final int ranking, final long serviceId, final String pid) {
-        final Map<String, Object> properties = Maps.newHashMap();
-        properties.put("service.id", serviceId);
-        properties.put("service.ranking", ranking);
-        properties.put("service.pid", pid);
-        return properties;
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentIsFeatureEnabled() {
+        manager.isFeatureEnabled(null);
     }
 
-    public class MyFeatureCustomManager extends FeatureManager {
-        @Override
-        protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
-            Feature newFeature;
-            for (final Feature f : getFeatures().collect(Collectors.toList())) {
-                if (name.equalsIgnoreCase(name)) {
-                    newFeature = createFeature(f.getName(), f.getDescription().get(), status, f.getGroup().orElse(null),
-                            f.getStrategy().orElse(null));
-                    unbindFeature(f, createServiceProperties(2, 5, "pid1"));
-                    bindFeature(newFeature, createServiceProperties(2, 5, "pid1"));
-                }
-            }
-            return true;
-        }
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentIsGroupEnabled() {
+        manager.isGroupEnabled(null);
     }
 
-    private FeatureManager createFeatureManagerWithCM() {
-        return new MyFeatureCustomManager();
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentEnableFeature() {
+        manager.enableFeature(null);
     }
 
-    public class MyFeatureGroupCustomManager extends FeatureManager {
-        @Override
-        protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
-            FeatureGroup newFeatureGroup;
-            for (final FeatureGroup g : getGroups().collect(Collectors.toList())) {
-                if (name.equalsIgnoreCase(name)) {
-                    newFeatureGroup = createFeatureGroup(g.getName(), g.getDescription().get(), status,
-                            g.getStrategy().orElse(null));
-                    unbindFeatureGroup(g, createServiceProperties(2, 5, "pid1"));
-                    bindFeatureGroup(newFeatureGroup, createServiceProperties(2, 5, "pid1"));
-                }
-            }
-            return true;
-        }
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentDisableFeature() {
+        manager.disableFeature(null);
     }
 
-    private FeatureManager createFeatureGroupManagerWithCM() {
-        return new MyFeatureGroupCustomManager();
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentEnableGroup() {
+        manager.enableGroup(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentDisableGroup() {
+        manager.disableGroup(null);
+    }
+
+    @Test
+    public void testNullArgumentGetFeaturesByGroup() {
+        assertEquals(manager.getFeaturesByGroup(null).count(), 0);
+    }
+
+    @Test
+    public void testNullArgumentGetFeaturesByStrategy() {
+        assertEquals(manager.getFeaturesByStrategy(null).count(), 0);
+    }
+
+    @Test
+    public void testNullArgumentGetGroupsByStrategy() {
+        assertEquals(manager.getGroupsByStrategy(null).count(), 0);
+    }
+
+    @Test
+    public void testBindFeatureWithNullName() {
+        final Feature feature = createFeatureCustom(null, "My Feature 1", true, "group1", "strategy1");
+
+        manager.bindFeature(feature, createServiceProperties(3, 5, "pid1"));
+
+        assertEquals(manager.getFeatures().count(), 0);
+    }
+
+    @Test
+    public void testBindFeatureWithEmptyName() {
+        final Feature feature = createFeatureCustom("", "My Feature 1", true, "group1", "strategy1");
+
+        manager.bindFeature(feature, createServiceProperties(3, 5, "pid1"));
+
+        assertEquals(manager.getFeatures().count(), 0);
+    }
+
+    @Test
+    public void testBindFeatureGroupWithNullName() {
+        final FeatureGroup group = createFeatureGroupCustom(null, "My Group 1", false, "strategy1");
+
+        manager.bindFeatureGroup(group, createServiceProperties(3, 5, "pid1"));
+
+        assertEquals(manager.getGroups().count(), 0);
+    }
+
+    @Test
+    public void testBindFeatureGroupWithEmptyName() {
+        final FeatureGroup group = createFeatureGroupCustom("", "My Group 1", false, "strategy1");
+
+        manager.bindFeatureGroup(group, createServiceProperties(3, 5, "pid1"));
+
+        assertEquals(manager.getGroups().count(), 0);
+    }
+
+    @Test
+    public void testBindStrategyWithNullName() {
+        final ActivationStrategy strategy = createActivationStrategyCustom(null, "My Strategy 1", false);
+
+        manager.bindStrategy(strategy, createServiceProperties(3, 5, "pid1"));
+
+        assertEquals(manager.getStrategies().count(), 0);
+    }
+
+    @Test
+    public void testBindStrategyWithEmptyName() {
+        final ActivationStrategy strategy = createActivationStrategyCustom("", "My Strategy 1", false);
+
+        manager.bindStrategy(strategy, createServiceProperties(3, 5, "pid1"));
+
+        assertEquals(manager.getStrategies().count(), 0);
     }
 
 }

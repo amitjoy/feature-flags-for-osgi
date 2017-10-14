@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.qivicon.featureflags.internal.DefaultStorage;
 import com.qivicon.featureflags.storage.StorageService;
 
 public final class DefaultStorageTest {
@@ -39,6 +38,21 @@ public final class DefaultStorageTest {
 
         storage.clear();
         assertEquals(storage.keys().count(), 0);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testGetNullArgument() {
+        storage.get(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testPutNullArgument() {
+        storage.put(null, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testRemoveNullArgument() {
+        storage.remove(null);
     }
 
 }

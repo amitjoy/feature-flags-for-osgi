@@ -13,8 +13,10 @@
 package com.qivicon.featureflags.internal;
 
 import static com.qivicon.featureflags.internal.Config.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import org.junit.Test;
@@ -40,6 +42,36 @@ public final class ConfigTest {
         assertEquals(parsedProps.get(ENABLED), true);
         assertEquals(parsedProps.get(GROUP), "group1");
         assertEquals(parsedProps.get(STRATEGY), "strategy1");
+    }
+
+    @Test(expected = InvocationTargetException.class)
+    public void testObjectConstruction() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        final Class<?> clazz = Class.forName(ConfigHelper.class.getName());
+        final Constructor<?> con[] = clazz.getDeclaredConstructors();
+        con[0].setAccessible(true);
+        con[0].newInstance(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgument1() {
+        ConfigHelper.parseProperties(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgument2() {
+        getIfPresent(null);
+    }
+
+    @Test
+    public void testInvalidArgument() {
+        assertFalse(getIfPresent("").isPresent());
+    }
+
+    @Test
+    public void testGetValue() {
+        final Config config = ENABLED;
+        assertEquals(config.value(), "enabled");
     }
 
 }
