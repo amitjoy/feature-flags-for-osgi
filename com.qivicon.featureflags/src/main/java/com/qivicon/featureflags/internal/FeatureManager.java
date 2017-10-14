@@ -61,7 +61,7 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
  * {@link Feature} services and {@link ActivationStrategy} services.
  */
 @Component(name = "FeatureManager", immediate = true)
-public final class FeatureManager implements FeatureService, org.osgi.service.cm.ConfigurationListener {
+public class FeatureManager implements FeatureService, org.osgi.service.cm.ConfigurationListener {
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -211,7 +211,7 @@ public final class FeatureManager implements FeatureService, org.osgi.service.cm
         return pid.isEmpty() ? false : checkAndUpdateConfiguration(groupName, pid, status);
     }
 
-    private boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
+    protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(pid, "?");
             final Map<String, Object> newProps = Maps.newHashMap();
@@ -360,7 +360,7 @@ public final class FeatureManager implements FeatureService, org.osgi.service.cm
      * {@link FeatureGroup} service binding callback
      */
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindFeatrueGroup(final FeatureGroup group, final Map<String, Object> props) {
+    protected void bindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
         featureGroupsLock.lock();
         try {
             final String name = group.getName();
@@ -377,7 +377,7 @@ public final class FeatureManager implements FeatureService, org.osgi.service.cm
     /**
      * {@link FeatureGroup} service unbinding callback
      */
-    protected void unbindFeatrueGroup(final FeatureGroup group, final Map<String, Object> props) {
+    protected void unbindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
         featureGroupsLock.lock();
         try {
             final String name = group.getName();
