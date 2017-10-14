@@ -12,4 +12,4 @@ branches:
 before_install:
       - "cd com.qivicon.featureflags"
       
-install: mvn compile -DskipTests=true -Dgpg.skip 
+install: mvn install -Dgpg.skip
