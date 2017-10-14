@@ -109,6 +109,7 @@ public final class ConfiguredFeature implements Feature {
                         .add("Name", name)
                         .add("Description", description)
                         .add("Strategy", strategy)
+                        .add("Group", group)
                         .add("Enabled", isEnabled).toString();
         //@formatter:on
     }

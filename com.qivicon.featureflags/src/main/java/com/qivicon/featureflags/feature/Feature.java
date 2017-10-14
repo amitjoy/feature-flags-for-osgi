@@ -30,12 +30,11 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
  * will be accessible whereas those with higher service IDs are ignored.
  * </p>
  * <p>
- * If a feature belongs to a valid
- * feature group or it specifies any valid activation strategy, this would not
- * return the actual enablement value.
+ * If a feature belongs to a valid feature group or it specifies any valid
+ * activation strategy, this would not return the actual enablement value.
+ * </p>
  * <p>
  * To check enablement of any feature, use {@link FeatureService#isFeatureEnabled(String)}.
- * </p>
  * </p>
  *
  * This interface is intended to be implemented by feature providers.

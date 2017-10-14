@@ -32,9 +32,9 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
  * If the feature group is enabled, all
  * the features belonging to it, will by default be enabled. Hence, no associated
  * strategy would be effective on belonging {@link Feature}s.
+ * </p>
  * <p>
  * To check enablement of any feature group, use {@link FeatureService#isGroupEnabled(String)}.
- * </p>
  * </p>
  *
  * This interface is intended to be implemented by feature providers.
