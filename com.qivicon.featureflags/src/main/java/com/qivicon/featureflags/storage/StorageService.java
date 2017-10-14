@@ -16,9 +16,21 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * {@code StorageService} is primarily used to provide a generic way to storing
- * and retrieving data. This can be implemented and exposed as OSGi
- * services.
+ * {@code StorageService} is primarily used to provide a generic way of storing
+ * and retrieving data. This can be implemented and exposed as OSGi service.
+ * This is primarily used by the JSON Resource processor.
+ * <p>
+ * The JSON Resources are read as soon as the containing bundle is in ACTIVE state
+ * and the features and groups are created as services thereafter. And when these
+ * JSON resource containing bundles get uninstalled, the registered services must
+ * not be removed from the runtime. By nature these persistence of these configured
+ * services are managed by OSGi runtime but we require to persist the names of these
+ * services so that by restart of these bundles, the services will not be registered
+ * again. That is why, to persist already registered service names, {@code StorageService}
+ * is used. This interface is left as simple as possible so that anyone can provide
+ * their own implementation of managing persistence. There is also a default
+ * implementation of {@code StorageService} that uses an in-memory storage structure.
+ * </p>
  * <p>
  * This interface is intended to be implemented by feature providers.
  * </p>
