@@ -16,6 +16,7 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.qivicon.featureflags.Constants.*;
 import static com.qivicon.featureflags.internal.Config.*;
 import static org.osgi.framework.Bundle.ACTIVE;
+import static org.osgi.framework.Constants.SERVICE_PID;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 
 import java.io.IOException;
@@ -31,7 +32,6 @@ import java.util.Optional;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.Constants;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
@@ -204,7 +204,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
     public void onEvent(final ConfigurationEvent event) {
         final String name = event.getType().name();
         if (event.getType() == Type.UPDATED) {
-            storageService.put(name, (String) event.getProperties().get(Constants.SERVICE_PID));
+            storageService.put(name, (String) event.getProperties().get(SERVICE_PID));
         }
     }
 
@@ -289,10 +289,10 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
             props.put(STRATEGY.value(), group.getStrategy());
             props.put(ENABLED.value(), Optional.ofNullable(group.isEnabled()).orElse(false));
             // remove all null values
-            Maps.filterValues(props, Objects::nonNull);
+            final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
             final Configuration configuration = configurationAdmin
                     .createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
-            configuration.update(new Hashtable<>(props));
+            configuration.update(new Hashtable<>(filteredProps));
             return Optional.of(configuration.getPid());
         } catch (final IOException e) {
             logger.trace("Cannot create feature group configuration instance", e);
