@@ -116,6 +116,7 @@
 							Tool, Created-By,
 							Built-By, Bnd-LastModified
 						</_removeheaders>
+						<_donotcopy>Test$</_donotcopy>
 					</instructions>
 				</configuration>
 			</plugin>
