@@ -20,16 +20,13 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
-import com.qivicon.featureflags.internal.Config;
 import com.qivicon.featureflags.util.ConfigHelper;
 
 public final class ConfigTest {
 
-    private Map<String, Object> featureProperties;
-
     @Test
     public void testProperties() {
-        featureProperties = Maps.newHashMap();
+        final Map<String, Object> featureProperties = Maps.newHashMap();
         featureProperties.put("name", "feature1");
         featureProperties.put("description", "My Feature");
         featureProperties.put("enabled", true);
