@@ -25,6 +25,7 @@ This requires a small number of dependencies to work properly:
 * SLF4J 1.7.2+
 * Google Guava 15+
 * GSON 2.2.5+
+* JUnit 4+ (For Unit Tests)
 
 ### Installation
 
@@ -41,7 +42,7 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 #### Building from Source
 
-1. Run `mvn clean install -Dgpg.skip=true` in the project folder
+1. Run `mvn clean install -Dgpg.skip` in the project folder
 
 ### License
 
