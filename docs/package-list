@@ -2,4 +2,5 @@ com.qivicon.featureflags
 com.qivicon.featureflags.feature
 com.qivicon.featureflags.feature.group
 com.qivicon.featureflags.listener
+com.qivicon.featureflags.storage
 com.qivicon.featureflags.strategy
