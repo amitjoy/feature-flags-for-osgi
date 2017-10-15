@@ -5,5 +5,8 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry kind="src" path="src/test/resources"/>
+	<classpathentry kind="lib" path="testlibs/junit-4.12.jar"/>
+	<classpathentry kind="lib" path="testlibs/mockito-core-2.10.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
