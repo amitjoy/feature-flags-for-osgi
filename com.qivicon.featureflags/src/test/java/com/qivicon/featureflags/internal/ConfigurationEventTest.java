@@ -12,7 +12,7 @@
  *******************************************************************************/
 package com.qivicon.featureflags.internal;
 
-import static com.qivicon.featureflags.internal.TestUtil.*;
+import static com.qivicon.featureflags.internal.TestHelper.*;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Map;

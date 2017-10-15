@@ -12,21 +12,40 @@
  *******************************************************************************/
 package com.qivicon.featureflags.internal;
 
-import static com.qivicon.featureflags.internal.TestUtil.*;
+import static com.qivicon.featureflags.internal.TestHelper.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.doReturn;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
+import com.qivicon.featureflags.ConfigurationEvent;
+import com.qivicon.featureflags.ConfigurationEvent.Type;
 import com.qivicon.featureflags.feature.Feature;
 import com.qivicon.featureflags.feature.group.FeatureGroup;
+import com.qivicon.featureflags.listener.ConfigurationListener;
 import com.qivicon.featureflags.strategy.ActivationStrategy;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
+@RunWith(MockitoJUnitRunner.class)
 public final class FeatureServiceTest {
 
     private FeatureManager manager;
+
+    @Mock
+    private BundleContext context;
+
+    @Mock
+    private ServiceReference reference;
 
     @Before
     public void init() {
@@ -198,6 +217,16 @@ public final class FeatureServiceTest {
         manager.disableGroup("group1");
 
         assertFalse(manager.getGroup("group1").get().isEnabled());
+    }
+
+    @Test
+    public void testIsEnabledWhenFeatureInstanceNotPresent() {
+        assertFalse(manager.isFeatureEnabled("feature1"));
+    }
+
+    @Test
+    public void testIsEnabledWhenGroupInstanceNotPresent() {
+        assertFalse(manager.isGroupEnabled("group1"));
     }
 
     @Test
@@ -442,55 +471,155 @@ public final class FeatureServiceTest {
     @Test
     public void testBindFeatureWithNullName() {
         final Feature feature = createFeatureCustom(null, "My Feature 1", true, "group1", "strategy1");
-
         manager.bindFeature(feature, createServiceProperties(3, 5, "pid1"));
-
         assertEquals(manager.getFeatures().count(), 0);
     }
 
     @Test
     public void testBindFeatureWithEmptyName() {
         final Feature feature = createFeatureCustom("", "My Feature 1", true, "group1", "strategy1");
-
         manager.bindFeature(feature, createServiceProperties(3, 5, "pid1"));
-
         assertEquals(manager.getFeatures().count(), 0);
     }
 
     @Test
     public void testBindFeatureGroupWithNullName() {
         final FeatureGroup group = createFeatureGroupCustom(null, "My Group 1", false, "strategy1");
-
         manager.bindFeatureGroup(group, createServiceProperties(3, 5, "pid1"));
-
         assertEquals(manager.getGroups().count(), 0);
     }
 
     @Test
     public void testBindFeatureGroupWithEmptyName() {
         final FeatureGroup group = createFeatureGroupCustom("", "My Group 1", false, "strategy1");
-
         manager.bindFeatureGroup(group, createServiceProperties(3, 5, "pid1"));
-
         assertEquals(manager.getGroups().count(), 0);
     }
 
     @Test
     public void testBindStrategyWithNullName() {
         final ActivationStrategy strategy = createActivationStrategyCustom(null, "My Strategy 1", false);
-
         manager.bindStrategy(strategy, createServiceProperties(3, 5, "pid1"));
-
         assertEquals(manager.getStrategies().count(), 0);
     }
 
     @Test
     public void testBindStrategyWithEmptyName() {
         final ActivationStrategy strategy = createActivationStrategyCustom("", "My Strategy 1", false);
-
         manager.bindStrategy(strategy, createServiceProperties(3, 5, "pid1"));
-
         assertEquals(manager.getStrategies().count(), 0);
+    }
+
+    @Test
+    public void testConfigAdmin() {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        manager = new FeatureManager();
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+
+        manager.bindFeature(feature, createServiceProperties(2, 5, "feature1"));
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.enableFeature("feature1");
+        manager.unsetConfigurationAdmin(configurationAdmin);
+
+        assertTrue(manager.getFeature("feature1").get().isEnabled());
+    }
+
+    @Test
+    public void testConfigAdminWhenPIDEmpty() {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        manager = new FeatureManager();
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+
+        manager.bindFeature(feature, createServiceProperties(2, 5, ""));
+        manager.setConfigurationAdmin(configurationAdmin);
+        assertFalse(manager.enableFeature("feature1"));
+        manager.unsetConfigurationAdmin(configurationAdmin);
+    }
+
+    @Test
+    public void testConfigAdminWhenPIDEmpty2() {
+        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
+        manager = new FeatureManager();
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
+
+        manager.bindFeatureGroup(group, createServiceProperties(2, 5, ""));
+        manager.setConfigurationAdmin(configurationAdmin);
+        assertFalse(manager.enableGroup("group1"));
+        manager.unsetConfigurationAdmin(configurationAdmin);
+    }
+
+    @Test
+    public void testConfigListenerForFeature() {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        manager = new FeatureManager();
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+        configurationAdmin.addListener(manager);
+
+        manager.bindFeature(feature, createServiceProperties(2, 5, "feature1"));
+        manager.setConfigurationAdmin(configurationAdmin);
+        final ConfigurationListener listener = new ConfigurationListener() {
+            @Override
+            public void onEvent(final ConfigurationEvent event) {
+                assertEquals(event.getType(), Type.UPDATED);
+            }
+        };
+        manager.bindConfigurationListener(listener);
+        manager.activate(context);
+        doReturn(feature).when(context).getService(reference);
+        manager.enableFeature("feature1");
+        manager.unbindConfigurationListener(listener);
+        manager.unsetConfigurationAdmin(configurationAdmin);
+
+        assertTrue(manager.getFeature("feature1").get().isEnabled());
+    }
+
+    @Test
+    public void testConfigListenerForFeatureGroup() {
+        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
+        manager = new FeatureManager();
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
+        configurationAdmin.addListener(manager);
+
+        manager.bindFeatureGroup(group, createServiceProperties(2, 5, "group1"));
+        manager.setConfigurationAdmin(configurationAdmin);
+        final ConfigurationListener listener = new ConfigurationListener() {
+            @Override
+            public void onEvent(final ConfigurationEvent event) {
+                assertEquals(event.getType(), Type.UPDATED);
+            }
+        };
+        manager.bindConfigurationListener(listener);
+        manager.activate(context);
+        doReturn(group).when(context).getService(reference);
+        manager.enableGroup("group1");
+        manager.unbindConfigurationListener(listener);
+        manager.unsetConfigurationAdmin(configurationAdmin);
+
+        assertTrue(manager.getGroup("group1").get().isEnabled());
+    }
+
+    @Test
+    public void testServiceDescription() throws ClassNotFoundException, NoSuchMethodException, SecurityException,
+            InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        final Feature feature1 = createFeature("feature1", "My Feature 2", false, "group1", "strategy1");
+        final Feature feature2 = createFeature("feature1", "My Feature 2", false, "group2", "strategy1");
+        final Feature feature3 = createFeature("feature2", "My Feature", false, "group", "strategy");
+        final Map<String, Object> props1 = createServiceProperties(3, 5, "");
+        final Map<String, Object> props2 = createServiceProperties(3, 5, "");
+        final Map<String, Object> props3 = createServiceProperties(3, 5, "myPid");
+
+        final Class clazz = Class.forName("com.qivicon.featureflags.internal.FeatureManager$Description");
+        final Constructor constructor = clazz.getConstructor(Object.class, Map.class);
+        constructor.setAccessible(true);
+        final Object instance1 = constructor.newInstance(feature1, props1);
+        final Object instance2 = constructor.newInstance(feature2, props2);
+        final Object instance3 = constructor.newInstance(feature3, props3);
+
+        assertTrue(instance1.equals(instance2));
+        assertEquals(instance1.hashCode(), instance2.hashCode());
+
+        assertEquals(instance3.toString(),
+                "Description{Ranking=3, ServiceID=5, Instance=ConfiguredFeature{Name=feature2, Description=My Feature, Strategy=strategy, Group=group, Enabled=false}, Properties={service.id=5, service.ranking=3, service.pid=myPid}}");
     }
 
 }

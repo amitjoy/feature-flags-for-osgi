@@ -14,9 +14,11 @@ package com.qivicon.featureflags.internal;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
 import com.qivicon.featureflags.Constants;
 
 public final class ConstantsTest {
@@ -25,9 +27,12 @@ public final class ConstantsTest {
     public void testObjectConstruction() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         final Class<?> clazz = Class.forName(Constants.class.getName());
-        final Constructor<?> con[] = clazz.getDeclaredConstructors();
-        con[0].setAccessible(true);
-        con[0].newInstance(null);
+        final List<Constructor<?>> constrctors = Lists.newArrayList(clazz.getDeclaredConstructors());
+        if (!constrctors.isEmpty()) {
+            Constructor<?> constructor = constrctors.get(0);
+            constructor.setAccessible(true);
+            constructor.newInstance((Object[])null);
+        }
     }
 
 }

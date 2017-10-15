@@ -17,10 +17,12 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.qivicon.featureflags.util.ConfigHelper;
 
@@ -48,9 +50,12 @@ public final class ConfigTest {
     public void testObjectConstruction() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         final Class<?> clazz = Class.forName(ConfigHelper.class.getName());
-        final Constructor<?> con[] = clazz.getDeclaredConstructors();
-        con[0].setAccessible(true);
-        con[0].newInstance(null);
+        final List<Constructor<?>> constrctors = Lists.newArrayList(clazz.getDeclaredConstructors());
+        if (!constrctors.isEmpty()) {
+            Constructor<?> constructor = constrctors.get(0);
+            constructor.setAccessible(true);
+            constructor.newInstance((Object[])null);
+        }
     }
 
     @Test(expected = NullPointerException.class)

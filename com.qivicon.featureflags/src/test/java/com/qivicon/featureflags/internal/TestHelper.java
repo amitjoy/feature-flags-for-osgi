@@ -22,7 +22,7 @@ import com.qivicon.featureflags.feature.Feature;
 import com.qivicon.featureflags.feature.group.FeatureGroup;
 import com.qivicon.featureflags.strategy.ActivationStrategy;
 
-public final class TestUtil {
+public final class TestHelper {
 
     public static Feature createFeature(final String name, final String description, final boolean enabled,
             final String group, final String strategy) {
@@ -169,8 +169,9 @@ public final class TestUtil {
                 if (name.equalsIgnoreCase(name)) {
                     newFeature = createFeature(f.getName(), f.getDescription().get(), status, f.getGroup().orElse(null),
                             f.getStrategy().orElse(null));
-                    unbindFeature(f, createServiceProperties(2, 5, "pid1"));
-                    bindFeature(newFeature, createServiceProperties(2, 5, "pid1"));
+                    final Map<String, Object> props = createServiceProperties(2, 5, "pid1");
+                    unbindFeature(f, props);
+                    bindFeature(newFeature, props);
                 }
             }
             return true;

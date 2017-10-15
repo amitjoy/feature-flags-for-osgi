@@ -55,8 +55,6 @@ public final class FeatureTest {
         final ConfiguredFeature feature = new ConfiguredFeature();
         feature.updated(featureProperties);
 
-        System.out.println("<<>>" + feature);
-
         assertEquals(feature.getName(), "feature1");
         assertEquals(feature.getDescription().get(), "My Feature");
         assertEquals(feature.isEnabled(), true);
