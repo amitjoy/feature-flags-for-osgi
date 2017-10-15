@@ -135,7 +135,7 @@ void unsetFeatureService(final FeatureService featureService) {
 If a strategy is provided for one or more features, the strategy will be used to determine which feature(s) will be active in the runtime. If you don't provide any strategy, the `enabled` property (`Feature#isEnabled()` method) will be used for enablement of the feature. That is, a strategy always overrides any value explicitly set to `enabled` flag.
 
 Apart from this, you can also bundle multiple features into a specific group. Such feature group can also associate a strategy. If a
-valid strategy has been associated to a feature group, the strategy will be used to determine the enablements of all the features that belong to this group and if not, the `enabled` property (`FeatureGroup#isEnabled()` method) will be used for enablement of this feature group and this will eventually determine the enabledments of all the features belonging to this group.
+valid strategy has been associated to a feature group, the strategy will be used to determine the enablements of all the features that belong to this group and if not, the `enabled` property (`FeatureGroup#isEnabled()` method) will be used for enablement of this feature group and this will eventually determine the enablements of all the features belonging to this group.
 
 The following flowchart shows the control flow for the determination of feature enablement:
 
