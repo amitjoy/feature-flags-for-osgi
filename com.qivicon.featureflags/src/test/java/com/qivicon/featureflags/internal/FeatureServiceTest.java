@@ -14,8 +14,9 @@ package com.qivicon.featureflags.internal;
 
 import static com.qivicon.featureflags.internal.TestHelper.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.qivicon.featureflags.ConfigurationEvent;
 import com.qivicon.featureflags.ConfigurationEvent.Type;
@@ -43,9 +45,10 @@ public final class FeatureServiceTest {
 
     @Mock
     private BundleContext context;
-
     @Mock
     private ServiceReference reference;
+    @Mock
+    private ConfigurationAdmin configurationAdmin;
 
     @Before
     public void init() {
@@ -596,6 +599,31 @@ public final class FeatureServiceTest {
         manager.unsetConfigurationAdmin(configurationAdmin);
 
         assertTrue(manager.getGroup("group1").get().isEnabled());
+    }
+
+    @Test
+    public void testConfigListenerForFeatureGroupWithIOException() throws IOException {
+        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
+        manager = new FeatureManager();
+
+        manager.bindFeatureGroup(group, createServiceProperties(2, 5, "group1"));
+        manager.setConfigurationAdmin(configurationAdmin);
+        final ConfigurationListener listener = new ConfigurationListener() {
+            @Override
+            public void onEvent(final ConfigurationEvent event) {
+                assertEquals(event.getType(), Type.UPDATED);
+            }
+        };
+        manager.bindConfigurationListener(listener);
+        manager.activate(context);
+
+        doThrow(IOException.class).when(configurationAdmin).getConfiguration("group1", "?");
+
+        manager.enableGroup("group1");
+        manager.unbindConfigurationListener(listener);
+        manager.unsetConfigurationAdmin(configurationAdmin);
+
+        assertFalse(manager.getGroup("group1").get().isEnabled());
     }
 
     @Test

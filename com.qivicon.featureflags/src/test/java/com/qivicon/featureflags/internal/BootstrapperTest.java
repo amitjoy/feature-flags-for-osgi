@@ -12,10 +12,12 @@
  *******************************************************************************/
 package com.qivicon.featureflags.internal;
 
+import static com.qivicon.featureflags.Constants.*;
 import static com.qivicon.featureflags.internal.TestHelper.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Map;
@@ -30,6 +32,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.util.tracker.BundleTracker;
 
 import com.google.common.collect.Multimap;
@@ -52,6 +55,8 @@ public final class BootstrapperTest {
     private BundleEvent bundleEvent;
     @Mock
     private ServiceReference reference;
+    @Mock
+    private ConfigurationAdmin configurationAdmin;
 
     private FeatureBootstrapper bootstrapper;
     private FeatureManager manager;
@@ -223,6 +228,122 @@ public final class BootstrapperTest {
 
         bootstrapper.unsetConfigurationAdmin(configurationAdmin);
         bootstrapper.unsetStorageService(storageService);
+    }
+
+    @Test
+    public void testBundleAddingWhenFeaturesAlreadyPresent() throws ClassNotFoundException, NoSuchFieldException,
+            SecurityException, IllegalArgumentException, IllegalAccessException {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+
+        bootstrapper.activate(context);
+        bootstrapper.setConfigurationAdmin(configurationAdmin);
+
+        final StorageService storage = new DefaultStorage();
+        storage.put("my.feature", "dummyValue1");
+        storage.put("MyFeatureGroup1", "dummyValue2");
+        storage.put("MyFeatureGroup2", "dummyValue3");
+        bootstrapper.setStorageService(storage);
+
+        final URL path = Resources.getResource("features.json");
+        doReturn(path).when(bundle).getEntry("/features.json");
+
+        bootstrapper.addingBundle(bundle, bundleEvent);
+
+        final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
+        final Field allFeatures = clazz.getDeclaredField("allFeatures");
+        allFeatures.setAccessible(true);
+        final Multimap<Bundle, String> allFeatureInstances = (Multimap<Bundle, String>) allFeatures.get(bootstrapper);
+        assertEquals(allFeatureInstances.size(), 0);
+
+        final Field allGroups = clazz.getDeclaredField("allFeatureGroups");
+        allGroups.setAccessible(true);
+        allGroups.get(bootstrapper);
+        final Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
+        assertEquals(allGroupInstances.get(bundle).size(), 0);
+
+        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetStorageService(storageService);
+    }
+
+    @Test
+    public void testBundleAddingWithIOException() throws ClassNotFoundException, NoSuchFieldException,
+            SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
+        createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+
+        bootstrapper.activate(context);
+        bootstrapper.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.setStorageService(storageService);
+
+        final URL path = Resources.getResource("features.json");
+        doReturn(path).when(bundle).getEntry("/features.json");
+        doReturn(Optional.empty()).when(storageService).get("my.feature");
+        doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_FACTORY_PID);
+        doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
+
+        bootstrapper.addingBundle(bundle, bundleEvent);
+
+        final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
+        final Field allFeatures = clazz.getDeclaredField("allFeatures");
+        allFeatures.setAccessible(true);
+        final Multimap<Bundle, String> allFeatureInstances = (Multimap<Bundle, String>) allFeatures.get(bootstrapper);
+        assertEquals(allFeatureInstances.size(), 0);
+
+        final Field allGroups = clazz.getDeclaredField("allFeatureGroups");
+        allGroups.setAccessible(true);
+        allGroups.get(bootstrapper);
+        final Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
+        assertEquals(allGroupInstances.get(bundle).size(), 0);
+
+        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetStorageService(storageService);
+    }
+
+    @Test
+    public void testBundleAddingModifiedRemoved() throws ClassNotFoundException, NoSuchFieldException,
+            SecurityException, IllegalArgumentException, IllegalAccessException {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+
+        bootstrapper.activate(context);
+        bootstrapper.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.setStorageService(storageService);
+
+        final URL path = Resources.getResource("features.json");
+        doReturn(path).when(bundle).getEntry("/features.json");
+        doReturn(Optional.empty()).when(storageService).get("my.feature");
+
+        bootstrapper.addingBundle(bundle, bundleEvent);
+
+        final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
+        final Field allFeatures = clazz.getDeclaredField("allFeatures");
+        allFeatures.setAccessible(true);
+        Multimap<Bundle, String> allFeatureInstances = (Multimap<Bundle, String>) allFeatures.get(bootstrapper);
+        assertEquals(allFeatureInstances.size(), 1);
+
+        final Field allGroups = clazz.getDeclaredField("allFeatureGroups");
+        allGroups.setAccessible(true);
+        allGroups.get(bootstrapper);
+        Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
+        assertEquals(allGroupInstances.get(bundle).size(), 2);
+
+        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetStorageService(storageService);
+
+        bootstrapper.modifiedBundle(bundle, bundleEvent, feature);
+        allFeatureInstances = (Multimap<Bundle, String>) allFeatures.get(bootstrapper);
+        allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
+
+        assertEquals(allFeatureInstances.size(), 1);
+        assertEquals(allGroupInstances.get(bundle).size(), 2);
+
+        bootstrapper.removedBundle(bundle, bundleEvent, feature);
+        allFeatureInstances = (Multimap<Bundle, String>) allFeatures.get(bootstrapper);
+        allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
+
+        assertEquals(allFeatureInstances.size(), 1);
+        assertEquals(allGroupInstances.get(bundle).size(), 2);
+
     }
 
     @Test

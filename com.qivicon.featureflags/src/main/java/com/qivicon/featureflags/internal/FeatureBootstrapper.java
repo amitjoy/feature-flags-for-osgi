@@ -319,13 +319,8 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
      * Internal class used to represent JSON data
      */
     private static final class Data {
-        private final List<Feature> features;
-        private final List<Group> groups;
-
-        public Data(final List<Feature> features, final List<Group> groups) {
-            this.features = features;
-            this.groups = groups;
-        }
+        private List<Feature> features;
+        private List<Group> groups;
 
         public List<Feature> getFeatures() {
             return features;
