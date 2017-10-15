@@ -191,8 +191,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
 
     @Override
     public void modifiedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
-        removedBundle(bundle, event, object);
-        addingBundle(bundle, event);
+        // do not remove any registered feature or feature group
     }
 
     @Override
@@ -202,9 +201,10 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
 
     @Override
     public void onEvent(final ConfigurationEvent event) {
-        final String name = event.getType().name();
         if (event.getType() == Type.UPDATED) {
-            storageService.put(name, (String) event.getProperties().get(SERVICE_PID));
+            final String name = event.getReference().getName();
+            final String servicePid = (String) event.getProperties().get(SERVICE_PID);
+            storageService.put(name, servicePid);
         }
     }
 

@@ -35,6 +35,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -169,114 +170,12 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         }
     }
 
-    private ConfigurationEvent getEvent(final Strategizable instance, final int type) {
-        Map<String, Object> properties = null;
-        if (instance instanceof Feature) {
-            properties = getFeatureProperties((Feature) instance);
-        } else {
-            properties = ImmutableMap.of();
-        }
-        if (instance instanceof FeatureGroup) {
-            properties = getFeatureGroupProperties((FeatureGroup) instance);
-        }
-        final Type eventType = type == 1 ? UPDATED : DELETED;
-        return new ConfigurationEvent(eventType, instance, properties);
-    }
-
-    private boolean toggleFeature(final String featureName, final boolean status) {
-        //@formatter:off
-        final String pid = allFeatures.values().stream()
-                .sorted()
-                .filter(x -> x.instance.getName().equalsIgnoreCase(featureName))
-                .findFirst()
-                .map(f -> f.props)
-                .map(m -> m.get(SERVICE_PID))
-                .map(String.class::cast)
-                .orElse("");
-        //@formatter:on
-        return pid.isEmpty() ? false : checkAndUpdateConfiguration(featureName, pid, status);
-    }
-
-    private boolean toggleFeatureGroup(final String groupName, final boolean status) {
-        //@formatter:off
-        final String pid = allFeatureGroups.values().stream()
-                .sorted()
-                .filter(x -> x.instance.getName().equalsIgnoreCase(groupName))
-                .findFirst()
-                .map(f -> f.props)
-                .map(m -> m.get(SERVICE_PID))
-                .map(String.class::cast)
-                .orElse("");
-         //@formatter:on
-        return pid.isEmpty() ? false : checkAndUpdateConfiguration(groupName, pid, status);
-    }
-
-    protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(pid, "?");
-            final Map<String, Object> newProps = Maps.newHashMap();
-            newProps.put(ENABLED.value(), status);
-            configuration.update(new Hashtable<>(newProps));
-            return true;
-        } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", name, e);
-        }
-        return false;
-    }
-
-    private boolean checkEnablement(final Feature feature) {
-        final String groupId = feature.getGroup().orElse("");
-        if (!groupId.isEmpty()) {
-            final FeatureGroup group = getGroup(groupId).orElse(null);
-            return checkGroupEnablement(group);
-        }
-        return checkFeatureStrategyEnablement(feature);
-    }
-
-    private boolean checkGroupEnablement(final FeatureGroup group) {
-        final String strategyId = group.getStrategy().orElse("");
-        if (!strategyId.isEmpty()) {
-            final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
-            if (strategy != null) {
-                return strategy.isEnabled(group, getFeatureGroupProperties(group));
-            }
-        } else {
-            return group.isEnabled();
-        }
-        return false;
-    }
-
-    private boolean checkFeatureStrategyEnablement(final Feature feature) {
-        final String strategyId = feature.getStrategy().orElse("");
-        if (!strategyId.isEmpty()) {
-            final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
-            if (strategy != null) {
-                return strategy.isEnabled(feature, getFeatureProperties(feature));
-            }
-        }
-        return feature.isEnabled();
-    }
-
-    private Map<String, Object> getFeatureProperties(final Feature feature) {
-        //@formatter:off
-        return allFeatures.values().stream()
-                .sorted()
-                .filter(x -> x.instance == feature)
-                .findFirst()
-                .map(f -> f.props)
-                .orElse(ImmutableMap.of());
-        //@formatter:on
-    }
-
-    private Map<String, Object> getFeatureGroupProperties(final FeatureGroup group) {
-        //@formatter:off
-        return allFeatureGroups.values().stream()
-                .sorted()
-                .filter(x -> x.instance == group)
-                .findFirst()
-                .map(f -> f.props)
-                .orElse(ImmutableMap.of());
-        //@formatter:on
+    /**
+     * OSGi Service Component Activation Callback
+     */
+    @Activate
+    protected void activate(final BundleContext context) {
+        this.context = context;
     }
 
     /**
@@ -416,6 +315,115 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         calculateActiveInstances(allInstances, activeInstances);
     }
 
+    private ConfigurationEvent getEvent(final Strategizable instance, final int type) {
+        Map<String, Object> properties = null;
+        if (instance instanceof Feature) {
+            properties = getFeatureProperties((Feature) instance);
+        } else if (instance instanceof FeatureGroup) {
+            properties = getFeatureGroupProperties((FeatureGroup) instance);
+        } else {
+            properties = ImmutableMap.of();
+        }
+        final Type eventType = type == 1 ? UPDATED : DELETED;
+        return new ConfigurationEvent(eventType, instance, properties);
+    }
+
+    private boolean toggleFeature(final String featureName, final boolean status) {
+        //@formatter:off
+        final String pid = allFeatures.values().stream()
+                .sorted()
+                .filter(x -> x.instance.getName().equalsIgnoreCase(featureName))
+                .findFirst()
+                .map(f -> f.props)
+                .map(m -> m.get(SERVICE_PID))
+                .map(String.class::cast)
+                .orElse("");
+        //@formatter:on
+        return pid.isEmpty() ? false : checkAndUpdateConfiguration(featureName, pid, status);
+    }
+
+    private boolean toggleFeatureGroup(final String groupName, final boolean status) {
+        //@formatter:off
+        final String pid = allFeatureGroups.values().stream()
+                .sorted()
+                .filter(x -> x.instance.getName().equalsIgnoreCase(groupName))
+                .findFirst()
+                .map(f -> f.props)
+                .map(m -> m.get(SERVICE_PID))
+                .map(String.class::cast)
+                .orElse("");
+        //@formatter:on
+        return pid.isEmpty() ? false : checkAndUpdateConfiguration(groupName, pid, status);
+    }
+
+    protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(pid, "?");
+            final Map<String, Object> newProps = Maps.newHashMap();
+            newProps.put(ENABLED.value(), status);
+            configuration.update(new Hashtable<>(newProps));
+            return true;
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve configuration for {}", name, e);
+        }
+        return false;
+    }
+
+    private boolean checkEnablement(final Feature feature) {
+        final String groupId = feature.getGroup().orElse("");
+        if (!groupId.isEmpty()) {
+            final FeatureGroup group = getGroup(groupId).orElse(null);
+            return checkGroupEnablement(group);
+        }
+        return checkFeatureStrategyEnablement(feature);
+    }
+
+    private boolean checkGroupEnablement(final FeatureGroup group) {
+        final String strategyId = group.getStrategy().orElse("");
+        if (!strategyId.isEmpty()) {
+            final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
+            if (strategy != null) {
+                return strategy.isEnabled(group, getFeatureGroupProperties(group));
+            }
+        } else {
+            return group.isEnabled();
+        }
+        return false;
+    }
+
+    private boolean checkFeatureStrategyEnablement(final Feature feature) {
+        final String strategyId = feature.getStrategy().orElse("");
+        if (!strategyId.isEmpty()) {
+            final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
+            if (strategy != null) {
+                return strategy.isEnabled(feature, getFeatureProperties(feature));
+            }
+        }
+        return feature.isEnabled();
+    }
+
+    private Map<String, Object> getFeatureProperties(final Feature feature) {
+        //@formatter:off
+        return allFeatures.values().stream()
+                .sorted()
+                .filter(x -> Objects.equals(x.instance, feature))
+                .findFirst()
+                .map(f -> f.props)
+                .orElse(ImmutableMap.of());
+        //@formatter:on
+    }
+
+    private Map<String, Object> getFeatureGroupProperties(final FeatureGroup group) {
+        //@formatter:off
+        return allFeatureGroups.values().stream()
+                .sorted()
+                .filter(x -> Objects.equals(x.instance, group))
+                .findFirst()
+                .map(g -> g.props)
+                .orElse(ImmutableMap.of());
+        //@formatter:on
+    }
+
     /**
      * Calculates map of active elements (Strategy or Feature) (eliminating name
      * collisions)
@@ -466,12 +474,28 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
 
         @Override
         public boolean equals(final Object obj) {
-            return Objects.equals(serviceId, obj);
+            if (!(obj instanceof Description)) {
+                return false;
+            }
+            final long otherServiceId = ((Description<?>) obj).serviceId;
+            return serviceId == otherServiceId;
         }
 
         @Override
         public int hashCode() {
             return Objects.hashCode(serviceId);
+        }
+
+        @Override
+        public String toString() {
+            //@formatter:off
+            return com.google.common.base.Objects.toStringHelper(this)
+                                        .add("Ranking", ranking)
+                                        .add("ServiceID", serviceId)
+                                        .add("Instance", instance)
+                                        .add("Properties", props)
+                                        .toString();
+            //@formatter:on
         }
     }
 

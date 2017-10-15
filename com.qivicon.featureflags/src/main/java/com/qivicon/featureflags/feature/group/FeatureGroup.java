@@ -29,9 +29,8 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
  * whereas those with higher service IDs are ignored.
  * </p>
  * <p>
- * If the feature group is enabled, all
- * the features belonging to it, will by default be enabled. Hence, no associated
- * strategy would be effective on belonging {@link Feature}s.
+ * If the feature group is enabled, all the features belonging to it, will by default be
+ * enabled. Hence, no associated strategy would be effective on belonging {@link Feature}s.
  * </p>
  * <p>
  * To check enablement of any feature group, use {@link FeatureService#isGroupEnabled(String)}.
