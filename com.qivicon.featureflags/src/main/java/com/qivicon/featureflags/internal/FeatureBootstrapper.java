@@ -146,6 +146,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
     protected void deactivate(final BundleContext context) {
         if (bundleTracker != null) {
             bundleTracker.close();
+            bundleTracker = null;
         }
     }
 
@@ -210,9 +211,6 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
 
     private void addFeatures(final Bundle bundle, final Data data) {
         final List<Feature> features = data.getFeatures();
-        if (features == null) {
-            return;
-        }
         for (final Feature feature : features) {
             final Optional<String> pid = registerFeature(feature);
             if (pid.isPresent()) {
@@ -223,9 +221,6 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
 
     private void addGroups(final Bundle bundle, final Data data) {
         final List<Group> groups = data.getGroups();
-        if (groups == null) {
-            return;
-        }
         for (final Group group : groups) {
             final Optional<String> pid = registerFeatureGroup(group);
             if (pid.isPresent()) {
@@ -346,22 +341,12 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
      * Internal class used to represent Feature JSON data
      */
     private static final class Feature {
-        private final String name;
-        private final String description;
-        private final String strategy;
-        private final String group;
-        private final boolean enabled;
-        private final Map<String, Object> properties;
-
-        public Feature(final String name, final String description, final String strategy, final String group,
-                final boolean enabled, final Map<String, Object> properties) {
-            this.name = name;
-            this.description = description;
-            this.strategy = strategy;
-            this.group = group;
-            this.enabled = enabled;
-            this.properties = properties;
-        }
+        private String name;
+        private String description;
+        private String strategy;
+        private String group;
+        private boolean enabled;
+        private Map<String, Object> properties;
 
         public String getName() {
             return name;
@@ -392,17 +377,10 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
      * Internal class used to represent Feature Group JSON data
      */
     private static final class Group {
-        private final String name;
-        private final String description;
-        private final String strategy;
-        private final boolean enabled;
-
-        public Group(final String name, final String description, final String strategy, final boolean enabled) {
-            this.name = name;
-            this.description = description;
-            this.strategy = strategy;
-            this.enabled = enabled;
-        }
+        private String name;
+        private String description;
+        private String strategy;
+        private boolean enabled;
 
         public String getName() {
             return name;

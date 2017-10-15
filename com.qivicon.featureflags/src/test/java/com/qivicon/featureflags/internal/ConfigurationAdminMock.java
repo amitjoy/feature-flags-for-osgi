@@ -155,6 +155,7 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
 
         @Override
         public void delete() throws IOException {
+            //mock and not required
         }
 
         @Override
@@ -164,10 +165,12 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
 
         @Override
         public void update() throws IOException {
+            //mock and not required
         }
 
         @Override
         public void setBundleLocation(final String location) {
+            //mock and not required
         }
 
         @Override

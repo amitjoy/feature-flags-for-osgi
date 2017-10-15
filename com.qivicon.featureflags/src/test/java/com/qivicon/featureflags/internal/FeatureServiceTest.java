@@ -616,6 +616,7 @@ public final class FeatureServiceTest {
         final Object instance3 = constructor.newInstance(feature3, props3);
 
         assertTrue(instance1.equals(instance2));
+        assertFalse(instance1.equals(props1));
         assertEquals(instance1.hashCode(), instance2.hashCode());
 
         assertEquals(instance3.toString(),

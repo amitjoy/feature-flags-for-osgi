@@ -30,6 +30,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.BundleTracker;
 
 import com.google.common.collect.Multimap;
 import com.google.common.io.Resources;
@@ -71,6 +72,22 @@ public final class BootstrapperTest {
         final Object service = storage.get(bootstrapper);
         assertTrue(service != null);
         assertTrue(service instanceof DefaultStorage);
+    }
+
+    @Test
+    public void testBundleTrackerNonNull() throws ClassNotFoundException, NoSuchFieldException, SecurityException,
+            IllegalArgumentException, IllegalAccessException {
+        bootstrapper.activate(context);
+        final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
+        final Field trackerField = clazz.getDeclaredField("bundleTracker");
+        trackerField.setAccessible(true);
+        Object tracker = trackerField.get(bootstrapper);
+        assertTrue(tracker != null);
+        assertTrue(tracker instanceof BundleTracker);
+
+        bootstrapper.deactivate(context);
+        tracker = trackerField.get(bootstrapper);
+        assertTrue(tracker == null);
     }
 
     @Test
