@@ -2,7 +2,7 @@
 
 ## Why? [![start with what and why](https://img.shields.io/badge/start%20with-why%3F-brightgreen.svg?style=flat)](http://featureflags.io/feature-flags/)
 
-This is an implementation of the Feature Toggles pattern for OSGi. Feature Toggles are a very common agile development practices in the context of continuous deployment and delivery. The basic idea is to associate a toggle with each new feature you are working on. This allows you to enable or disable these features at application runtime, even for individual users.
+This is an implementation of the Feature Toggles pattern (also known as Feature Flags) for OSGi. Feature Toggles are a very common agile development practices in the context of continuous deployment and delivery. The basic idea is to associate a toggle with each new feature you are working on. This allows you to enable or disable these features at application runtime, even for individual users.
 
 ------------------------------------------------
 
@@ -27,7 +27,6 @@ This requires a small number of dependencies to work properly:
 * SLF4J 1.7.2+
 * Google Guava 15+
 * GSON 2.2.5+
-* JUnit 4+ (For Unit Tests)
 
 ### Installation
 
@@ -39,8 +38,14 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 #### Project Import
 
+**Import as Eclipse Project**
+
 1. Add `SLF4J`, `Google Guava` and `GSON` to your Eclipse IDE Installation's Target Platform
-2. Import this project as Existing Project (`General -> Existing Project into Workspace`)
+2. Import this project as Existing Project (`File -> Import -> General -> Existing Project into Workspace`)
+
+**Import as Maven Project**
+
+1. You can also import the project as Existing Maven Project (`File -> Import -> Maven -> Existing Maven Projects`)
 
 #### Building from Source
 
@@ -141,6 +146,8 @@ The following flowchart shows the control flow for the determination of feature 
 
 ![feature-flags](https://user-images.githubusercontent.com/13380182/31471988-37e71132-aeec-11e7-8f14-45230c69b713.png)
 
-*Examples of strategies*: `IP Based Strategy` by which some features would be enabled based on specific IP Addresses or `Time Based Strategy` by which a group of features are enabled at a certain time of a day.
+**Examples of strategies**: `IP Based Strategy` by which some features would be enabled based on specific IP Addresses or `Time Based Strategy` by which a group of features are enabled at a certain time of a day.
+
+**Motivation of Feature Group**: Feature groups are primarily used to enable or disable multiple related features all-together. That's why enablement of any feature group is directly applied to the belonging features. Not all features should belong to feature group and hence a feature can optionally specify the feature group to which it belongs. Please note that use feature groups only if you have multiple features to group together and whose enablements and disablements would happen together. If you do have multiple features whose enablements and disablements are not at all related, **do not specify any feature group** for those features. For more information, have a look at the aforementioned flowchart.
 
 ----------------------------------------------------------------
