@@ -9,8 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.internal;
 
-import static com.amitinside.featureflags.Constants.*;
-import static com.amitinside.featureflags.internal.Config.*;
 import static com.google.common.base.Charsets.UTF_8;
 import static org.osgi.framework.Bundle.ACTIVE;
 import static org.osgi.framework.Constants.SERVICE_PID;
@@ -20,17 +18,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -42,10 +36,10 @@ import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
+import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.storage.StorageService;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
@@ -67,7 +61,7 @@ import com.google.gson.Gson;
  *        "name":"feature1",
  *        "description":"My Feature 1",
  *        "enabled":false,
- *        "group":"MyFeatureGroup1"
+ *        "groups":["MyFeatureGroup1"]
  *     },
  *     {
  *        "name":"feature2",
@@ -78,7 +72,7 @@ import com.google.gson.Gson;
  *        "name":"feature3",
  *        "description":"My Feature 3",
  *        "enabled":false,
- *        "group":"MyFeatureGroup1"
+ *        "groups":["MyFeatureGroup1", "MyFeatureGroup2"]
  *     },
  *     {
  *        "name":"feature4",
@@ -102,7 +96,12 @@ import com.google.gson.Gson;
  *     {
  *        "name":"MyFeatureGroup2",
  *        "description":"I don't like this Group",
- *        "enabled":false
+ *        "enabled":false,
+ *        "properties":{
+ *           "p4":1,
+ *           "p5":"test1",
+ *           "p6":"test2"
+ *        }
  *     }
  *  ]
  * }
@@ -112,7 +111,6 @@ import com.google.gson.Gson;
  * These properties will be added as your feature's service properties. You can also create feature
  * groups by specifying groups in the JSON resource.
  */
-@SuppressWarnings("unused")
 @Component(service = FeatureBootstrapper.class, name = "FeatureBootstrapper", immediate = true)
 public final class FeatureBootstrapper implements BundleTrackerCustomizer, ConfigurationListener {
 
@@ -120,7 +118,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private BundleTracker bundleTracker;
-    private ConfigurationAdmin configurationAdmin;
+    private FeatureService featureService;
     private StorageService storageService;
     private final Gson gson = new Gson();
 
@@ -148,18 +146,18 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
     }
 
     /**
-     * {@link ConfigurationAdmin} service binding callback
+     * {@link FeatureService} service binding callback
      */
     @Reference
-    protected void setConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
-        this.configurationAdmin = configurationAdmin;
+    protected void setFeatureService(final FeatureService featureService) {
+        this.featureService = featureService;
     }
 
     /**
-     * {@link ConfigurationAdmin} service unbinding callback
+     * {@link FeatureService} service unbinding callback
      */
-    protected void unsetConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
-        this.configurationAdmin = null;
+    protected void unsetFeatureService(final FeatureService featureService) {
+        this.featureService = null;
     }
 
     /**
@@ -236,25 +234,14 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
     private Optional<String> registerFeature(final Feature feature) {
         try {
             final String name = feature.getName();
+            final List<String> groups = feature.getGroups();
             final Optional<String> value = storageService.get(name);
             if (value.isPresent()) {
                 return Optional.empty();
             }
-            final Map<String, Object> props = Maps.newHashMap();
-            props.put(NAME.value(), name);
-            props.put(DESCRIPTION.value(), feature.getDescription());
-            props.put(STRATEGY.value(), feature.getStrategy());
-            props.put(GROUP.value(), feature.getGroup());
-            props.put(ENABLED.value(), Optional.ofNullable(feature.isEnabled()).orElse(false));
-            final Map<String, Object> properties = feature.getProperties();
-            if (properties != null) {
-                props.putAll(properties);
-            }
-            // remove all null values
-            final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-            final Configuration configuration = configurationAdmin.createFactoryConfiguration(FEATURE_FACTORY_PID);
-            configuration.update(new Hashtable<>(filteredProps));
-            return Optional.of(configuration.getPid());
+            final String pid = featureService.createFeature(name, feature.getDescription(), feature.getStrategy(),
+                    groups, feature.isEnabled(), feature.getProperties());
+            return Optional.of(pid);
         } catch (final IOException e) {
             logger.trace("Cannot create feature configuration instance", e);
         }
@@ -275,17 +262,9 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
             if (value.isPresent()) {
                 return Optional.empty();
             }
-            final Map<String, Object> props = Maps.newHashMap();
-            props.put(NAME.value(), group.getName());
-            props.put(DESCRIPTION.value(), group.getDescription());
-            props.put(STRATEGY.value(), group.getStrategy());
-            props.put(ENABLED.value(), Optional.ofNullable(group.isEnabled()).orElse(false));
-            // remove all null values
-            final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-            final Configuration configuration = configurationAdmin
-                    .createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
-            configuration.update(new Hashtable<>(filteredProps));
-            return Optional.of(configuration.getPid());
+            final String pid = featureService.createGroup(name, group.getDescription(), group.getStrategy(),
+                    group.isEnabled(), group.getProperties());
+            return Optional.of(pid);
         } catch (final IOException e) {
             logger.trace("Cannot create feature group configuration instance", e);
         }
@@ -336,7 +315,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
         private String name;
         private String description;
         private String strategy;
-        private String group;
+        private List<String> groups;
         private boolean enabled;
         private Map<String, Object> properties;
 
@@ -352,8 +331,8 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
             return strategy;
         }
 
-        public String getGroup() {
-            return group;
+        public List<String> getGroups() {
+            return groups;
         }
 
         public Map<String, Object> getProperties() {
@@ -373,6 +352,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
         private String description;
         private String strategy;
         private boolean enabled;
+        private Map<String, Object> properties;
 
         public String getName() {
             return name;
@@ -388,6 +368,10 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
 
         public boolean isEnabled() {
             return enabled;
+        }
+
+        public Map<String, Object> getProperties() {
+            return properties;
         }
     }
 

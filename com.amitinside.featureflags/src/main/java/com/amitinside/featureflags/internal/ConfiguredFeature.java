@@ -65,7 +65,7 @@ public final class ConfiguredFeature implements Feature {
             strategy = Optional.ofNullable(props.get(STRATEGY)).map(String.class::cast)
                                                                .filter(s -> !s.isEmpty())
                                                                .orElse(null);
-            groups = Optional.ofNullable(props.get(GROUP)).map(String[].class::cast)
+            groups = Optional.ofNullable(props.get(GROUPS)).map(String[].class::cast)
                                                                .orElse(null);
             isEnabled = Optional.ofNullable(props.get(ENABLED)).map(Boolean.class::cast)
                                                                .orElse(false);
