@@ -59,7 +59,7 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
 
 /**
  * This service implements the {@link FeatureService}. It keeps track of all
- * {@link Feature} services and {@link ActivationStrategy} services.
+ * {@link Feature}, {@link FeatureGroup} and {@link ActivationStrategy} services.
  */
 @Component(name = "FeatureManager", immediate = true)
 public class FeatureManager implements FeatureService, org.osgi.service.cm.ConfigurationListener {
