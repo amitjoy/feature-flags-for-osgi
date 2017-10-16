@@ -10,7 +10,8 @@
 package com.amitinside.featureflags.internal;
 
 import static com.amitinside.featureflags.ConfigurationEvent.Type.*;
-import static com.amitinside.featureflags.internal.Config.ENABLED;
+import static com.amitinside.featureflags.Constants.*;
+import static com.amitinside.featureflags.internal.Config.*;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.framework.Constants.*;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
@@ -48,6 +49,7 @@ import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -165,6 +167,63 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         } finally {
             context.ungetService(reference);
         }
+    }
+
+    @Override
+    public String createFeature(final String name, final String description, final String strategy,
+            final List<String> groups, final boolean isEnabled, final Map<String, Object> serviceProperties)
+            throws IOException {
+        requireNonNull(name, "Feature name cannot be null");
+        final List<String> filteredGroups = groups == null ? ImmutableList.of() : groups;
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put(NAME.value(), name);
+        props.put(DESCRIPTION.value(), description);
+        props.put(STRATEGY.value(), strategy);
+        props.put(GROUPS.value(), filteredGroups.toArray(new String[0]));
+        props.put(ENABLED.value(), isEnabled);
+        if (serviceProperties != null) {
+            props.putAll(serviceProperties);
+        }
+        // remove all null values
+        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
+        final Configuration configuration = configurationAdmin.createFactoryConfiguration(FEATURE_FACTORY_PID);
+        configuration.update(new Hashtable<>(filteredProps));
+        return configuration.getPid();
+    }
+
+    @Override
+    public String createGroup(final String name, final String description, final String strategy,
+            final boolean isEnabled, final Map<String, Object> serviceProperties) throws IOException {
+        requireNonNull(name, "Feature Group name cannot be null");
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put(NAME.value(), name);
+        props.put(DESCRIPTION.value(), description);
+        props.put(STRATEGY.value(), strategy);
+        props.put(ENABLED.value(), isEnabled);
+        if (serviceProperties != null) {
+            props.putAll(serviceProperties);
+        }
+        // remove all null values
+        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
+        final Configuration configuration = configurationAdmin.createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
+        configuration.update(new Hashtable<>(filteredProps));
+        return configuration.getPid();
+    }
+
+    @Override
+    public void removeFeature(final String name) throws IOException {
+        requireNonNull(name, "Feature name cannot be null");
+        final String pid = getFeaturePID(name);
+        final Configuration configuration = configurationAdmin.getConfiguration(pid);
+        configuration.delete();
+    }
+
+    @Override
+    public void removeGroup(final String name) throws IOException {
+        requireNonNull(name, "Feature Group name cannot be null");
+        final String pid = getGroupPID(name);
+        final Configuration configuration = configurationAdmin.getConfiguration(pid);
+        configuration.delete();
     }
 
     /**
@@ -324,8 +383,18 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     private boolean toggleFeature(final String featureName, final boolean status) {
+        final String pid = getFeaturePID(featureName);
+        return pid.isEmpty() ? false : checkAndUpdateConfiguration(featureName, pid, status);
+    }
+
+    private boolean toggleFeatureGroup(final String groupName, final boolean status) {
+        final String pid = getGroupPID(groupName);
+        return pid.isEmpty() ? false : checkAndUpdateConfiguration(groupName, pid, status);
+    }
+
+    private String getFeaturePID(final String featureName) {
         //@formatter:off
-        final String pid = allFeatures.values().stream()
+        return allFeatures.values().stream()
                 .sorted()
                 .filter(x -> x.instance.getName().equalsIgnoreCase(featureName))
                 .findFirst()
@@ -334,12 +403,11 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
                 .map(String.class::cast)
                 .orElse("");
         //@formatter:on
-        return pid.isEmpty() ? false : checkAndUpdateConfiguration(featureName, pid, status);
     }
 
-    private boolean toggleFeatureGroup(final String groupName, final boolean status) {
+    private String getGroupPID(final String groupName) {
         //@formatter:off
-        final String pid = allFeatureGroups.values().stream()
+        return allFeatureGroups.values().stream()
                 .sorted()
                 .filter(x -> x.instance.getName().equalsIgnoreCase(groupName))
                 .findFirst()
@@ -348,7 +416,6 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
                 .map(String.class::cast)
                 .orElse("");
         //@formatter:on
-        return pid.isEmpty() ? false : checkAndUpdateConfiguration(groupName, pid, status);
     }
 
     protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
