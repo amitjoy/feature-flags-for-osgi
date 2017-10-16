@@ -271,8 +271,6 @@ public final class BootstrapperTest {
     @Test
     public void testBundleAddingWithIOException() throws ClassNotFoundException, NoSuchFieldException,
             SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
-        createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
-
         manager.setConfigurationAdmin(configurationAdmin);
         bootstrapper.activate(context);
         bootstrapper.setFeatureService(manager);

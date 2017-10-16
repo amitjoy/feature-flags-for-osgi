@@ -157,10 +157,8 @@ public final class FeatureTest {
         final ConfiguredFeature feature = new ConfiguredFeature();
         feature.activate(featureProperties);
 
-        System.out.println(feature.toString());
-
-        // assertEquals(feature.toString(),
-        // "ConfiguredFeature{Name=feature1, Description=My Feature, Strategy=strategy1, Group=group1, Enabled=true}");
+        assertEquals(feature.toString(),
+                "ConfiguredFeature{Name=feature1, Description=My Feature, Strategy=strategy1, Groups=[group1], Enabled=true}");
     }
 
     @Test
