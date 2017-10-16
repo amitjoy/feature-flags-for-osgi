@@ -47,13 +47,13 @@
             default=""
             description="Strategy ID of this feature to check if the feature is enabled or not by this configuration" />
        
-        <AD id="group"
-            name="Group"
+        <AD id="groups"
+            name="Groups"
             type="String"
-            cardinality="324211"
+            cardinality="55555"
             required="false"
             default=""
-            description="Group ID of this feature to check if the feature belongs to any group" />
+            description="Group IDs of this feature to check if the feature belongs to any group(s)" />
         
     </OCD>
     
