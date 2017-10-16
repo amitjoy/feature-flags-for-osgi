@@ -10,7 +10,7 @@ branches:
     - master
 
 before_install:
-      - "cd com.qivicon.featureflags"
+      - "cd com.amitinside.featureflags"
       
 install: mvn install -Dgpg.skip
 

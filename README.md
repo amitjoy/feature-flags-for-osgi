@@ -107,7 +107,7 @@ This project is licensed under EPL-1.0
   ]
 }
 ```
-3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.qivicon.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.qivicon.featureflags.feature.group`.
+3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.amitinside.featureflags.feature.group`.
 
 4. In your DS Component, use `FeatureService` to check if the feature is enabled
 
@@ -146,7 +146,7 @@ valid strategy has been associated to a feature group, the strategy will be used
 
 The following flowchart shows the control flow for the determination of feature enablement:
 
-![feature-flags](https://user-images.githubusercontent.com/13380182/31471988-37e71132-aeec-11e7-8f14-45230c69b713.png)
+![feature-flags](https://user-images.githubusercontent.com/13380182/31622445-bddc346c-b29c-11e7-9fae-6e9c7a483a30.png)
 
 **Examples of strategies**: `IP Based Strategy` by which some features would be enabled based on specific IP Addresses or `Time Based Strategy` by which a group of features are enabled at a certain time of a day.
 
