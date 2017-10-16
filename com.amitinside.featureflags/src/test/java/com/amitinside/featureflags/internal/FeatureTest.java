@@ -29,7 +29,7 @@ public final class FeatureTest {
         featureProperties.put("name", "feature1");
         featureProperties.put("description", "My Feature");
         featureProperties.put("enabled", true);
-        featureProperties.put("group", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", "strategy1");
 
         final ConfiguredFeature feature = new ConfiguredFeature();
@@ -48,7 +48,7 @@ public final class FeatureTest {
         featureProperties.put("name", "feature1");
         featureProperties.put("description", "My Feature");
         featureProperties.put("enabled", true);
-        featureProperties.put("group", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", "strategy1");
 
         final ConfiguredFeature feature = new ConfiguredFeature();
@@ -66,7 +66,7 @@ public final class FeatureTest {
         featureProperties = Maps.newHashMap();
         featureProperties.put("name", "feature1");
         featureProperties.put("enabled", true);
-        featureProperties.put("group", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", "strategy1");
 
         final ConfiguredFeature feature = new ConfiguredFeature();
@@ -106,7 +106,7 @@ public final class FeatureTest {
         featureProperties.put("name", "feature1");
         featureProperties.put("description", "My Feature");
         featureProperties.put("enabled", true);
-        featureProperties.put("group", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
 
         final ConfiguredFeature feature = new ConfiguredFeature();
         feature.activate(featureProperties);
@@ -125,7 +125,7 @@ public final class FeatureTest {
         featureProperties.put("name", null);
         featureProperties.put("description", "My Feature");
         featureProperties.put("enabled", true);
-        featureProperties.put("group", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", "strategy1");
 
         final ConfiguredFeature feature = new ConfiguredFeature();
@@ -138,7 +138,7 @@ public final class FeatureTest {
         featureProperties.put("name", "");
         featureProperties.put("description", "My Feature");
         featureProperties.put("enabled", true);
-        featureProperties.put("group", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", "strategy1");
 
         final ConfiguredFeature feature = new ConfiguredFeature();
@@ -151,7 +151,7 @@ public final class FeatureTest {
         featureProperties.put("name", "feature1");
         featureProperties.put("description", "My Feature");
         featureProperties.put("enabled", true);
-        featureProperties.put("group", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", Lists.newArrayList("group1").toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", "strategy1");
 
         final ConfiguredFeature feature = new ConfiguredFeature();
@@ -169,7 +169,7 @@ public final class FeatureTest {
         featureProperties.put("name", "feature1");
         featureProperties.put("description", "My Feature");
         featureProperties.put("enabled", true);
-        featureProperties.put("group", Lists.newArrayList().toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", Lists.newArrayList().toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", "");
 
         final ConfiguredFeature feature = new ConfiguredFeature();

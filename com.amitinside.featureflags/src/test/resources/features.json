@@ -3,7 +3,8 @@
 		{
 			"name": "my.feature",
 			"description": "My Feature",
-			"enabled": false
+			"enabled": false,
+			"groups": ["MyFeatureGroup1", "MyFeatureGroup2"]
 		}
 	],
 	"groups": [

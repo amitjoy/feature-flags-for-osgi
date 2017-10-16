@@ -34,6 +34,7 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @RunWith(MockitoJUnitRunner.class)
@@ -470,6 +471,16 @@ public final class FeatureServiceTest {
         manager.disableGroup(null);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentCreateFeature() throws IOException {
+        manager.createFeature(null, "", "", Lists.newArrayList(), false, Maps.newHashMap());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentCreateFeatureGroup() throws IOException {
+        manager.createGroup(null, "", "", false, Maps.newHashMap());
+    }
+
     @Test
     public void testNullArgumentGetFeaturesByGroup() {
         assertEquals(manager.getFeaturesByGroup(null).count(), 0);
@@ -663,6 +674,69 @@ public final class FeatureServiceTest {
 
         assertEquals(instance3.toString(),
                 "Description{Ranking=3, ServiceID=5, Instance=ConfiguredFeature{Name=feature2, Description=My Feature, Strategy=strategy, Groups=[group], Enabled=false}, Properties={service.id=5, service.ranking=3, service.pid=myPid}}");
+    }
+
+    @Test
+    public void testCreateFeature() throws IOException {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+
+        manager.activate(context);
+        manager.setConfigurationAdmin(configurationAdmin);
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put("p", "test");
+
+        assertNotNull(manager.createFeature("feature1", "My Feature 1", "strategy1", Lists.newArrayList("group1"),
+                false, props));
+    }
+
+    @Test
+    public void testCreateFeatureGroup() throws IOException {
+        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
+        configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
+
+        manager.activate(context);
+        manager.setConfigurationAdmin(configurationAdmin);
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put("p", "test");
+
+        assertNotNull(manager.createGroup("group1", "My Group 1", "strategy1", false, props));
+    }
+
+    @Test
+    public void testRemoveFeature() throws IOException {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+
+        final Map<String, Object> props = createServiceProperties(3, 5, "myPid");
+        manager.bindFeature(feature, props);
+        manager.setConfigurationAdmin(configurationAdmin);
+
+        assertEquals(manager.getFeatures().count(), 1);
+
+        manager.removeFeature("feature1");
+        manager.unbindFeature(feature, props);
+
+        assertEquals(manager.getFeatures().count(), 0);
+    }
+
+    @Test
+    public void testRemoveFeatureGroup() throws IOException {
+        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
+        configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
+
+        final Map<String, Object> props = createServiceProperties(3, 5, "myPid");
+        manager.bindFeatureGroup(group, props);
+        manager.setConfigurationAdmin(configurationAdmin);
+
+        assertEquals(manager.getGroups().count(), 1);
+
+        manager.removeGroup("group1");
+        manager.unbindFeatureGroup(group, props);
+
+        assertEquals(manager.getGroups().count(), 0);
     }
 
 }

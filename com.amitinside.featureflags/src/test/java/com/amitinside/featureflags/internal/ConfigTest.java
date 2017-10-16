@@ -31,7 +31,7 @@ public final class ConfigTest {
         featureProperties.put("name", "feature1");
         featureProperties.put("description", "My Feature");
         featureProperties.put("enabled", true);
-        featureProperties.put("group", "group1");
+        featureProperties.put("groups", "group1");
         featureProperties.put("strategy", "strategy1");
 
         final Map<Config, Object> parsedProps = ConfigHelper.parseProperties(featureProperties);
@@ -39,7 +39,7 @@ public final class ConfigTest {
         assertEquals(parsedProps.get(NAME), "feature1");
         assertEquals(parsedProps.get(DESCRIPTION), "My Feature");
         assertEquals(parsedProps.get(ENABLED), true);
-        assertEquals(parsedProps.get(GROUP), "group1");
+        assertEquals(parsedProps.get(GROUPS), "group1");
         assertEquals(parsedProps.get(STRATEGY), "strategy1");
     }
 

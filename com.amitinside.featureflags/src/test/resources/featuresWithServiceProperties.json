@@ -19,7 +19,10 @@
 		{
 			"name": "MyFeatureGroup2",
 			"description": "I don't like this Group",
-			"enabled": false
+			"enabled": false,
+			"properties": {
+				"p2": "test2"
+			}
 		}
 	]
 }

@@ -111,8 +111,9 @@ public final class BootstrapperTest {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
+        manager.setConfigurationAdmin(configurationAdmin);
         bootstrapper.activate(context);
-        bootstrapper.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("features.json");
@@ -133,7 +134,7 @@ public final class BootstrapperTest {
         final Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
         assertEquals(allGroupInstances.get(bundle).size(), 2);
 
-        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetFeatureService(manager);
         bootstrapper.unsetStorageService(storageService);
     }
 
@@ -143,8 +144,9 @@ public final class BootstrapperTest {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
+        manager.setConfigurationAdmin(configurationAdmin);
         bootstrapper.activate(context);
-        bootstrapper.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("featuresWithServiceProperties.json");
@@ -164,7 +166,7 @@ public final class BootstrapperTest {
         final Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
         assertEquals(allGroupInstances.get(bundle).size(), 2);
 
-        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetFeatureService(manager);
         bootstrapper.unsetStorageService(storageService);
     }
 
@@ -174,8 +176,9 @@ public final class BootstrapperTest {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
+        manager.setConfigurationAdmin(configurationAdmin);
         bootstrapper.activate(context);
-        bootstrapper.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
 
         bootstrapper.addingBundle(bundle, bundleEvent);
@@ -192,7 +195,7 @@ public final class BootstrapperTest {
         final Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
         assertEquals(allGroupInstances.get(bundle).size(), 0);
 
-        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetFeatureService(manager);
         bootstrapper.unsetStorageService(storageService);
     }
 
@@ -202,8 +205,9 @@ public final class BootstrapperTest {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
+        manager.setConfigurationAdmin(configurationAdmin);
         bootstrapper.activate(context);
-        bootstrapper.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("featuresEmpty.json");
@@ -223,7 +227,7 @@ public final class BootstrapperTest {
         final Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
         assertEquals(allGroupInstances.get(bundle).size(), 0);
 
-        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetFeatureService(manager);
         bootstrapper.unsetStorageService(storageService);
     }
 
@@ -233,8 +237,9 @@ public final class BootstrapperTest {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
+        manager.setConfigurationAdmin(configurationAdmin);
         bootstrapper.activate(context);
-        bootstrapper.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.setFeatureService(manager);
 
         final StorageService storage = new DefaultStorage();
         storage.put("my.feature", "dummyValue1");
@@ -259,7 +264,7 @@ public final class BootstrapperTest {
         final Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
         assertEquals(allGroupInstances.get(bundle).size(), 0);
 
-        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetFeatureService(manager);
         bootstrapper.unsetStorageService(storageService);
     }
 
@@ -268,8 +273,9 @@ public final class BootstrapperTest {
             SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
         createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
 
+        manager.setConfigurationAdmin(configurationAdmin);
         bootstrapper.activate(context);
-        bootstrapper.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("features.json");
@@ -292,7 +298,7 @@ public final class BootstrapperTest {
         final Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
         assertEquals(allGroupInstances.get(bundle).size(), 0);
 
-        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetFeatureService(manager);
         bootstrapper.unsetStorageService(storageService);
     }
 
@@ -302,8 +308,9 @@ public final class BootstrapperTest {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
+        manager.setConfigurationAdmin(configurationAdmin);
         bootstrapper.activate(context);
-        bootstrapper.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("features.json");
@@ -324,7 +331,7 @@ public final class BootstrapperTest {
         Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
         assertEquals(allGroupInstances.get(bundle).size(), 2);
 
-        bootstrapper.unsetConfigurationAdmin(configurationAdmin);
+        bootstrapper.unsetFeatureService(manager);
         bootstrapper.unsetStorageService(storageService);
 
         bootstrapper.modifiedBundle(bundle, bundleEvent, feature);

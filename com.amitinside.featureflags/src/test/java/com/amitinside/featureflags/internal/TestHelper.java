@@ -32,7 +32,7 @@ public final class TestHelper {
         featureProperties.put("name", name);
         featureProperties.put("description", description);
         featureProperties.put("enabled", enabled);
-        featureProperties.put("group", groups.collect(Collectors.toList()).toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", groups.collect(Collectors.toList()).toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", strategy);
 
         final ConfiguredFeature feature = new ConfiguredFeature();
@@ -46,7 +46,7 @@ public final class TestHelper {
         featureProperties.put("name", name);
         featureProperties.put("description", description);
         featureProperties.put("enabled", enabled);
-        featureProperties.put("group", groups.toArray(EMPTY_ARRAY));
+        featureProperties.put("groups", groups.toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", strategy);
 
         final ConfiguredFeature feature = new ConfiguredFeature();
@@ -183,7 +183,7 @@ public final class TestHelper {
             Feature newFeature;
             for (final Feature f : getFeatures().collect(Collectors.toList())) {
                 if (name.equalsIgnoreCase(name)) {
-                    newFeature = createFeature(f.getName(), f.getDescription().get(), status,
+                    newFeature = TestHelper.createFeature(f.getName(), f.getDescription().get(), status,
                             f.getGroups().findAny().orElse(null), f.getStrategy().orElse(null));
                     final Map<String, Object> props = createServiceProperties(2, 5, "pid1");
                     unbindFeature(f, props);
