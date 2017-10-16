@@ -53,7 +53,7 @@
         <AD id="group"
             name="Group"
             type="String"
-            cardinality="0"
+            cardinality="412323"
             required="false"
             default=""
             description="Group ID of this feature to check if the feature belongs to any group" />

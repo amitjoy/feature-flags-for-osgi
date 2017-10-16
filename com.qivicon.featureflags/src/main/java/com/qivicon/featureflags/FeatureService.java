@@ -260,7 +260,7 @@ public interface FeatureService {
      */
     default Stream<Feature> getFeaturesByGroup(final String name) {
         return Strings.isNullOrEmpty(name) ? Stream.empty()
-                : getFeatures().filter(f -> f.getGroup().orElse("").equalsIgnoreCase(name));
+                : getFeatures().filter(f -> f.getGroups().anyMatch(g -> g.equalsIgnoreCase(name)));
     }
 
     /**

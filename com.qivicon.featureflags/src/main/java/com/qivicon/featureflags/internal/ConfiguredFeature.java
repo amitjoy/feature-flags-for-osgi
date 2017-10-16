@@ -17,10 +17,12 @@ import static com.qivicon.featureflags.Constants.FEATURE_FACTORY_PID;
 import static com.qivicon.featureflags.internal.Config.*;
 import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -37,7 +39,7 @@ public final class ConfiguredFeature implements Feature {
     private String name;
     private String description;
     private String strategy;
-    private String group;
+    private String[] groups;
     private volatile boolean isEnabled;
 
     private final Lock lock = new ReentrantLock(true);
@@ -66,8 +68,7 @@ public final class ConfiguredFeature implements Feature {
             strategy = Optional.ofNullable(props.get(STRATEGY)).map(String.class::cast)
                                                                .filter(s -> !s.isEmpty())
                                                                .orElse(null);
-            group = Optional.ofNullable(props.get(GROUP)).map(String.class::cast)
-                                                               .filter(s -> !s.isEmpty())
+            groups = Optional.ofNullable(props.get(GROUP)).map(String[].class::cast)
                                                                .orElse(null);
             isEnabled = Optional.ofNullable(props.get(ENABLED)).map(Boolean.class::cast)
                                                                .orElse(false);
@@ -98,8 +99,8 @@ public final class ConfiguredFeature implements Feature {
     }
 
     @Override
-    public Optional<String> getGroup() {
-        return Optional.ofNullable(group);
+    public Stream<String> getGroups() {
+        return Optional.ofNullable(groups).map(Arrays::stream).orElse(Stream.empty());
     }
 
     @Override
@@ -109,7 +110,7 @@ public final class ConfiguredFeature implements Feature {
                         .add("Name", name)
                         .add("Description", description)
                         .add("Strategy", strategy)
-                        .add("Group", group)
+                        .add("Groups", Arrays.toString(groups))
                         .add("Enabled", isEnabled).toString();
         //@formatter:on
     }

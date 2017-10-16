@@ -12,9 +12,11 @@
  *******************************************************************************/
 package com.qivicon.featureflags.internal;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Maps;
 import com.qivicon.featureflags.Strategizable;
@@ -24,13 +26,30 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
 
 public final class TestHelper {
 
+    private static final String[] EMPTY_ARRAY = new String[0];
+
     public static Feature createFeature(final String name, final String description, final boolean enabled,
             final String group, final String strategy) {
+        final Stream<String> groups = Optional.ofNullable(group).map(Stream::of).orElse(Stream.empty());
         final Map<String, Object> featureProperties = Maps.newHashMap();
         featureProperties.put("name", name);
         featureProperties.put("description", description);
         featureProperties.put("enabled", enabled);
-        featureProperties.put("group", group);
+        featureProperties.put("group", groups.collect(Collectors.toList()).toArray(EMPTY_ARRAY));
+        featureProperties.put("strategy", strategy);
+
+        final ConfiguredFeature feature = new ConfiguredFeature();
+        feature.activate(featureProperties);
+        return feature;
+    }
+
+    public static Feature createFeature(final String name, final String description, final boolean enabled,
+            final List<String> groups, final String strategy) {
+        final Map<String, Object> featureProperties = Maps.newHashMap();
+        featureProperties.put("name", name);
+        featureProperties.put("description", description);
+        featureProperties.put("enabled", enabled);
+        featureProperties.put("group", groups.toArray(EMPTY_ARRAY));
         featureProperties.put("strategy", strategy);
 
         final ConfiguredFeature feature = new ConfiguredFeature();
@@ -98,8 +117,8 @@ public final class TestHelper {
             }
 
             @Override
-            public Optional<String> getGroup() {
-                return Optional.ofNullable(group);
+            public Stream<String> getGroups() {
+                return Stream.of(group);
             }
         };
     }
@@ -167,8 +186,8 @@ public final class TestHelper {
             Feature newFeature;
             for (final Feature f : getFeatures().collect(Collectors.toList())) {
                 if (name.equalsIgnoreCase(name)) {
-                    newFeature = createFeature(f.getName(), f.getDescription().get(), status, f.getGroup().orElse(null),
-                            f.getStrategy().orElse(null));
+                    newFeature = createFeature(f.getName(), f.getDescription().get(), status,
+                            f.getGroups().findAny().orElse(null), f.getStrategy().orElse(null));
                     final Map<String, Object> props = createServiceProperties(2, 5, "pid1");
                     unbindFeature(f, props);
                     bindFeature(newFeature, props);

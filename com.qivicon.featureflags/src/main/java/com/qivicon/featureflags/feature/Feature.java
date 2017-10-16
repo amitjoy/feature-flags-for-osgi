@@ -12,7 +12,7 @@
  *******************************************************************************/
 package com.qivicon.featureflags.feature;
 
-import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.qivicon.featureflags.FeatureService;
 import com.qivicon.featureflags.Strategizable;
@@ -48,12 +48,20 @@ import com.qivicon.featureflags.strategy.ActivationStrategy;
 public interface Feature extends Strategizable {
 
     /**
-     * The associated group identifier that will be used to check
-     * whether this feature belongs to any group.
+     * The associated group identifiers that will be used to check
+     * whether this feature belongs to any group. A feature can associate
+     * multiple groups but the enabled one will only be taken into
+     * account.
+     * <p>
+     * If a feature associates multiple groups in which multiple
+     * groups are active, then the feature groups are sorted
+     * according to their natural order of the names of the groups. Any of
+     * the groups with lower sort order and is enabled, would eventually determine the
+     * enablement of this feature.
+     * </p>
      *
-     * @return The group identifier of this feature wrapped in {@link Optional}
-     *         or empty {@link Optional} instance
+     * @return The group identifiers of this feature or empty {@link Stream}
      */
-    Optional<String> getGroup();
+    Stream<String> getGroups();
 
 }

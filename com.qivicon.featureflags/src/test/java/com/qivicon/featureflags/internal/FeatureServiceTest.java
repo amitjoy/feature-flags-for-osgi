@@ -30,6 +30,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import com.google.common.collect.Lists;
 import com.qivicon.featureflags.ConfigurationEvent;
 import com.qivicon.featureflags.ConfigurationEvent.Type;
 import com.qivicon.featureflags.feature.Feature;
@@ -234,7 +235,7 @@ public final class FeatureServiceTest {
 
     @Test
     public void testIsEnabledWhenFeatureDoesNotBelongToGroup() {
-        final Feature feature = createFeature("feature1", "My Feature 1", true, null, "strategy1");
+        final Feature feature = createFeature("feature1", "My Feature 1", true, (String) null, "strategy1");
 
         manager.bindFeature(feature, createServiceProperties(2, 5, "pid1"));
 
@@ -245,7 +246,7 @@ public final class FeatureServiceTest {
 
     @Test
     public void testIsEnabledWhenFeatureDoesNotBelongToGroupButStrategy() {
-        final Feature feature = createFeature("feature1", "My Feature 1", true, null, "strategy1");
+        final Feature feature = createFeature("feature1", "My Feature 1", true, (String) null, "strategy1");
 
         final ActivationStrategy strategy = createStrategy("strategy1", false, "My Strategy 1");
 
@@ -324,6 +325,22 @@ public final class FeatureServiceTest {
         assertFalse(manager.isFeatureEnabled("feature1"));
         assertFalse(manager.isFeatureEnabled("feature2"));
         assertFalse(manager.isGroupEnabled("group1"));
+    }
+
+    @Test
+    public void testIsEnabledWhenFeaturesSpecifiesMultpleFeatures() {
+        manager = createFeatureGroupManagerWithCM();
+        final Feature feature = createFeature("feature1", "My Feature 1", false, Lists.newArrayList("group1", "group2"),
+                null);
+
+        final FeatureGroup group1 = createFeatureGroup("group1", "My Group 1", false, null);
+        final FeatureGroup group2 = createFeatureGroup("group2", "My Group 2", true, null);
+
+        manager.bindFeature(feature, createServiceProperties(2, 5, "pid1"));
+        manager.bindFeatureGroup(group1, createServiceProperties(2, 5, "pid3"));
+        manager.bindFeatureGroup(group2, createServiceProperties(3, 5, "pid4"));
+
+        assertTrue(manager.isFeatureEnabled("feature1"));
     }
 
     @Test
@@ -648,7 +665,7 @@ public final class FeatureServiceTest {
         assertEquals(instance1.hashCode(), instance2.hashCode());
 
         assertEquals(instance3.toString(),
-                "Description{Ranking=3, ServiceID=5, Instance=ConfiguredFeature{Name=feature2, Description=My Feature, Strategy=strategy, Group=group, Enabled=false}, Properties={service.id=5, service.ranking=3, service.pid=myPid}}");
+                "Description{Ranking=3, ServiceID=5, Instance=ConfiguredFeature{Name=feature2, Description=My Feature, Strategy=strategy, Groups=[group], Enabled=false}, Properties={service.id=5, service.ranking=3, service.pid=myPid}}");
     }
 
 }

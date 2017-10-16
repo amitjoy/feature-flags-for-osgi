@@ -129,7 +129,7 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
                 if (key.equalsIgnoreCase("enabled")) {
                     if (isFeature && f != null) {
                         newFeature = TestHelper.createFeature(f.getName(), f.getDescription().get(), (boolean) value,
-                                f.getGroup().orElse(null), f.getStrategy().orElse(null));
+                                f.getGroups().findAny().orElse(null), f.getStrategy().orElse(null));
                     }
                     if (isGroup && g != null) {
                         newGroup = TestHelper.createFeatureGroup(g.getName(), g.getDescription().get(), (boolean) value,
@@ -155,7 +155,7 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
 
         @Override
         public void delete() throws IOException {
-            //mock and not required
+            // mock and not required
         }
 
         @Override
@@ -165,12 +165,12 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
 
         @Override
         public void update() throws IOException {
-            //mock and not required
+            // mock and not required
         }
 
         @Override
         public void setBundleLocation(final String location) {
-            //mock and not required
+            // mock and not required
         }
 
         @Override
