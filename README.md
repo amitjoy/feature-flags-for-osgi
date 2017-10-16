@@ -18,6 +18,8 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/template-populator.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-osgi/)
 
+[![License](http://img.shields.io/badge/license-EPL-blue.svg)](http://www.eclipse.org/legal/epl-v10.html)
+
 ### Dependencies
 
 This requires a small number of dependencies to work properly:
@@ -67,7 +69,7 @@ This project is licensed under EPL-1.0
         "name":"feature1",
         "description":"My Feature 1",
         "enabled":false,
-        "group":"MyFeatureGroup1"
+        "groups":["MyFeatureGroup1"]
      },
      {
         "name":"feature2",
@@ -78,7 +80,7 @@ This project is licensed under EPL-1.0
         "name":"feature3",
         "description":"My Feature 3",
         "enabled":false,
-        "group":"MyFeatureGroup1"
+        "groups":["MyFeatureGroup1", "MyFeatureGroup2"]
      },
      {
         "name":"feature4",
@@ -102,12 +104,19 @@ This project is licensed under EPL-1.0
      {
         "name":"MyFeatureGroup2",
         "description":"I don't like this Group",
-        "enabled":false
+        "enabled":false,
+        "properties":{
+           "p4":1,
+           "p5":"test1",
+           "p6":"test2"
+        }
      }
   ]
 }
 ```
-3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.amitinside.featureflags.feature.group`.
+3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.amitinside.featureflags.feature.group`. Likewise you can add extra properties to your group as shown in the example. These properties will be added as your group's service properties.
+
+3.1 Instead of providing `features.json`, you can also use `FeatureService#createFeature(...)` and `FeatureService#createGroup(...)` to create features and feature groups.
 
 4. In your DS Component, use `FeatureService` to check if the feature is enabled
 
@@ -142,7 +151,7 @@ If a strategy is provided for one or more features, the strategy will be used to
 Apart from this, you can also bundle multiple features into a specific group. Such feature group can also associate a strategy. If a
 valid strategy has been associated to a feature group, the strategy will be used to determine the enablements of all the features that belong to this group and if not, the `enabled` property (`FeatureGroup#isEnabled()` method) will be used for enablement of this feature group and this will eventually determine the enablements of all the features belonging to this group.
 
-**N.B** A feature can also specify multiple feature groups to which it belongs. In such scenario, the active group would be responsible for the enablement of the feature.
+**N.B:** A feature can also specify multiple feature groups to which it belongs. In such scenario, the active group would be responsible for the enablement of the feature.
 
 The following flowchart shows the control flow for the determination of feature enablement:
 
