@@ -173,7 +173,7 @@
 				<version>3.0.0-M1</version>
 				<configuration>
 					<additionalparam>-Xdoclint:none</additionalparam>
-					<excludePackageNames>com.qivicon.featureflags.internal:com.qivicon.featureflags.util</excludePackageNames>
+					<excludePackageNames>com.amitinside.featureflags.internal:com.amitinside.featureflags.util</excludePackageNames>
 				</configuration>
 				<executions>
 					<execution>
