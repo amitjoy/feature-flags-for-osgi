@@ -18,8 +18,6 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/template-populator.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-osgi/)
 
-[![License](http://img.shields.io/badge/license-EPL-blue.svg)](http://www.eclipse.org/legal/epl-v10.html)
-
 ### Dependencies
 
 This requires a small number of dependencies to work properly:
@@ -55,7 +53,7 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 ### License
 
-This project is licensed under EPL-1.0
+This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/license-EPL-blue.svg)](http://www.eclipse.org/legal/epl-v10.html)
 
 ### Usage
 
