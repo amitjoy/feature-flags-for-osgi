@@ -734,6 +734,36 @@ public final class FeatureServiceTest {
     }
 
     @Test
+    public void testRemoveFeatureIOException() throws IOException {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+
+        final Map<String, Object> props = createServiceProperties(3, 5, "myPid");
+        manager.bindFeature(feature, props);
+        manager.setConfigurationAdmin(configurationAdmin);
+
+        assertEquals(manager.getFeatures().count(), 1);
+        doThrow(IOException.class).when(configurationAdmin).getConfiguration("myPid");
+
+        manager.removeFeature("feature1");
+        assertEquals(manager.getFeatures().count(), 1);
+    }
+
+    @Test
+    public void testRemoveFeatureGroupIOException() throws IOException {
+        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
+
+        final Map<String, Object> props = createServiceProperties(3, 5, "myPid");
+        manager.bindFeatureGroup(group, props);
+        manager.setConfigurationAdmin(configurationAdmin);
+
+        assertEquals(manager.getGroups().count(), 1);
+        doThrow(IOException.class).when(configurationAdmin).getConfiguration("myPid");
+
+        manager.removeGroup("group1");
+        assertEquals(manager.getGroups().count(), 1);
+    }
+
+    @Test
     public void testRemoveFeature() throws IOException {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
