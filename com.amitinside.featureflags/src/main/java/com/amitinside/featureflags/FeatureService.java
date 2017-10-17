@@ -9,7 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -121,13 +120,13 @@ public interface FeatureService {
      * @param groups The groups of the feature (can be {@code null})
      * @param isEnabled The enabled flag denoting whether the feature will be enabled
      * @param serviceProperties The extra properties to be added to the feature.
-     * @return configuration PID as created
+     * @return configuration PID as created wrapped in {@link Optional} or empty {@link Optional}
+     *         instance if feature does not get created due to failure
      *
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     * @throws IOException if access to the persistent storage to store configuration fails.
      */
-    String createFeature(String name, String description, String strategy, List<String> groups, boolean isEnabled,
-            Map<String, Object> serviceProperties) throws IOException;
+    Optional<String> createFeature(String name, String description, String strategy, List<String> groups,
+            boolean isEnabled, Map<String, Object> serviceProperties);
 
     /**
      * Creates a group with the provided configuration.
@@ -137,13 +136,13 @@ public interface FeatureService {
      * @param strategy The strategy of the group. (can be {@code null})
      * @param isEnabled The enabled flag denoting whether the group will be enabled
      * @param serviceProperties The extra properties to be added to the group.
-     * @return configuration PID as created
+     * @return configuration PID as created wrapped in {@link Optional} or empty {@link Optional}
+     *         instance if feature group does not get created due to failure
      *
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     * @throws IOException if access to the persistent storage to store configuration fails.
      */
-    String createGroup(String name, String description, String strategy, boolean isEnabled,
-            Map<String, Object> serviceProperties) throws IOException;
+    Optional<String> createGroup(String name, String description, String strategy, boolean isEnabled,
+            Map<String, Object> serviceProperties);
 
     /**
      * Removes a feature.
@@ -151,9 +150,8 @@ public interface FeatureService {
      * @param name The name of the feature. (cannot be {@code null})
      *
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     * @throws IOException if access to the persistent storage to store configuration fails.
      */
-    void removeFeature(String name) throws IOException;
+    void removeFeature(String name);
 
     /**
      * Removes a group.
@@ -161,9 +159,8 @@ public interface FeatureService {
      * @param name The name of the group. (cannot be {@code null})
      *
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     * @throws IOException if access to the persistent storage to store configuration fails.
      */
-    void removeGroup(String name) throws IOException;
+    void removeGroup(String name);
 
     /**
      * Returns {@code true} if a feature with the given name is known and

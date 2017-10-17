@@ -170,9 +170,8 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
-    public String createFeature(final String name, final String description, final String strategy,
-            final List<String> groups, final boolean isEnabled, final Map<String, Object> serviceProperties)
-            throws IOException {
+    public Optional<String> createFeature(final String name, final String description, final String strategy,
+            final List<String> groups, final boolean isEnabled, final Map<String, Object> serviceProperties) {
         requireNonNull(name, "Feature name cannot be null");
         final List<String> filteredGroups = groups == null ? ImmutableList.of() : groups;
         final Map<String, Object> props = Maps.newHashMap();
@@ -186,14 +185,18 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         }
         // remove all null values
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-        final Configuration configuration = configurationAdmin.createFactoryConfiguration(FEATURE_FACTORY_PID);
-        configuration.update(new Hashtable<>(filteredProps));
-        return configuration.getPid();
+        try {
+            final Configuration configuration = configurationAdmin.createFactoryConfiguration(FEATURE_FACTORY_PID);
+            configuration.update(new Hashtable<>(filteredProps));
+            return Optional.ofNullable(configuration.getPid());
+        } catch (final IOException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public String createGroup(final String name, final String description, final String strategy,
-            final boolean isEnabled, final Map<String, Object> serviceProperties) throws IOException {
+    public Optional<String> createGroup(final String name, final String description, final String strategy,
+            final boolean isEnabled, final Map<String, Object> serviceProperties) {
         requireNonNull(name, "Feature Group name cannot be null");
         final Map<String, Object> props = Maps.newHashMap();
         props.put(NAME.value(), name);
@@ -205,25 +208,38 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         }
         // remove all null values
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-        final Configuration configuration = configurationAdmin.createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
-        configuration.update(new Hashtable<>(filteredProps));
-        return configuration.getPid();
+        try {
+            final Configuration configuration = configurationAdmin
+                    .createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
+            configuration.update(new Hashtable<>(filteredProps));
+            return Optional.ofNullable(configuration.getPid());
+        } catch (final IOException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public void removeFeature(final String name) throws IOException {
+    public void removeFeature(final String name) {
         requireNonNull(name, "Feature name cannot be null");
         final String pid = getFeaturePID(name);
-        final Configuration configuration = configurationAdmin.getConfiguration(pid);
-        configuration.delete();
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(pid);
+            configuration.delete();
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve configuration for {}", name, e);
+        }
     }
 
     @Override
-    public void removeGroup(final String name) throws IOException {
+    public void removeGroup(final String name) {
         requireNonNull(name, "Feature Group name cannot be null");
         final String pid = getGroupPID(name);
-        final Configuration configuration = configurationAdmin.getConfiguration(pid);
-        configuration.delete();
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(pid);
+            configuration.delete();
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve configuration for {}", name, e);
+        }
     }
 
     /**

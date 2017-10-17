@@ -232,20 +232,14 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
      *         instance or empty {@link Optional}
      */
     private Optional<String> registerFeature(final Feature feature) {
-        try {
-            final String name = feature.getName();
-            final List<String> groups = feature.getGroups();
-            final Optional<String> value = storageService.get(name);
-            if (value.isPresent()) {
-                return Optional.empty();
-            }
-            final String pid = featureService.createFeature(name, feature.getDescription(), feature.getStrategy(),
-                    groups, feature.isEnabled(), feature.getProperties());
-            return Optional.of(pid);
-        } catch (final IOException e) {
-            logger.trace("Cannot create feature configuration instance", e);
+        final String name = feature.getName();
+        final List<String> groups = feature.getGroups();
+        final Optional<String> value = storageService.get(name);
+        if (value.isPresent()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return featureService.createFeature(name, feature.getDescription(), feature.getStrategy(), groups,
+                feature.isEnabled(), feature.getProperties());
     }
 
     /**
@@ -256,19 +250,13 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
      *         instance or empty {@link Optional}
      */
     private Optional<String> registerFeatureGroup(final Group group) {
-        try {
-            final String name = group.getName();
-            final Optional<String> value = storageService.get(name);
-            if (value.isPresent()) {
-                return Optional.empty();
-            }
-            final String pid = featureService.createGroup(name, group.getDescription(), group.getStrategy(),
-                    group.isEnabled(), group.getProperties());
-            return Optional.of(pid);
-        } catch (final IOException e) {
-            logger.trace("Cannot create feature group configuration instance", e);
+        final String name = group.getName();
+        final Optional<String> value = storageService.get(name);
+        if (value.isPresent()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return featureService.createGroup(name, group.getDescription(), group.getStrategy(), group.isEnabled(),
+                group.getProperties());
     }
 
     /**

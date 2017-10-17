@@ -9,6 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.internal;
 
+import static com.amitinside.featureflags.Constants.*;
 import static com.amitinside.featureflags.internal.TestHelper.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -687,8 +688,23 @@ public final class FeatureServiceTest {
         final Map<String, Object> props = Maps.newHashMap();
         props.put("p", "test");
 
-        assertNotNull(manager.createFeature("feature1", "My Feature 1", "strategy1", Lists.newArrayList("group1"),
-                false, props));
+        assertTrue(manager
+                .createFeature("feature1", "My Feature 1", "strategy1", Lists.newArrayList("group1"), false, props)
+                .isPresent());
+    }
+
+    @Test
+    public void testCreateFeatureIOException() throws IOException {
+        manager.activate(context);
+        manager.setConfigurationAdmin(configurationAdmin);
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put("p", "test");
+        doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_FACTORY_PID);
+
+        assertFalse(manager
+                .createFeature("feature1", "My Feature 1", "strategy1", Lists.newArrayList("group1"), false, props)
+                .isPresent());
     }
 
     @Test
@@ -702,7 +718,19 @@ public final class FeatureServiceTest {
         final Map<String, Object> props = Maps.newHashMap();
         props.put("p", "test");
 
-        assertNotNull(manager.createGroup("group1", "My Group 1", "strategy1", false, props));
+        assertTrue(manager.createGroup("group1", "My Group 1", "strategy1", false, props).isPresent());
+    }
+
+    @Test
+    public void testCreateFeatureGroupIOException() throws IOException {
+        manager.activate(context);
+        manager.setConfigurationAdmin(configurationAdmin);
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put("p", "test");
+        doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
+
+        assertFalse(manager.createGroup("group1", "My Group 1", "strategy1", false, props).isPresent());
     }
 
     @Test
