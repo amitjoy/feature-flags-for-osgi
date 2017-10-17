@@ -116,9 +116,9 @@ This project is licensed under EPL-1.0
 ```
 3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.amitinside.featureflags.feature.group`. Likewise you can add extra properties to your group as shown in the example. These properties will be added as your group's service properties.
 
-3.1 Instead of providing `features.json`, you can also use `FeatureService#createFeature(...)` and `FeatureService#createGroup(...)` to create features and feature groups.
+4. Instead of providing `features.json`, you can also use `FeatureService#createFeature(...)` and `FeatureService#createGroup(...)` to create features and feature groups.
 
-4. In your DS Component, use `FeatureService` to check if the feature is enabled
+5. In your DS Component, use `FeatureService` to check if the feature is enabled
 
 ```java
 private FeatureService featureService;
@@ -140,9 +140,9 @@ void unsetFeatureService(final FeatureService featureService) {
    this.featureService = null;
 }
 ```
-5. Instead of providing `features.json`, you can also implement `Feature` interface and expose it as an OSGi service
-6. The strategy must be privided by implementing `ActivationStrategy` interface and exposing as an OSGi service
-7. You can also provide a feature group by implementing `FeatureGroup` interface and exposing as an OSGi service
+6. Instead of providing `features.json`, you can also implement `Feature` interface and expose it as an OSGi service
+7. The strategy must be privided by implementing `ActivationStrategy` interface and exposing as an OSGi service
+8. You can also provide a feature group by implementing `FeatureGroup` interface and exposing as an OSGi service
 
 --------------------------------------------------------------
 
