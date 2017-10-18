@@ -30,6 +30,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
+import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.listener.ConfigurationListener;
@@ -473,13 +474,38 @@ public final class FeatureServiceTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNullArgumentCreateFeature() throws IOException {
-        manager.createFeature(null, "", "", Lists.newArrayList(), false, Maps.newHashMap());
+    public void testNullArgumentCreateFeature1() throws IOException {
+        manager.createFeature(null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNullArgumentCreateFeatureGroup() throws IOException {
-        manager.createGroup(null, "", "", false, Maps.newHashMap());
+    public void testNullArgumentCreateFeature2() throws IOException {
+        //@formatter:off
+        final Factory factory = Factory.make(null, c -> c.withDescription("")
+                                                         .withStrategy("")
+                                                         .withGroups(Lists.newArrayList())
+                                                         .withProperties(Maps.newHashMap())
+                                                         .withEnabled(false)
+                                                         .close());
+        //@formatter:on
+        manager.createFeature(factory);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentCreateFeatureGroup1() throws IOException {
+        manager.createGroup(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentCreateFeatureGroup2() throws IOException {
+        //@formatter:off
+        final Factory factory = Factory.make(null, c -> c.withDescription("")
+                                                         .withStrategy("")
+                                                         .withProperties(Maps.newHashMap())
+                                                         .withEnabled(false)
+                                                         .close());
+        //@formatter:on
+        manager.createGroup(factory);
     }
 
     @Test
@@ -588,7 +614,7 @@ public final class FeatureServiceTest {
         manager.setConfigurationAdmin(configurationAdmin);
         final ConfigurationListener listener = new ConfigurationListener() {
             @Override
-            public void onEvent(final ConfigurationEvent event) {
+            public void accept(final ConfigurationEvent event) {
                 assertEquals(event.getType(), Type.UPDATED);
             }
         };
@@ -613,7 +639,7 @@ public final class FeatureServiceTest {
         manager.setConfigurationAdmin(configurationAdmin);
         final ConfigurationListener listener = new ConfigurationListener() {
             @Override
-            public void onEvent(final ConfigurationEvent event) {
+            public void accept(final ConfigurationEvent event) {
                 assertEquals(event.getType(), Type.UPDATED);
             }
         };
@@ -636,7 +662,7 @@ public final class FeatureServiceTest {
         manager.setConfigurationAdmin(configurationAdmin);
         final ConfigurationListener listener = new ConfigurationListener() {
             @Override
-            public void onEvent(final ConfigurationEvent event) {
+            public void accept(final ConfigurationEvent event) {
                 assertEquals(event.getType(), Type.UPDATED);
             }
         };
@@ -688,9 +714,15 @@ public final class FeatureServiceTest {
         final Map<String, Object> props = Maps.newHashMap();
         props.put("p", "test");
 
-        assertTrue(manager
-                .createFeature("feature1", "My Feature 1", "strategy1", Lists.newArrayList("group1"), false, props)
-                .isPresent());
+        //@formatter:off
+        final Factory factory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
+                                       .withStrategy("strategy1")
+                                       .withGroups(Lists.newArrayList("group1"))
+                                       .withProperties(props)
+                                       .withEnabled(false)
+                                       .close());
+        //@formatter:on
+        assertTrue(manager.createFeature(factory).isPresent());
     }
 
     @Test
@@ -702,9 +734,15 @@ public final class FeatureServiceTest {
         props.put("p", "test");
         doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_FACTORY_PID);
 
-        assertFalse(manager
-                .createFeature("feature1", "My Feature 1", "strategy1", Lists.newArrayList("group1"), false, props)
-                .isPresent());
+        //@formatter:off
+        final Factory factory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
+                                                               .withStrategy("strategy1")
+                                                               .withGroups(Lists.newArrayList("group1"))
+                                                               .withProperties(props)
+                                                               .withEnabled(false)
+                                                               .close());
+        //@formatter:on
+        assertFalse(manager.createFeature(factory).isPresent());
     }
 
     @Test
@@ -718,7 +756,14 @@ public final class FeatureServiceTest {
         final Map<String, Object> props = Maps.newHashMap();
         props.put("p", "test");
 
-        assertTrue(manager.createGroup("group1", "My Group 1", "strategy1", false, props).isPresent());
+        //@formatter:off
+        final Factory factory = Factory.make("group1", c -> c.withDescription("My Group 1")
+                                                               .withStrategy("strategy1")
+                                                               .withProperties(props)
+                                                               .withEnabled(false)
+                                                               .close());
+        //@formatter:on
+        assertTrue(manager.createGroup(factory).isPresent());
     }
 
     @Test
@@ -730,7 +775,14 @@ public final class FeatureServiceTest {
         props.put("p", "test");
         doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
 
-        assertFalse(manager.createGroup("group1", "My Group 1", "strategy1", false, props).isPresent());
+        //@formatter:off
+        final Factory factory = Factory.make("group1", c -> c.withDescription("My Group 1")
+                                                             .withStrategy("strategy1")
+                                                             .withProperties(props)
+                                                             .withEnabled(false)
+                                                             .close());
+        //@formatter:on
+        assertFalse(manager.createGroup(factory).isPresent());
     }
 
     @Test

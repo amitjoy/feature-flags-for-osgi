@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
+import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
@@ -49,7 +50,6 @@ import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -162,7 +162,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
             final Object service = context.getService(reference);
             if (service instanceof Feature || service instanceof FeatureGroup) {
                 final Strategizable instance = (Strategizable) service;
-                listeners.forEach(l -> l.onEvent(getEvent(instance, event.getType())));
+                listeners.forEach(l -> l.accept(getEvent(instance, event.getType())));
             }
         } finally {
             context.ungetService(reference);
@@ -170,19 +170,23 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
-    public Optional<String> createFeature(final String name, final String description, final String strategy,
-            final List<String> groups, final boolean isEnabled, final Map<String, Object> serviceProperties) {
-        requireNonNull(name, "Feature name cannot be null");
-        final List<String> filteredGroups = groups == null ? ImmutableList.of() : groups;
+    public Optional<String> createFeature(final Factory featureFactory) {
+        requireNonNull(featureFactory, "Feature factory cannot be null");
+        // extract data
+        final List<String> groups = featureFactory.getGroups();
+        final String name = featureFactory.getName();
+        final String description = featureFactory.getDescription().orElse(null);
+        final String strategy = featureFactory.getStrategy().orElse(null);
+        final boolean isEnabled = featureFactory.isEnabled();
+        final Map<String, Object> serviceProperties = featureFactory.getProperties();
+
         final Map<String, Object> props = Maps.newHashMap();
         props.put(NAME.value(), name);
         props.put(DESCRIPTION.value(), description);
         props.put(STRATEGY.value(), strategy);
-        props.put(GROUPS.value(), filteredGroups.toArray(new String[0]));
+        props.put(GROUPS.value(), groups.toArray(new String[0]));
         props.put(ENABLED.value(), isEnabled);
-        if (serviceProperties != null) {
-            props.putAll(serviceProperties);
-        }
+        props.putAll(serviceProperties);
         // remove all null values
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         try {
@@ -195,17 +199,21 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
-    public Optional<String> createGroup(final String name, final String description, final String strategy,
-            final boolean isEnabled, final Map<String, Object> serviceProperties) {
-        requireNonNull(name, "Feature Group name cannot be null");
+    public Optional<String> createGroup(final Factory groupFactory) {
+        requireNonNull(groupFactory, "Group factory cannot be null");
+        // extract data
+        final String name = groupFactory.getName();
+        final String description = groupFactory.getDescription().orElse(null);
+        final String strategy = groupFactory.getStrategy().orElse(null);
+        final boolean isEnabled = groupFactory.isEnabled();
+        final Map<String, Object> serviceProperties = groupFactory.getProperties();
+
         final Map<String, Object> props = Maps.newHashMap();
         props.put(NAME.value(), name);
         props.put(DESCRIPTION.value(), description);
         props.put(STRATEGY.value(), strategy);
         props.put(ENABLED.value(), isEnabled);
-        if (serviceProperties != null) {
-            props.putAll(serviceProperties);
-        }
+        props.putAll(serviceProperties);
         // remove all null values
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         try {
@@ -222,24 +230,14 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     public void removeFeature(final String name) {
         requireNonNull(name, "Feature name cannot be null");
         final String pid = getFeaturePID(name);
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(pid);
-            configuration.delete();
-        } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", name, e);
-        }
+        deleteConfiguration(name, pid);
     }
 
     @Override
     public void removeGroup(final String name) {
         requireNonNull(name, "Feature Group name cannot be null");
         final String pid = getGroupPID(name);
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(pid);
-            configuration.delete();
-        } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", name, e);
-        }
+        deleteConfiguration(name, pid);
     }
 
     /**
@@ -505,6 +503,15 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
                 .map(g -> g.props)
                 .orElse(ImmutableMap.of());
         //@formatter:on
+    }
+
+    private void deleteConfiguration(final String name, final String pid) {
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(pid);
+            configuration.delete();
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve configuration for {}", name, e);
+        }
     }
 
     /**

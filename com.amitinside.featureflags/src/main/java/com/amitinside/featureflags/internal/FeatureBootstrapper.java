@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.ConfigurationEvent;
+import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.storage.StorageService;
@@ -197,7 +198,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
     }
 
     @Override
-    public void onEvent(final ConfigurationEvent event) {
+    public void accept(final ConfigurationEvent event) {
         final String name = event.getReference().getName();
         final String servicePid = (String) event.getProperties().get(SERVICE_PID);
         if (event.getType() == UPDATED) {
@@ -236,13 +237,20 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
      */
     private Optional<String> registerFeature(final Feature feature) {
         final String name = feature.getName();
-        final List<String> groups = feature.getGroups();
+        feature.getGroups();
         final Optional<String> value = storageService.get(name);
         if (value.isPresent()) {
             return Optional.empty();
         }
-        return featureService.createFeature(name, feature.getDescription(), feature.getStrategy(), groups,
-                feature.isEnabled(), feature.getProperties());
+        //@formatter:off
+        final Factory factory = Factory.make(name, c -> c.withDescription(feature.getDescription())
+                                                           .withStrategy(feature.getStrategy())
+                                                           .withGroups(feature.getGroups())
+                                                           .withProperties(feature.getProperties())
+                                                           .withEnabled(feature.isEnabled())
+                                                           .close());
+        //@formatter:on
+        return featureService.createFeature(factory);
     }
 
     /**
@@ -258,8 +266,14 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
         if (value.isPresent()) {
             return Optional.empty();
         }
-        return featureService.createGroup(name, group.getDescription(), group.getStrategy(), group.isEnabled(),
-                group.getProperties());
+        //@formatter:off
+        final Factory factory = Factory.make(name, c -> c.withDescription(group.getDescription())
+                                                        .withStrategy(group.getStrategy())
+                                                        .withProperties(group.getProperties())
+                                                        .withEnabled(group.isEnabled())
+                                                        .close());
+        //@formatter:on
+        return featureService.createGroup(factory);
     }
 
     /**

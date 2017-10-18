@@ -9,8 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -114,35 +112,26 @@ public interface FeatureService {
     /**
      * Creates a feature with the provided configuration.
      *
-     * @param name The name of the feature. (cannot be {@code null})
-     * @param description The description of the feature. (can be {@code null})
-     * @param strategy The strategy of the feature. (can be {@code null})
-     * @param groups The groups of the feature (can be {@code null})
-     * @param isEnabled The enabled flag denoting whether the feature will be enabled
-     * @param serviceProperties The extra properties to be added to the feature.
+     * @param featureFactory The factory to be used to create the feature. (cannot be {@code null})
      * @return configuration PID as created wrapped in {@link Optional} or empty {@link Optional}
      *         instance if feature does not get created due to failure
      *
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     * @throws NullPointerException if the specified argument {@code featureFactory} is {@code null}
+     *             or the factory has been configured with a {@code null} name
      */
-    Optional<String> createFeature(String name, String description, String strategy, List<String> groups,
-            boolean isEnabled, Map<String, Object> serviceProperties);
+    Optional<String> createFeature(Factory featureFactory);
 
     /**
      * Creates a group with the provided configuration.
      *
-     * @param name The name of the group. (cannot be {@code null})
-     * @param description The description of the group. (can be {@code null})
-     * @param strategy The strategy of the group. (can be {@code null})
-     * @param isEnabled The enabled flag denoting whether the group will be enabled
-     * @param serviceProperties The extra properties to be added to the group.
+     * @param groupFactory The factory to be used to create the group. (cannot be {@code null})
      * @return configuration PID as created wrapped in {@link Optional} or empty {@link Optional}
      *         instance if feature group does not get created due to failure
      *
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     * @throws NullPointerException if the specified argument {@code groupFactory} is {@code null}
+     *             or the factory has been configured with a {@code null} name
      */
-    Optional<String> createGroup(String name, String description, String strategy, boolean isEnabled,
-            Map<String, Object> serviceProperties);
+    Optional<String> createGroup(Factory groupFactory);
 
     /**
      * Removes a feature.
