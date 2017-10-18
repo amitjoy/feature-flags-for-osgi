@@ -15,8 +15,6 @@ import static org.osgi.framework.Constants.SERVICE_PID;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +39,7 @@ import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.storage.StorageService;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.io.CharStreams;
+import com.google.common.io.Resources;
 import com.google.gson.Gson;
 
 /**
@@ -113,6 +111,9 @@ import com.google.gson.Gson;
  */
 @Component(service = FeatureBootstrapper.class, name = "FeatureBootstrapper", immediate = true)
 public final class FeatureBootstrapper implements BundleTrackerCustomizer, ConfigurationListener {
+
+    /** JSON Resource */
+    public static final String RESOURCE = "/features.json";
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -267,14 +268,14 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
      * @return the data or {@code null}
      */
     private Data getData(final Bundle bundle) {
-        final URL featuresFileURL = bundle.getEntry("/features.json");
-        if (featuresFileURL != null) {
-            try (final InputStream inputStream = featuresFileURL.openConnection().getInputStream()) {
-                final String resource = CharStreams.toString(new InputStreamReader(inputStream, UTF_8));
+        try {
+            final URL featuresFileURL = bundle.getEntry(RESOURCE);
+            if (featuresFileURL != null) {
+                final String resource = Resources.toString(featuresFileURL, UTF_8);
                 return gson.fromJson(resource, Data.class);
-            } catch (final IOException e) {
-                logger.trace("Cannot retrieve feature JSON resource", e);
             }
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve feature JSON resource", e);
         }
         return null;
     }

@@ -10,6 +10,7 @@
 package com.amitinside.featureflags.internal;
 
 import static com.amitinside.featureflags.Constants.*;
+import static com.amitinside.featureflags.internal.FeatureBootstrapper.RESOURCE;
 import static com.amitinside.featureflags.internal.TestHelper.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -117,7 +118,7 @@ public final class BootstrapperTest {
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("features.json");
-        doReturn(path).when(bundle).getEntry("/features.json");
+        doReturn(path).when(bundle).getEntry(RESOURCE);
         doReturn(Optional.empty()).when(storageService).get("my.feature");
 
         bootstrapper.addingBundle(bundle, bundleEvent);
@@ -150,7 +151,7 @@ public final class BootstrapperTest {
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("featuresWithServiceProperties.json");
-        doReturn(path).when(bundle).getEntry("/features.json");
+        doReturn(path).when(bundle).getEntry(RESOURCE);
 
         bootstrapper.addingBundle(bundle, bundleEvent);
 
@@ -211,7 +212,7 @@ public final class BootstrapperTest {
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("featuresEmpty.json");
-        doReturn(path).when(bundle).getEntry("/features.json");
+        doReturn(path).when(bundle).getEntry(RESOURCE);
 
         bootstrapper.addingBundle(bundle, bundleEvent);
 
@@ -248,7 +249,7 @@ public final class BootstrapperTest {
         bootstrapper.setStorageService(storage);
 
         final URL path = Resources.getResource("features.json");
-        doReturn(path).when(bundle).getEntry("/features.json");
+        doReturn(path).when(bundle).getEntry(RESOURCE);
 
         bootstrapper.addingBundle(bundle, bundleEvent);
 
@@ -269,7 +270,7 @@ public final class BootstrapperTest {
     }
 
     @Test
-    public void testBundleAddingWithIOException() throws ClassNotFoundException, NoSuchFieldException,
+    public void testBundleAddingWithIOException1() throws ClassNotFoundException, NoSuchFieldException,
             SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
         manager.setConfigurationAdmin(configurationAdmin);
         bootstrapper.activate(context);
@@ -277,10 +278,38 @@ public final class BootstrapperTest {
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("features.json");
-        doReturn(path).when(bundle).getEntry("/features.json");
+        doReturn(path).when(bundle).getEntry(RESOURCE);
         doReturn(Optional.empty()).when(storageService).get("my.feature");
         doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_FACTORY_PID);
         doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
+
+        bootstrapper.addingBundle(bundle, bundleEvent);
+
+        final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
+        final Field allFeatures = clazz.getDeclaredField("allFeatures");
+        allFeatures.setAccessible(true);
+        final Multimap<Bundle, String> allFeatureInstances = (Multimap<Bundle, String>) allFeatures.get(bootstrapper);
+        assertEquals(allFeatureInstances.size(), 0);
+
+        final Field allGroups = clazz.getDeclaredField("allFeatureGroups");
+        allGroups.setAccessible(true);
+        allGroups.get(bootstrapper);
+        final Multimap<Bundle, String> allGroupInstances = (Multimap<Bundle, String>) allGroups.get(bootstrapper);
+        assertEquals(allGroupInstances.get(bundle).size(), 0);
+
+        bootstrapper.unsetFeatureService(manager);
+        bootstrapper.unsetStorageService(storageService);
+    }
+
+    @Test
+    public void testBundleAddingWithIOException2() throws ClassNotFoundException, NoSuchFieldException,
+            SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
+        manager.setConfigurationAdmin(configurationAdmin);
+        bootstrapper.activate(context);
+        bootstrapper.setFeatureService(manager);
+        bootstrapper.setStorageService(storageService);
+
+        doThrow(IOException.class).when(bundle).getEntry(RESOURCE);
 
         bootstrapper.addingBundle(bundle, bundleEvent);
 
@@ -312,7 +341,7 @@ public final class BootstrapperTest {
         bootstrapper.setStorageService(storageService);
 
         final URL path = Resources.getResource("features.json");
-        doReturn(path).when(bundle).getEntry("/features.json");
+        doReturn(path).when(bundle).getEntry(RESOURCE);
         doReturn(Optional.empty()).when(storageService).get("my.feature");
 
         bootstrapper.addingBundle(bundle, bundleEvent);
