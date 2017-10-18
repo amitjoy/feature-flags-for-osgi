@@ -244,11 +244,11 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
         }
         //@formatter:off
         final Factory factory = Factory.make(name, c -> c.withDescription(feature.getDescription())
-                                                           .withStrategy(feature.getStrategy())
-                                                           .withGroups(feature.getGroups())
-                                                           .withProperties(feature.getProperties())
-                                                           .withEnabled(feature.isEnabled())
-                                                           .close());
+                                                         .withStrategy(feature.getStrategy())
+                                                         .withGroups(feature.getGroups())
+                                                         .withProperties(feature.getProperties())
+                                                         .withEnabled(feature.isEnabled())
+                                                         .close());
         //@formatter:on
         return featureService.createFeature(factory);
     }

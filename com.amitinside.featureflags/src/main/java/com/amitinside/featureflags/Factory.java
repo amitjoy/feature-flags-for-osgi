@@ -176,8 +176,15 @@ public class Factory {
         return groups == null ? ImmutableList.of() : ImmutableList.copyOf(groups);
     }
 
+    /**
+     * Creates a {@link Factory} instance
+     * @param name the name of the instance
+     * @param configuration the function representing the instance configuration
+     * @return the {@link Factory} instance
+     */
     public static Factory make(final String name,
             final Function<BuilderWithDescription, FactoryFinalizationStep> configuration) {
+        requireNonNull(configuration, "Function cannot be null");
         return configuration.andThen(FactoryFinalizationStep::create).apply(new Builder(name));
     }
 
