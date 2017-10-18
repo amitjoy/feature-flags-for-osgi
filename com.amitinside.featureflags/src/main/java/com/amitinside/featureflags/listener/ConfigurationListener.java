@@ -21,6 +21,7 @@ import com.amitinside.featureflags.ConfigurationEvent;
  * </p>
  * {@code ConfigurationListener} objects can inspect the received
  * {@code ConfigurationEvent} object to determine several properties.
+ *
  * <p>
  * This interface is intended to be implemented by feature providers.
  * </p>

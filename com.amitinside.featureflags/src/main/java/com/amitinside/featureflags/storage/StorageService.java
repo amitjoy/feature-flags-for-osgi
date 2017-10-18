@@ -28,6 +28,7 @@ import java.util.stream.Stream;
  * their own implementation of managing persistence. There is also a default
  * implementation of {@code StorageService} that uses an in-memory storage structure.
  * </p>
+ *
  * <p>
  * This interface is intended to be implemented by feature providers.
  * </p>
