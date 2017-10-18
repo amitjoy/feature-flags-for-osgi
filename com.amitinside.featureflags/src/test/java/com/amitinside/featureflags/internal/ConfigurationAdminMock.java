@@ -26,7 +26,6 @@ import org.osgi.service.cm.ConfigurationListener;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
-import com.amitinside.featureflags.internal.FeatureManager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -153,7 +152,8 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
 
         @Override
         public void delete() throws IOException {
-            // mock and not required
+            final ConfigurationEvent event = new ConfigurationEvent(reference, 2, "", name);
+            listeners.forEach(l -> l.configurationEvent(event));
         }
 
         @Override

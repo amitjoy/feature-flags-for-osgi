@@ -9,6 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.internal;
 
+import static com.amitinside.featureflags.ConfigurationEvent.Type.UPDATED;
 import static com.google.common.base.Charsets.UTF_8;
 import static org.osgi.framework.Bundle.ACTIVE;
 import static org.osgi.framework.Constants.SERVICE_PID;
@@ -33,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.ConfigurationEvent;
-import com.amitinside.featureflags.ConfigurationEvent.Type;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.storage.StorageService;
@@ -198,10 +198,12 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
 
     @Override
     public void onEvent(final ConfigurationEvent event) {
-        if (event.getType() == Type.UPDATED) {
-            final String name = event.getReference().getName();
-            final String servicePid = (String) event.getProperties().get(SERVICE_PID);
+        final String name = event.getReference().getName();
+        final String servicePid = (String) event.getProperties().get(SERVICE_PID);
+        if (event.getType() == UPDATED) {
             storageService.put(name, servicePid);
+        } else {
+            storageService.remove(name);
         }
     }
 

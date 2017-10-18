@@ -378,7 +378,7 @@ public final class BootstrapperTest {
     }
 
     @Test
-    public void testConfigListenerForFeatureGroup() {
+    public void testConfigListenerForFeatureGroup1() {
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
         manager = new FeatureManager();
@@ -397,6 +397,38 @@ public final class BootstrapperTest {
         manager.enableGroup("group1");
 
         assertEquals("group1", storage.get("group1").get());
+
+        manager.unbindFeatureGroup(group, props);
+        manager.unbindConfigurationListener(bootstrapper);
+        manager.unsetConfigurationAdmin(configurationAdmin);
+
+        bootstrapper.unsetStorageService(storage);
+    }
+
+    @Test
+    public void testConfigListenerForFeatureGroup2() {
+        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
+        manager = new FeatureManager();
+        configurationAdmin.addListener(manager);
+
+        final StorageService storage = new DefaultStorage();
+        bootstrapper.setStorageService(storage);
+
+        doReturn(group).when(context).getService(reference);
+
+        final Map<String, Object> props = createServiceProperties(2, 5, "group1");
+        manager.bindFeatureGroup(group, props);
+        manager.bindConfigurationListener(bootstrapper);
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
+        manager.enableGroup("group1");
+
+        assertEquals("group1", storage.get("group1").get());
+
+        manager.removeGroup("group1");
+
+        assertFalse(storage.get("group1").isPresent());
 
         manager.unbindFeatureGroup(group, props);
         manager.unbindConfigurationListener(bootstrapper);
