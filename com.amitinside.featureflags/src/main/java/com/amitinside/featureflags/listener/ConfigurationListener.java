@@ -9,6 +9,8 @@
  *******************************************************************************/
 package com.amitinside.featureflags.listener;
 
+import java.util.function.Consumer;
+
 import com.amitinside.featureflags.ConfigurationEvent;
 
 /**
@@ -29,11 +31,13 @@ import com.amitinside.featureflags.ConfigurationEvent;
  * @ThreadSafe
  */
 @FunctionalInterface
-public interface ConfigurationListener {
+public interface ConfigurationListener extends Consumer<ConfigurationEvent> {
+
     /**
      * Receives notification of a Configuration that has changed.
      *
      * @param event The {@code ConfigurationEvent}.
      */
-    public void onEvent(ConfigurationEvent event);
+    @Override
+    void accept(ConfigurationEvent event);
 }

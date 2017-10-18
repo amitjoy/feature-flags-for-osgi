@@ -32,6 +32,9 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
  * @see Feature
  * @see FeatureGroup
  * @see Strategizable
+ *
+ * @ThreadSafe
+ * @Immutable
  */
 public class ConfigurationEvent {
 
@@ -53,7 +56,7 @@ public class ConfigurationEvent {
     private final Map<String, Object> properties;
 
     /**
-     * Constructs a <code>ConfigurationEvent</code> object from the given
+     * Constructs a {@code ConfigurationEvent} object from the given
      * <code>ServiceReference</code> object, event type, and pids.
      *
      * @param type The event type. See {@link #getType}.
