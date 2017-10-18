@@ -11,6 +11,8 @@ package com.amitinside.featureflags;
 
 import java.util.Optional;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
@@ -31,6 +33,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  *
  * @ThreadSafe
  */
+@ProviderType
 public interface Strategizable {
 
     /**

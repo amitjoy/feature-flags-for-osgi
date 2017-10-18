@@ -12,6 +12,8 @@ package com.amitinside.featureflags.storage;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.osgi.annotation.versioning.ConsumerType;
+
 /**
  * {@code StorageService} is primarily used to provide a generic way of storing
  * and retrieving data. This can be implemented and exposed as OSGi service.
@@ -33,6 +35,7 @@ import java.util.stream.Stream;
  * This interface is intended to be implemented by feature providers.
  * </p>
  */
+@ConsumerType
 public interface StorageService {
 
     /**

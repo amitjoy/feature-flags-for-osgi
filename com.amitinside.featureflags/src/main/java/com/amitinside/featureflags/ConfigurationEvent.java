@@ -13,6 +13,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 
@@ -36,6 +38,7 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
  * @ThreadSafe
  * @Immutable
  */
+@ProviderType
 public class ConfigurationEvent {
 
     /**
