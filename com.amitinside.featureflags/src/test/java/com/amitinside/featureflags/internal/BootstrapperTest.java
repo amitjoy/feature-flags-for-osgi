@@ -52,6 +52,8 @@ public final class BootstrapperTest {
     @Mock
     private BundleEvent bundleEvent;
     @Mock
+    private BundleTracker bundleTracker;
+    @Mock
     private ServiceReference reference;
     @Mock
     private ConfigurationAdmin configurationAdmin;
@@ -78,8 +80,31 @@ public final class BootstrapperTest {
     }
 
     @Test
-    public void testBundleTrackerNonNull() throws ClassNotFoundException, NoSuchFieldException, SecurityException,
+    public void testBundleTrackerNullCheckOnDeactivate() throws ClassNotFoundException, NoSuchFieldException, SecurityException,
             IllegalArgumentException, IllegalAccessException {
+        bootstrapper.activate(context); //instantiates tracker
+        final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
+        final Field trackerField = clazz.getDeclaredField("bundleTracker");
+        trackerField.setAccessible(true);
+        Object tracker = trackerField.get(bootstrapper);
+        assertTrue(tracker != null);
+        assertTrue(tracker instanceof BundleTracker);
+        
+        //set tracker to our mock instance
+        trackerField.set(bootstrapper, bundleTracker);
+        
+        //set to null
+        trackerField.set(bootstrapper, null);
+        tracker = trackerField.get(bootstrapper);
+        
+        assertTrue(tracker == null);
+        bootstrapper.deactivate(context);
+        verify(bundleTracker, times(0)).close();
+    }
+    
+    @Test
+    public void testBundleTrackerNonNull() throws ClassNotFoundException, NoSuchFieldException, SecurityException,
+    IllegalArgumentException, IllegalAccessException {
         bootstrapper.activate(context);
         final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
         final Field trackerField = clazz.getDeclaredField("bundleTracker");
@@ -87,7 +112,7 @@ public final class BootstrapperTest {
         Object tracker = trackerField.get(bootstrapper);
         assertTrue(tracker != null);
         assertTrue(tracker instanceof BundleTracker);
-
+        
         bootstrapper.deactivate(context);
         tracker = trackerField.get(bootstrapper);
         assertTrue(tracker == null);
