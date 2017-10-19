@@ -24,7 +24,9 @@ public enum Config {
     DESCRIPTION("description"),
     ENABLED("enabled"),
     STRATEGY("strategy"),
-    GROUPS("groups");
+    GROUPS("groups"),
+    PROPERTY_KEY("property_key"),
+    PROPERTY_VALUE("property_value");
 
     final String value;
 

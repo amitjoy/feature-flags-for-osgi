@@ -22,6 +22,9 @@ public final class Constants {
     /** Factory PID of {@code FeatureGroup} configuration instances */
     public static final String FEATURE_GROUP_FACTORY_PID = "com.amitinside.featureflags.feature.group";
 
+    /** Factory PID of System Property {@code ActivationStrategy} configuration instances */
+    public static final String STRATEGY_SYSTEM_PROPERTY_PID = "com.amitinside.featureflags.strategy.system.property";
+
     /** Constructor */
     private Constants() {
         throw new IllegalAccessError("Non-Instantiable");

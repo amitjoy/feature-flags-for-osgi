@@ -50,7 +50,7 @@ public interface ActivationStrategy {
      * The name of the strategy.
      *
      * @return The name of this strategy which must not be {@code null} or an
-     *         empty string.
+     *         empty string
      */
     String getName();
 
