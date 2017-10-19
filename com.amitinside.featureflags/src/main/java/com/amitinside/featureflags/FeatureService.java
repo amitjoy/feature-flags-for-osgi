@@ -178,7 +178,7 @@ public interface FeatureService {
      * </p>
      *
      * @see <a href=
-     *      "https://user-images.githubusercontent.com/13380182/31622445-bddc346c-b29c-11e7-9fae-6e9c7a483a30.png">Control
+     *      "https://user-images.githubusercontent.com/13380182/31776356-9862ac2e-b4eb-11e7-89f5-fad75d49eb53.png">Control
      *      flow for the determination of feature enablement</a>
      *
      * @param name The name of the feature to check for enablement.
@@ -202,7 +202,7 @@ public interface FeatureService {
      * in the feature group would be used.
      *
      * @see <a href=
-     *      "https://user-images.githubusercontent.com/13380182/31622445-bddc346c-b29c-11e7-9fae-6e9c7a483a30.png.png">Control
+     *      "https://user-images.githubusercontent.com/13380182/31776356-9862ac2e-b4eb-11e7-89f5-fad75d49eb53.png.png">Control
      *      flow for the determination of feature enablement</a>
      *
      * @param name The name of the feature group to check for enablement.
@@ -224,7 +224,7 @@ public interface FeatureService {
      * </p>
      *
      * @see <a href=
-     *      "https://user-images.githubusercontent.com/13380182/31622445-bddc346c-b29c-11e7-9fae-6e9c7a483a30.png">Control
+     *      "https://user-images.githubusercontent.com/13380182/31776356-9862ac2e-b4eb-11e7-89f5-fad75d49eb53.png">Control
      *      flow for the determination of feature enablement</a>
      *
      * @param name the name of the feature
@@ -246,7 +246,7 @@ public interface FeatureService {
      * </p>
      *
      * @see <a href=
-     *      "https://user-images.githubusercontent.com/13380182/31622445-bddc346c-b29c-11e7-9fae-6e9c7a483a30.png">Control
+     *      "https://user-images.githubusercontent.com/13380182/31776356-9862ac2e-b4eb-11e7-89f5-fad75d49eb53.png">Control
      *      flow for the determination of feature enablement</a>
      *
      * @param name the name of the feature
@@ -265,7 +265,7 @@ public interface FeatureService {
      * </p>
      *
      * @see <a href=
-     *      "https://user-images.githubusercontent.com/13380182/31622445-bddc346c-b29c-11e7-9fae-6e9c7a483a30.png">Control
+     *      "https://user-images.githubusercontent.com/13380182/31776356-9862ac2e-b4eb-11e7-89f5-fad75d49eb53.png">Control
      *      flow for the determination of feature enablement</a>
      *
      * @param name the name of the feature group
@@ -284,7 +284,7 @@ public interface FeatureService {
      * </p>
      *
      * @see <a href=
-     *      "https://user-images.githubusercontent.com/13380182/31622445-bddc346c-b29c-11e7-9fae-6e9c7a483a30.png">Control
+     *      "https://user-images.githubusercontent.com/13380182/31776356-9862ac2e-b4eb-11e7-89f5-fad75d49eb53.png">Control
      *      flow for the determination of feature enablement</a>
      *
      * @param name the name of the feature group
