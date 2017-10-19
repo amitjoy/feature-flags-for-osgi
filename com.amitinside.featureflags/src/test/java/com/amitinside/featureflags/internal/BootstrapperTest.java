@@ -96,8 +96,8 @@ public final class BootstrapperTest {
     @Test
     public void testStorageNonNullWithCustomService() throws ClassNotFoundException, NoSuchFieldException,
             SecurityException, IllegalArgumentException, IllegalAccessException {
-        bootstrapper.activate(context);
         bootstrapper.setStorageService(storageService);
+        bootstrapper.activate(context);
         final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
         final Field storage = clazz.getDeclaredField("storageService");
         storage.setAccessible(true);
@@ -113,9 +113,9 @@ public final class BootstrapperTest {
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
         manager.setConfigurationAdmin(configurationAdmin);
-        bootstrapper.activate(context);
         bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
+        bootstrapper.activate(context);
 
         final URL path = Resources.getResource("features.json");
         doReturn(path).when(bundle).getEntry(RESOURCE);
@@ -146,9 +146,9 @@ public final class BootstrapperTest {
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
         manager.setConfigurationAdmin(configurationAdmin);
-        bootstrapper.activate(context);
         bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
+        bootstrapper.activate(context);
 
         final URL path = Resources.getResource("featuresWithServiceProperties.json");
         doReturn(path).when(bundle).getEntry(RESOURCE);
@@ -178,9 +178,9 @@ public final class BootstrapperTest {
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
         manager.setConfigurationAdmin(configurationAdmin);
-        bootstrapper.activate(context);
         bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
+        bootstrapper.activate(context);
 
         bootstrapper.addingBundle(bundle, bundleEvent);
 
@@ -273,9 +273,9 @@ public final class BootstrapperTest {
     public void testBundleAddingWithIOException1() throws ClassNotFoundException, NoSuchFieldException,
             SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
         manager.setConfigurationAdmin(configurationAdmin);
-        bootstrapper.activate(context);
         bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
+        bootstrapper.activate(context);
 
         final URL path = Resources.getResource("features.json");
         doReturn(path).when(bundle).getEntry(RESOURCE);
@@ -305,9 +305,9 @@ public final class BootstrapperTest {
     public void testBundleAddingWithIOException2() throws ClassNotFoundException, NoSuchFieldException,
             SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
         manager.setConfigurationAdmin(configurationAdmin);
-        bootstrapper.activate(context);
         bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
+        bootstrapper.activate(context);
 
         doThrow(IOException.class).when(bundle).getEntry(RESOURCE);
 
@@ -336,9 +336,9 @@ public final class BootstrapperTest {
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
         manager.setConfigurationAdmin(configurationAdmin);
-        bootstrapper.activate(context);
         bootstrapper.setFeatureService(manager);
         bootstrapper.setStorageService(storageService);
+        bootstrapper.activate(context);
 
         final URL path = Resources.getResource("features.json");
         doReturn(path).when(bundle).getEntry(RESOURCE);
