@@ -34,6 +34,10 @@ public final class ServicePropertyStrategyTest {
 
         assertEquals(strategy.getName(), "strategy1");
         assertEquals(strategy.getDescription().get(), "My Strategy");
+
+        final Map<String, Object> map = Maps.newHashMap();
+        map.put("prop", "val");
+        assertTrue(strategy.isEnabled(null, map));
     }
 
     @Test
@@ -49,6 +53,29 @@ public final class ServicePropertyStrategyTest {
 
         assertEquals(strategy.getName(), "strategy1");
         assertEquals(strategy.getDescription().get(), "My Strategy");
+
+        final Map<String, Object> map = Maps.newHashMap();
+        map.put("prop", "val");
+        assertTrue(strategy.isEnabled(null, map));
+    }
+
+    @Test
+    public void testPropertiesUnAvailability() {
+        strategyProperties = Maps.newHashMap();
+        strategyProperties.put("name", "strategy1");
+        strategyProperties.put("description", "My Strategy");
+        strategyProperties.put("property_key", "prop");
+        strategyProperties.put("property_value", "val");
+
+        final ServicePropertyActivationStrategy strategy = new ServicePropertyActivationStrategy();
+        strategy.activate(strategyProperties);
+
+        assertEquals(strategy.getName(), "strategy1");
+        assertEquals(strategy.getDescription().get(), "My Strategy");
+
+        final Map<String, Object> map = Maps.newHashMap();
+        map.put("prop1", "val1");
+        assertFalse(strategy.isEnabled(null, map));
     }
 
     @Test
@@ -90,6 +117,36 @@ public final class ServicePropertyStrategyTest {
 
         final ServicePropertyActivationStrategy strategy = new ServicePropertyActivationStrategy();
         strategy.activate(strategyProperties);
+    }
+
+    @Test
+    public void testPropertyKeyEmpty() {
+        strategyProperties = Maps.newHashMap();
+        strategyProperties.put("name", "strategy1");
+        strategyProperties.put("description", "My Strategy");
+        strategyProperties.put("property_key", "");
+        strategyProperties.put("property_value", "val");
+
+        final ServicePropertyActivationStrategy strategy = new ServicePropertyActivationStrategy();
+        strategy.activate(strategyProperties);
+
+        assertEquals(strategy.toString(),
+                "ServicePropertyActivationStrategy{Name=strategy1, Description=My Strategy, Property Key=null, Property Value=val}");
+    }
+
+    @Test
+    public void testPropertyValueEmpty() {
+        strategyProperties = Maps.newHashMap();
+        strategyProperties.put("name", "strategy1");
+        strategyProperties.put("description", "My Strategy");
+        strategyProperties.put("property_key", "prop");
+        strategyProperties.put("property_value", "");
+
+        final ServicePropertyActivationStrategy strategy = new ServicePropertyActivationStrategy();
+        strategy.activate(strategyProperties);
+
+        assertEquals(strategy.toString(),
+                "ServicePropertyActivationStrategy{Name=strategy1, Description=My Strategy, Property Key=prop, Property Value=null}");
     }
 
     @Test
