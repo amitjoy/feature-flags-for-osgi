@@ -160,7 +160,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         final ServiceReference reference = event.getReference();
         try {
             final Object service = context.getService(reference);
-            if (service instanceof Feature || service instanceof FeatureGroup) {
+            if (service instanceof Strategizable) {
                 final Strategizable instance = (Strategizable) service;
                 listeners.forEach(l -> l.accept(getEvent(instance, event.getType())));
             }
