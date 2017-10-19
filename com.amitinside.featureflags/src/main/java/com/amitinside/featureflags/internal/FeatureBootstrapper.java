@@ -248,7 +248,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
                                                          .withGroups(feature.getGroups())
                                                          .withProperties(feature.getProperties())
                                                          .withEnabled(feature.isEnabled())
-                                                         .close());
+                                                         .build());
         //@formatter:on
         return featureService.createFeature(factory);
     }
@@ -271,7 +271,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
                                                         .withStrategy(group.getStrategy())
                                                         .withProperties(group.getProperties())
                                                         .withEnabled(group.isEnabled())
-                                                        .close());
+                                                        .build());
         //@formatter:on
         return featureService.createGroup(factory);
     }

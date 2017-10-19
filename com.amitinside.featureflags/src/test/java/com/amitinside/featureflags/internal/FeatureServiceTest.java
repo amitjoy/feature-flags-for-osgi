@@ -497,7 +497,7 @@ public final class FeatureServiceTest {
                                                          .withGroups(Lists.newArrayList())
                                                          .withProperties(Maps.newHashMap())
                                                          .withEnabled(false)
-                                                         .close());
+                                                         .build());
         //@formatter:on
         manager.createFeature(factory);
     }
@@ -514,7 +514,7 @@ public final class FeatureServiceTest {
                                                          .withStrategy("")
                                                          .withProperties(Maps.newHashMap())
                                                          .withEnabled(false)
-                                                         .close());
+                                                         .build());
         //@formatter:on
         manager.createGroup(factory);
     }
@@ -731,7 +731,7 @@ public final class FeatureServiceTest {
                                        .withGroups(Lists.newArrayList("group1"))
                                        .withProperties(props)
                                        .withEnabled(false)
-                                       .close());
+                                       .build());
         //@formatter:on
         assertTrue(manager.createFeature(factory).isPresent());
     }
@@ -751,7 +751,7 @@ public final class FeatureServiceTest {
                                                                .withGroups(Lists.newArrayList("group1"))
                                                                .withProperties(props)
                                                                .withEnabled(false)
-                                                               .close());
+                                                               .build());
         //@formatter:on
         assertFalse(manager.createFeature(factory).isPresent());
     }
@@ -772,7 +772,7 @@ public final class FeatureServiceTest {
                                                                .withStrategy("strategy1")
                                                                .withProperties(props)
                                                                .withEnabled(false)
-                                                               .close());
+                                                               .build());
         //@formatter:on
         assertTrue(manager.createGroup(factory).isPresent());
     }
@@ -791,7 +791,7 @@ public final class FeatureServiceTest {
                                                              .withStrategy("strategy1")
                                                              .withProperties(props)
                                                              .withEnabled(false)
-                                                             .close());
+                                                             .build());
         //@formatter:on
         assertFalse(manager.createGroup(factory).isPresent());
     }

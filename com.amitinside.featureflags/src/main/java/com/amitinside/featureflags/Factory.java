@@ -33,13 +33,13 @@ import com.google.common.collect.ImmutableMap;
  *                                                      .withStrategy("strategy1")
  *                                                      .withProperties(props)
  *                                                      .withEnabled(false)
- *                                                      .close());
+ *                                                      .build());
  * final Factory featureFactory = Factory.make("group1", c -> c.withDescription("My Group 1")
  *                                                      .withStrategy("strategy1")
  *                                                      .withGroups(Lists.newArrayList("group1"))
  *                                                      .withProperties(props)
  *                                                      .withEnabled(false)
- *                                                      .close());
+ *                                                      .build());
  * </pre>
  *
  * @noimplement This interface is not intended to be implemented by feature providers.
@@ -134,7 +134,7 @@ public class Factory {
         }
 
         @Override
-        public FactoryFinalizationStep close() {
+        public FactoryFinalizationStep build() {
             return this;
         }
     }
@@ -220,7 +220,7 @@ public class Factory {
     }
 
     public static interface FinalStep {
-        public FactoryFinalizationStep close();
+        public FactoryFinalizationStep build();
     }
 
     public static interface FactoryFinalizationStep {
