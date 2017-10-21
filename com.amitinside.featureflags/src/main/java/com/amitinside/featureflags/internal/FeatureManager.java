@@ -460,27 +460,25 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     private boolean checkGroupEnablement(final FeatureGroup group) {
-        final String strategyId = group.getStrategy().orElse("");
-        if (!strategyId.isEmpty()) {
-            final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
-            if (strategy != null) {
-                return strategy.isEnabled(group, getFeatureGroupProperties(group));
-            }
-        } else {
-            return group.isEnabled();
-        }
-        return false;
+        //@formatter:off
+        return group.getStrategy()
+                    .map(this::getStrategy)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(x -> x.isEnabled(group, getFeatureGroupProperties(group)))
+                    .orElse(group.isEnabled());
+        //@formatter:on
     }
 
     private boolean checkFeatureStrategyEnablement(final Feature feature) {
-        final String strategyId = feature.getStrategy().orElse("");
-        if (!strategyId.isEmpty()) {
-            final ActivationStrategy strategy = getStrategy(strategyId).orElse(null);
-            if (strategy != null) {
-                return strategy.isEnabled(feature, getFeatureProperties(feature));
-            }
-        }
-        return feature.isEnabled();
+        //@formatter:off
+        return feature.getStrategy()
+                      .map(this::getStrategy)
+                      .filter(Optional::isPresent)
+                      .map(Optional::get)
+                      .map(x -> x.isEnabled(feature, getFeatureProperties(feature)))
+                      .orElse(feature.isEnabled());
+        //@formatter:on
     }
 
     private Map<String, Object> getFeatureProperties(final Feature feature) {
