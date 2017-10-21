@@ -56,8 +56,6 @@ public final class FeatureServiceTest {
     private ConfigurationAdmin configurationAdmin;
     @Mock
     private org.osgi.service.cm.ConfigurationEvent event;
-    @Mock
-    private ActivationStrategy strategy;
 
     @Before
     public void init() {
