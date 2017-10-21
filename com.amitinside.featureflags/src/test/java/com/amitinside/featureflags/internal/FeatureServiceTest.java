@@ -284,6 +284,15 @@ public final class FeatureServiceTest {
     }
 
     @Test
+    public void testIsEnabledWhenFeatureDoesBelongToGroupButNoActualGroupIsAvailable() {
+        final Feature feature = createFeature("feature1", "My Feature 1", true, "group1", "strategy1");
+
+        manager.bindFeature(feature, createServiceProperties(2, 5, "pid1"));
+
+        assertFalse(manager.isFeatureEnabled("feature1"));
+    }
+
+    @Test
     public void testIsEnabledWhenFeatureDoesBelongToGroupAndHasAStrategy() {
         final Feature feature = createFeature("feature1", "My Feature 1", true, "group1", "strategy1");
 
