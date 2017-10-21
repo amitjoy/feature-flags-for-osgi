@@ -20,7 +20,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
 import com.amitinside.featureflags.Strategizable;
+import com.amitinside.featureflags.feature.Feature;
+import com.amitinside.featureflags.feature.group.FeatureGroup;
 
+/**
+ * This strategy is responsible for checking configured property key and value in the
+ * {@link Feature} or {@link FeatureGroup}'s OSGi service property.
+ */
 @Component(name = "ConfiguredServicePropertyStrategy", immediate = true, configurationPolicy = REQUIRE, configurationPid = STRATEGY_SERVICE_PROPERTY_PID)
 public final class ServicePropertyActivationStrategy extends AbstractPropertyActivationStrategy {
 

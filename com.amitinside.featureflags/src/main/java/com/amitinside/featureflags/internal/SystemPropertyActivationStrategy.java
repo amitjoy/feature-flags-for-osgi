@@ -20,6 +20,10 @@ import org.osgi.service.component.annotations.Modified;
 
 import com.amitinside.featureflags.Strategizable;
 
+/**
+ * This strategy is responsible for checking configured property key and value in the
+ * system configured properties.
+ */
 @Component(name = "ConfiguredSystemPropertyStrategy", immediate = true, configurationPolicy = REQUIRE, configurationPid = STRATEGY_SYSTEM_PROPERTY_PID)
 public final class SystemPropertyActivationStrategy extends AbstractPropertyActivationStrategy {
 
