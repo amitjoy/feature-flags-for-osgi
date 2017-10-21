@@ -54,6 +54,10 @@ public final class FeatureServiceTest {
     private Strategizable strategizable;
     @Mock
     private ConfigurationAdmin configurationAdmin;
+    @Mock
+    private org.osgi.service.cm.ConfigurationEvent event;
+    @Mock
+    private ActivationStrategy strategy;
 
     @Before
     public void init() {
@@ -675,6 +679,13 @@ public final class FeatureServiceTest {
         manager.unsetConfigurationAdmin(configurationAdmin);
 
         assertTrue(manager.getGroup("group1").get().isEnabled());
+    }
+
+    @Test
+    public void testConfigurationEventMethod() {
+        manager.activate(context);
+        manager.configurationEvent(event);
+        verify(event, times(0)).getType();
     }
 
     @Test
