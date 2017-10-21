@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.junit.Before;
@@ -31,6 +32,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
 import com.amitinside.featureflags.Factory;
+import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.listener.ConfigurationListener;
@@ -48,6 +50,8 @@ public final class FeatureServiceTest {
     private BundleContext context;
     @Mock
     private ServiceReference reference;
+    @Mock
+    private Strategizable strategizable;
     @Mock
     private ConfigurationAdmin configurationAdmin;
 
@@ -662,6 +666,25 @@ public final class FeatureServiceTest {
         manager.unsetConfigurationAdmin(configurationAdmin);
 
         assertTrue(manager.getGroup("group1").get().isEnabled());
+    }
+
+    @Test
+    public void testGetEventMethodForStrategizableButNotFeatureOrFeatureGroup() {
+        manager = new FeatureManager();
+        try {
+            final Method method = manager.getClass().getDeclaredMethod("getEvent", Strategizable.class, int.class);
+            method.setAccessible(true);
+            final ConfigurationEvent event = (ConfigurationEvent) method.invoke(manager, strategizable, 1);
+            assertTrue(event.getProperties().isEmpty());
+        } catch (final NoSuchMethodException e) {
+            throw new AssertionError(e.getMessage());
+        } catch (final IllegalArgumentException e) {
+            throw new AssertionError(e.getMessage());
+        } catch (final IllegalAccessException e) {
+            throw new AssertionError(e.getMessage());
+        } catch (final InvocationTargetException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
