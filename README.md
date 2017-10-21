@@ -2,7 +2,7 @@
 
 ## Why? [![start with what and why](https://img.shields.io/badge/start%20with-why%3F-brightgreen.svg?style=flat)](http://featureflags.io/feature-flags/)
 
-This is an implementation of the Feature Toggles pattern (also known as Feature Flags) for OSGi. Feature Toggles are a very common agile development practices in the context of continuous deployment and delivery. The basic idea is to associate a toggle with each new feature you are working on. This allows you to enable or disable these features at application runtime, even for individual users.
+This is an implementation of the Feature Toggles pattern (also known as Feature Flags) for OSGi. Feature Toggles are a widespread agile development practices in the context of continuous deployment and delivery. The basic idea is to associate a toggle with each new feature you are working on. This allows you to enable or disable these features at application runtime, even for individual users.
 
 ------------------------------------------------
 
@@ -20,7 +20,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 ### Dependencies
 
-This requires a small number of dependencies to work properly:
+This requires a small number of dependencies to work correctly:
 
 * Java 8+
 * OSGi R4+
@@ -112,7 +112,7 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
   ]
 }
 ```
-3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.amitinside.featureflags.feature.group`. Likewise you can add extra properties to your group as shown in the example. These properties will be added as your group's service properties.
+3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.amitinside.featureflags.feature.group`. Likewise, you can add extra properties to your group as shown in the example. These properties will be added to your group's service properties.
 
 4. Instead of providing `features.json`, you can also use `FeatureService#createFeature(...)` and `FeatureService#createGroup(...)` to create features and feature groups.
 
@@ -139,7 +139,7 @@ void unsetFeatureService(final FeatureService featureService) {
 }
 ```
 6. Instead of providing `features.json`, you can also implement `Feature` interface and expose it as an OSGi service
-7. The strategy must be privided by implementing `ActivationStrategy` interface and exposing as an OSGi service
+7. The strategy must be provided by implementing `ActivationStrategy` interface and exposing as an OSGi service
 8. You can also provide a feature group by implementing `FeatureGroup` interface and exposing as an OSGi service
 
 --------------------------------------------------------------
@@ -155,7 +155,10 @@ The following flowchart shows the control flow for the determination of feature 
 
 ![feature-flags](https://user-images.githubusercontent.com/13380182/31776356-9862ac2e-b4eb-11e7-89f5-fad75d49eb53.png)
 
-**Examples of strategies**: `IP Based Strategy` by which some features would be enabled based on specific IP Addresses or `Time Based Strategy` by which a group of features are enabled at a certain time of a day.
+**Strategies Included**:
+
+1. **Service Property Activation Strategy**: This strategy is responsible for checking configured property key and value in the feature or feature group's OSGi service property.
+2. **System Property Activation Strategy**: Likewise this strategy checks for specified property key and value in the system configured properties.
 
 **Motivation of Feature Group**: Feature groups are primarily used to enable or disable multiple related features all-together. That's why enablement of any feature group is directly applied to the belonging features. Not all features should belong to feature group and hence a feature can optionally specify the feature group to which it belongs. Please note that use feature groups only if you have multiple features to group together and whose enablements and disablements would happen together. If you do have multiple features whose enablements and disablements are not at all related, **do not specify any feature group** for those features. For more information, have a look at the aforementioned flowchart.
 
