@@ -695,9 +695,11 @@ public final class FeatureServiceTest {
         final Feature feature1 = createFeature("feature1", "My Feature 2", false, "group1", "strategy1");
         final Feature feature2 = createFeature("feature1", "My Feature 2", false, "group2", "strategy1");
         final Feature feature3 = createFeature("feature2", "My Feature", false, "group", "strategy");
+        final Feature feature4 = createFeature("feature3", "My Feature", false, "group", "strategy");
         final Map<String, Object> props1 = createServiceProperties(3, 5, "");
         final Map<String, Object> props2 = createServiceProperties(3, 5, "");
         final Map<String, Object> props3 = createServiceProperties(3, 5, "myPid");
+        final Map<String, Object> props4 = createServiceProperties(3, 6, "myPid");
 
         final Class clazz = Class.forName("com.amitinside.featureflags.internal.FeatureManager$Description");
         final Constructor constructor = clazz.getConstructor(Object.class, Map.class);
@@ -705,8 +707,10 @@ public final class FeatureServiceTest {
         final Object instance1 = constructor.newInstance(feature1, props1);
         final Object instance2 = constructor.newInstance(feature2, props2);
         final Object instance3 = constructor.newInstance(feature3, props3);
+        final Object instance4 = constructor.newInstance(feature4, props4);
 
         assertTrue(instance1.equals(instance2));
+        assertFalse(instance1.equals(instance4));
         assertFalse(instance1.equals(props1));
         assertEquals(instance1.hashCode(), instance2.hashCode());
 
