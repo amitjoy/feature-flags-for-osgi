@@ -448,13 +448,12 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     private boolean checkEnablement(final Feature feature) {
         final long noOfGroups = feature.getGroups().count();
         if (noOfGroups > 0) {
-            FeatureGroup group;
             if (noOfGroups == 1) {
-                group = getGroup(feature.getGroups().findAny().orElse("")).orElse(null);
+                final FeatureGroup group = getGroup(feature.getGroups().findAny().orElse("")).orElse(null);
+                return group == null ? false : checkGroupEnablement(group);
             } else {
                 return feature.getGroups().anyMatch(this::isGroupEnabled);
             }
-            return checkGroupEnablement(group);
         }
         return checkFeatureStrategyEnablement(feature);
     }
