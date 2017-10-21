@@ -25,6 +25,9 @@ public final class Constants {
     /** Factory PID of System Property {@code ActivationStrategy} configuration instances */
     public static final String STRATEGY_SYSTEM_PROPERTY_PID = "com.amitinside.featureflags.strategy.system.property";
 
+    /** Factory PID of Service Property {@code ActivationStrategy} configuration instances */
+    public static final String STRATEGY_SERVICE_PROPERTY_PID = "com.amitinside.featureflags.strategy.service.property";
+
     /** Constructor */
     private Constants() {
         throw new IllegalAccessError("Non-Instantiable");

@@ -9,11 +9,10 @@
  *******************************************************************************/
 package com.amitinside.featureflags.internal;
 
-import static com.amitinside.featureflags.Constants.STRATEGY_SERVICE_PROPERTY_PID;
+import static com.amitinside.featureflags.Constants.STRATEGY_SYSTEM_PROPERTY_PID;
 import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
 
 import java.util.Map;
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -21,8 +20,8 @@ import org.osgi.service.component.annotations.Modified;
 
 import com.amitinside.featureflags.Strategizable;
 
-@Component(name = "ConfiguredServicePropertyStrategy", immediate = true, configurationPolicy = REQUIRE, configurationPid = STRATEGY_SERVICE_PROPERTY_PID)
-public final class ServicePropertyActivationStrategy extends AbstractPropertyActivationStrategy {
+@Component(name = "ConfiguredSystemPropertyStrategy", immediate = true, configurationPolicy = REQUIRE, configurationPid = STRATEGY_SYSTEM_PROPERTY_PID)
+public final class SystemPropertyActivationStrategy extends AbstractPropertyActivationStrategy {
 
     @Override
     @Activate
@@ -44,10 +43,8 @@ public final class ServicePropertyActivationStrategy extends AbstractPropertyAct
         if (key == null || value == null) {
             return false;
         }
-        if (properties.containsKey(key)) {
-            return Objects.equals(properties.get(key), value);
-        }
-        return false;
+        final String entry = System.getProperty(key);
+        return entry == null ? false : true;
     }
 
 }
