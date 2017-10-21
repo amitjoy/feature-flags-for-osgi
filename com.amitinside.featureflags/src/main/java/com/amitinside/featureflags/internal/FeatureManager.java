@@ -172,22 +172,9 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     @Override
     public Optional<String> createFeature(final Factory featureFactory) {
         requireNonNull(featureFactory, "Feature factory cannot be null");
-        // extract data
         final List<String> groups = featureFactory.getGroups();
-        final String name = featureFactory.getName();
-        final String description = featureFactory.getDescription().orElse(null);
-        final String strategy = featureFactory.getStrategy().orElse(null);
-        final boolean isEnabled = featureFactory.isEnabled();
-        final Map<String, Object> serviceProperties = featureFactory.getProperties();
-
-        final Map<String, Object> props = Maps.newHashMap();
-        props.put(NAME.value(), name);
-        props.put(DESCRIPTION.value(), description);
-        props.put(STRATEGY.value(), strategy);
+        final Map<String, Object> props = extractData(featureFactory);
         props.put(GROUPS.value(), groups.toArray(new String[0]));
-        props.put(ENABLED.value(), isEnabled);
-        props.putAll(serviceProperties);
-        // remove all null values
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         try {
             final Configuration configuration = configurationAdmin.createFactoryConfiguration(FEATURE_FACTORY_PID);
@@ -201,20 +188,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     @Override
     public Optional<String> createGroup(final Factory groupFactory) {
         requireNonNull(groupFactory, "Group factory cannot be null");
-        // extract data
-        final String name = groupFactory.getName();
-        final String description = groupFactory.getDescription().orElse(null);
-        final String strategy = groupFactory.getStrategy().orElse(null);
-        final boolean isEnabled = groupFactory.isEnabled();
-        final Map<String, Object> serviceProperties = groupFactory.getProperties();
-
-        final Map<String, Object> props = Maps.newHashMap();
-        props.put(NAME.value(), name);
-        props.put(DESCRIPTION.value(), description);
-        props.put(STRATEGY.value(), strategy);
-        props.put(ENABLED.value(), isEnabled);
-        props.putAll(serviceProperties);
-        // remove all null values
+        final Map<String, Object> props = extractData(groupFactory);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         try {
             final Configuration configuration = configurationAdmin
@@ -443,6 +417,22 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
             logger.trace("Cannot retrieve configuration for {}", name, e);
         }
         return false;
+    }
+
+    private Map<String, Object> extractData(final Factory factory) {
+        final String name = factory.getName();
+        final String description = factory.getDescription().orElse(null);
+        final String strategy = factory.getStrategy().orElse(null);
+        final boolean isEnabled = factory.isEnabled();
+        final Map<String, Object> serviceProperties = factory.getProperties();
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put(NAME.value(), name);
+        props.put(DESCRIPTION.value(), description);
+        props.put(STRATEGY.value(), strategy);
+        props.put(ENABLED.value(), isEnabled);
+        props.putAll(serviceProperties);
+        return props;
     }
 
     private boolean checkEnablement(final Feature feature) {
