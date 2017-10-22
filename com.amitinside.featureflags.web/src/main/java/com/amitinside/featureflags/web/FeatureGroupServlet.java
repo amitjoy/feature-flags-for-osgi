@@ -31,26 +31,26 @@ import org.osgi.service.component.annotations.Reference;
 
 import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.FeatureService;
-import com.amitinside.featureflags.feature.Feature;
+import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
-@Component(name = "FeatureGroupServlet", service = FeatureFlagsServlet.class)
+@Component(name = "FeatureGroupServlet", service = FeatureFlagsServlet.class, immediate = true)
 public final class FeatureGroupServlet extends HttpServlet implements FeatureFlagsServlet {
 
     private static final long serialVersionUID = 7683703693369965631L;
 
     private FeatureService featureService;
     private final Gson gson = new Gson();
-    private final Map<Feature, Map<String, Object>> featureProeprties = Maps.newHashMap();
+    private final Map<FeatureGroup, Map<String, Object>> groupProperties = Maps.newHashMap();
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
-        if (uris.size() == 1 && uris.get(0).equalsIgnoreCase("features")) {
-            final List<FeatureData> data = featureService.getFeatures().map(this::mapToFeatureData)
+        if (uris.size() == 1 && uris.get(0).equalsIgnoreCase("groups")) {
+            final List<GroupData> data = featureService.getGroups().map(this::mapToGroupData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
             resp.setStatus(HttpServletResponse.SC_OK);
@@ -59,8 +59,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             }
         }
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase("features")) {
-
-            final FeatureData data = featureService.getFeature(uris.get(1)).map(this::mapToFeatureData).orElse(null);
+            final GroupData data = featureService.getGroup(uris.get(1)).map(this::mapToGroupData).orElse(null);
 
             final String json = gson.toJson(data);
             resp.setStatus(HttpServletResponse.SC_OK);
@@ -74,7 +73,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
-        if (uris.size() == 1 && uris.get(0).equalsIgnoreCase("features")) {
+        if (uris.size() == 1 && uris.get(0).equalsIgnoreCase("groups")) {
             final StringBuilder stringBuilder = new StringBuilder();
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
                 final char[] charBuffer = new char[1024];
@@ -86,16 +85,15 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final FeatureData data = gson.fromJson(stringBuilder.toString(), FeatureData.class);
+            final GroupData data = gson.fromJson(stringBuilder.toString(), GroupData.class);
             //@formatter:off
             final Factory factory = Factory.make(data.getName(), c -> c.withDescription(data.getDescription())
                                                                  .withStrategy(data.getStrategy())
-                                                                 .withGroups(data.getGroups())
                                                                  .withProperties(data.getProperties())
                                                                  .withEnabled(data.isEnabled())
                                                                  .build());
             //@formatter:on
-            final Optional<String> pid = featureService.createFeature(factory);
+            final Optional<String> pid = featureService.createGroup(factory);
             if (pid.isPresent()) {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 try (PrintWriter writer = resp.getWriter()) {
@@ -112,14 +110,14 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
-        if (uris.size() == 3 && uris.get(0).equalsIgnoreCase("features")) {
+        if (uris.size() == 3 && uris.get(0).equalsIgnoreCase("groups")) {
             final String flag = uris.get(2);
             final boolean isEnabled = Boolean.parseBoolean(flag);
             final String name = uris.get(1);
             if (isEnabled) {
-                featureService.enableFeature(name);
+                featureService.enableGroup(name);
             } else {
-                featureService.disableFeature(name);
+                featureService.disableGroup(name);
             }
             resp.setStatus(HttpServletResponse.SC_OK);
         }
@@ -129,7 +127,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
-        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase("features")) {
+        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase("groups")) {
             final String name = uris.get(1);
             featureService.removeFeature(name);
             resp.setStatus(HttpServletResponse.SC_OK);
@@ -152,51 +150,48 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     }
 
     /**
-     * {@link Feature} service binding callback
+     * {@link FeatureGroup} service binding callback
      */
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindFeature(final Feature feature, final Map<String, Object> props) {
-        featureProeprties.put(feature, props);
+    protected void bindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
+        groupProperties.put(group, props);
     }
 
     /**
-     * {@link Feature} service unbinding callback
+     * {@link FeatureGroup} service unbinding callback
      */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void unbindFeature(final Feature feature, final Map<String, Object> props) {
-        featureProeprties.remove(feature);
+    protected void unbindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
+        groupProperties.remove(group);
     }
 
     private static final class DataHolder {
-        private final List<FeatureData> features;
+        private final List<GroupData> groups;
 
-        public DataHolder(final List<FeatureData> features) {
-            this.features = features;
+        public DataHolder(final List<GroupData> groups) {
+            this.groups = groups;
         }
 
         @SuppressWarnings("unused")
-        public List<FeatureData> getFeatures() {
-            return features;
+        public List<GroupData> getGroups() {
+            return groups;
         }
     }
 
     /**
-     * Internal class used to represent Feature Group JSON data
+     * Internal class used to represent Feature JSON data
      */
-    private static final class FeatureData {
+    private static final class GroupData {
         private final String name;
         private final String description;
         private final String strategy;
-        private final List<String> groups;
         private final boolean enabled;
         private final Map<String, Object> properties;
 
-        public FeatureData(final String name, final String description, final String strategy,
-                final List<String> groups, final boolean enabled, final Map<String, Object> properties) {
+        public GroupData(final String name, final String description, final String strategy, final boolean enabled,
+                final Map<String, Object> properties) {
             this.name = name;
             this.description = description;
             this.strategy = strategy;
-            this.groups = groups;
             this.enabled = enabled;
             this.properties = properties;
         }
@@ -213,10 +208,6 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             return strategy;
         }
 
-        public List<String> getGroups() {
-            return groups;
-        }
-
         public Map<String, Object> getProperties() {
             return properties;
         }
@@ -226,12 +217,16 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
         }
     }
 
-    private FeatureData mapToFeatureData(final Feature feature) {
-        final String name = feature.getName();
-        final String strategy = feature.getStrategy().orElse(null);
-        final String description = feature.getDescription().orElse(null);
-        final List<String> groups = feature.getGroups().collect(Collectors.toList());
-        final boolean isEnabled = feature.isEnabled();
-        return new FeatureData(name, description, strategy, groups, isEnabled, featureProeprties.get(feature));
+    private GroupData mapToGroupData(final FeatureGroup group) {
+        final String name = group.getName();
+        final String strategy = group.getStrategy().orElse(null);
+        final String description = group.getDescription().orElse(null);
+        final boolean isEnabled = group.isEnabled();
+        return new GroupData(name, description, strategy, isEnabled, groupProperties.get(group));
+    }
+
+    @Override
+    public String getAlias() {
+        return "/groups";
     }
 }

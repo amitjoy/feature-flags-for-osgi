@@ -37,14 +37,14 @@ import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
-@Component(name = "StrategyServlet", service = FeatureFlagsServlet.class)
+@Component(name = "StrategyServlet", service = FeatureFlagsServlet.class, immediate = true)
 public final class StrategyServlet extends HttpServlet implements FeatureFlagsServlet {
 
     private static final long serialVersionUID = 7683703693369965631L;
 
     private FeatureService featureService;
     private final Gson gson = new Gson();
-    private final Map<ActivationStrategy, Map<String, Object>> strategyProeprties = Maps.newHashMap();
+    private final Map<ActivationStrategy, Map<String, Object>> strategyProperties = Maps.newHashMap();
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
@@ -138,15 +138,14 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
      */
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
     protected void bindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
-        strategyProeprties.put(strategy, props);
+        strategyProperties.put(strategy, props);
     }
 
     /**
      * {@link ActivationStrategy} service unbinding callback
      */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
     protected void unbindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
-        strategyProeprties.remove(strategy);
+        strategyProperties.remove(strategy);
     }
 
     private static final class DataHolder {
@@ -199,8 +198,13 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
     private StrategyData mapToStrategyData(final ActivationStrategy strategy) {
         final String name = strategy.getName();
         final String description = strategy.getDescription().orElse(null);
-        final Map<String, Object> props = strategyProeprties.get(strategy);
+        final Map<String, Object> props = strategyProperties.get(strategy);
         return new StrategyData(name, description, (String) props.get("property_key"),
                 (String) props.get("property_value"));
+    }
+
+    @Override
+    public String getAlias() {
+        return "/strategies";
     }
 }
