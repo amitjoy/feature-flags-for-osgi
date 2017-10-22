@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.google.common.collect.ImmutableList;
@@ -53,7 +51,6 @@ import com.google.common.collect.ImmutableMap;
  * @ThreadSafe
  * @Immutable
  */
-@ProviderType
 public class Factory {
 
     private final String name;
@@ -69,7 +66,7 @@ public class Factory {
      * @param builder the {@link Builder} instance
      *
      * @throws NullPointerException NullPointerException if the {@link Builder}
-     *         or specified {@code name} is {@code null} 
+     *             or specified {@code name} is {@code null}
      */
     private Factory(final Builder builder) {
         requireNonNull(builder, "Builder cannot be null");
@@ -174,7 +171,7 @@ public class Factory {
 
     /**
      * Creates a {@link Factory} instance
-     * 
+     *
      * @param name the name of the instance
      * @param configuration the function representing the instance configuration
      * @return the {@link Factory} instance

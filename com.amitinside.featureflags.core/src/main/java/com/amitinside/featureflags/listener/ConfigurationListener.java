@@ -11,8 +11,6 @@ package com.amitinside.featureflags.listener;
 
 import java.util.function.Consumer;
 
-import org.osgi.annotation.versioning.ConsumerType;
-
 import com.amitinside.featureflags.ConfigurationEvent;
 
 /**
@@ -32,7 +30,6 @@ import com.amitinside.featureflags.ConfigurationEvent;
  *
  * @ThreadSafe
  */
-@ConsumerType
 @FunctionalInterface
 public interface ConfigurationListener extends Consumer<ConfigurationEvent> {
 

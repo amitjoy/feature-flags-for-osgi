@@ -14,15 +14,13 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 
 /**
  * StrategyFactory is used to create configuration factories for {@code SystemPropertyActivationStrategy}
  * and {@code ServicePropertyActivationStrategy}.
- * This is primarily used by {@link FeatureService} to create {@code SystemPropertyActivationStrategy} and 
+ * This is primarily used by {@link FeatureService} to create {@code SystemPropertyActivationStrategy} and
  * {@code ServicePropertyActivationStrategy} configuration instances.
  *
  * <pre>
@@ -43,7 +41,6 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
  * @ThreadSafe
  * @Immutable
  */
-@ProviderType
 public class StrategyFactory {
 
     private final String name;
@@ -57,8 +54,8 @@ public class StrategyFactory {
      *
      * @param builder the {@link Builder} instance
      *
-     * @throws NullPointerException if the {@link Builder} is {@code null} or specified {@code name} or 
-     *      specified {@code type} in {@link Builder} is null 
+     * @throws NullPointerException if the {@link Builder} is {@code null} or specified {@code name} or
+     *             specified {@code type} in {@link Builder} is null
      */
     private StrategyFactory(final Builder builder) {
         requireNonNull(builder, "Builder cannot be null");
@@ -117,7 +114,7 @@ public class StrategyFactory {
     public String getName() {
         return name;
     }
-    
+
     /**
      * Returns configured name (cannot be {@code null})
      */
@@ -179,7 +176,7 @@ public class StrategyFactory {
     public static interface FactoryFinalizationStep {
         public StrategyFactory create();
     }
-    
+
     public enum StrategyType {
         SERVICE_PROPERTY,
         SYSTEM_PROPERTY

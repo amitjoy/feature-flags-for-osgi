@@ -12,8 +12,6 @@ package com.amitinside.featureflags.strategy;
 import java.util.Map;
 import java.util.Optional;
 
-import org.osgi.annotation.versioning.ConsumerType;
-
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
@@ -43,7 +41,6 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
  *
  * @ThreadSafe
  */
-@ConsumerType
 public interface ActivationStrategy {
 
     /**

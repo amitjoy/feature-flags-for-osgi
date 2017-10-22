@@ -12,8 +12,6 @@ package com.amitinside.featureflags;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
@@ -32,7 +30,6 @@ import com.google.common.base.Strings;
  *
  * @ThreadSafe
  */
-@ProviderType
 public interface FeatureService {
 
     /**
@@ -135,7 +132,7 @@ public interface FeatureService {
      *             or the factory has been configured with a {@code null} name
      */
     Optional<String> createGroup(Factory groupFactory);
-    
+
     /**
      * Creates a property based strategy.
      *
@@ -165,7 +162,7 @@ public interface FeatureService {
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
      */
     void removeGroup(String name);
-    
+
     /**
      * Removes a property based strategy.
      *

@@ -11,8 +11,6 @@ package com.amitinside.featureflags.feature;
 
 import java.util.stream.Stream;
 
-import org.osgi.annotation.versioning.ConsumerType;
-
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
@@ -44,7 +42,6 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  *
  * @ThreadSafe
  */
-@ConsumerType
 public interface Feature extends Strategizable {
 
     /**

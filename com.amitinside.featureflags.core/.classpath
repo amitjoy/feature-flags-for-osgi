@@ -8,6 +8,5 @@
 	<classpathentry kind="src" path="src/test/resources"/>
 	<classpathentry kind="lib" path="libs/junit-4.12.jar"/>
 	<classpathentry kind="lib" path="libs/mockito-core-2.10.0.jar"/>
-	<classpathentry kind="lib" path="libs/org.osgi.annotation-6.0.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
