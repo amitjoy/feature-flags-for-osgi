@@ -135,6 +135,18 @@ public interface FeatureService {
      *             or the factory has been configured with a {@code null} name
      */
     Optional<String> createGroup(Factory groupFactory);
+    
+    /**
+     * Creates a property based strategy.
+     *
+     * @param factory The factory to be used to create the property based strategy. (cannot be {@code null})
+     * @return configuration PID as created wrapped in {@link Optional} or empty {@link Optional}
+     *         instance if strategy does not get created due to failure
+     *
+     * @throws NullPointerException if the specified argument {@code factory} is {@code null}
+     *             or the factory has been configured with a {@code null} name
+     */
+    Optional<String> createPropertyBasedStrategy(StrategyFactory factory);
 
     /**
      * Removes a feature.
@@ -153,6 +165,15 @@ public interface FeatureService {
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
      */
     void removeGroup(String name);
+    
+    /**
+     * Removes a property based strategy.
+     *
+     * @param name The name of the property based strategy. (cannot be {@code null})
+     *
+     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     */
+    void removePropertyBasedStrategy(String name);
 
     /**
      * Returns {@code true} if a feature with the given name is known and

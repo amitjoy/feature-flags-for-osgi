@@ -168,6 +168,34 @@ public final class TestHelper {
         };
     }
 
+    public static ActivationStrategy createSystemPropertyActivationStrategy(final String name, final String description,
+            final String key, final String value) {
+        final Map<String, Object> properties = Maps.newHashMap();
+        properties.put("name", name);
+        properties.put("description", description);
+        properties.put("enabled", true);
+        properties.put("property_key", key);
+        properties.put("property_value", value);
+
+        final SystemPropertyActivationStrategy strategy = new SystemPropertyActivationStrategy();
+        strategy.activate(properties);
+        return strategy;
+    }
+
+    public static ActivationStrategy createServicePropertyActivationStrategy(final String name,
+            final String description, final String key, final String value) {
+        final Map<String, Object> properties = Maps.newHashMap();
+        properties.put("name", name);
+        properties.put("description", description);
+        properties.put("enabled", true);
+        properties.put("property_key", key);
+        properties.put("property_value", value);
+
+        final ServicePropertyActivationStrategy strategy = new ServicePropertyActivationStrategy();
+        strategy.activate(properties);
+        return strategy;
+    }
+
     public static Map<String, Object> createServiceProperties(final int ranking, final long serviceId,
             final String pid) {
         final Map<String, Object> properties = Maps.newHashMap();

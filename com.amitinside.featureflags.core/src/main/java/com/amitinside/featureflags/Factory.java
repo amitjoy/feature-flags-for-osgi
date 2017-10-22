@@ -27,19 +27,20 @@ import com.google.common.collect.ImmutableMap;
  * Factory is used to create configuration factories for {@link Feature} or {@link FeatureGroup}.
  * This is primarily used by {@link FeatureService} to create {@link Feature} and {@link FeatureGroup}
  * configuration instances.
- * 
+ *
  * <pre>
  * final Factory groupFactory = Factory.make("group1", c -> c.withDescription("My Group 1")
- *                                                      .withStrategy("strategy1")
- *                                                      .withProperties(props)
- *                                                      .withEnabled(false)
- *                                                      .build());
+ *                                                           .withStrategy("strategy1")
+ *                                                           .withProperties(props)
+ *                                                           .withEnabled(false)
+ *                                                           .build());
+ *                                                           
  * final Factory featureFactory = Factory.make("group1", c -> c.withDescription("My Group 1")
- *                                                      .withStrategy("strategy1")
- *                                                      .withGroups(Lists.newArrayList("group1"))
- *                                                      .withProperties(props)
- *                                                      .withEnabled(false)
- *                                                      .build());
+ *                                                             .withStrategy("strategy1")
+ *                                                             .withGroups(Lists.newArrayList("group1"))
+ *                                                             .withProperties(props)
+ *                                                             .withEnabled(false)
+ *                                                             .build());
  * </pre>
  *
  * @noimplement This interface is not intended to be implemented by feature providers.
@@ -65,19 +66,14 @@ public class Factory {
     /**
      * Constructs a Factory instance
      *
-     * @param name the name of the instance
-     * @param description the description of the instance
-     * @param strategy the strategy of the instance
-     * @param groups the groups assigned to the instance
-     * @param properties the extra service proeprties
-     * @param isEnabled the enabled property
+     * @param builder the {@link Builder} instance
      *
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     * @throws NullPointerException NullPointerException if the {@link Builder}
+     *         or specified {@code name} is {@code null} 
      */
     private Factory(final Builder builder) {
-        final String instanceName = builder.name;
-        requireNonNull(instanceName, "Name cannot be null");
-        name = instanceName;
+        requireNonNull(builder, "Builder cannot be null");
+        name = requireNonNull(builder.name, "Name cannot be null");
         description = builder.description;
         strategy = builder.strategy;
         groups = builder.groups;
@@ -178,6 +174,7 @@ public class Factory {
 
     /**
      * Creates a {@link Factory} instance
+     * 
      * @param name the name of the instance
      * @param configuration the function representing the instance configuration
      * @return the {@link Factory} instance

@@ -11,6 +11,7 @@ package com.amitinside.featureflags.internal;
 
 import static com.amitinside.featureflags.ConfigurationEvent.Type.*;
 import static com.amitinside.featureflags.Constants.*;
+import static com.amitinside.featureflags.StrategyFactory.StrategyType.SERVICE_PROPERTY;
 import static com.amitinside.featureflags.internal.Config.*;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.framework.Constants.*;
@@ -44,6 +45,7 @@ import com.amitinside.featureflags.ConfigurationEvent.Type;
 import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.Strategizable;
+import com.amitinside.featureflags.StrategyFactory;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.listener.ConfigurationListener;
@@ -201,6 +203,22 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
+    public Optional<String> createPropertyBasedStrategy(final StrategyFactory factory) {
+        requireNonNull(factory, "Strategy factory cannot be null");
+        final Map<String, Object> props = extractStrategyData(factory);
+        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
+        final String type = factory.getType() == SERVICE_PROPERTY ? STRATEGY_SERVICE_PROPERTY_PID
+                : STRATEGY_SYSTEM_PROPERTY_PID;
+        try {
+            final Configuration configuration = configurationAdmin.createFactoryConfiguration(type);
+            configuration.update(new Hashtable<>(filteredProps));
+            return Optional.ofNullable(configuration.getPid());
+        } catch (final IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public void removeFeature(final String name) {
         requireNonNull(name, "Feature name cannot be null");
         final String pid = getFeaturePID(name);
@@ -211,6 +229,13 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     public void removeGroup(final String name) {
         requireNonNull(name, "Feature Group name cannot be null");
         final String pid = getGroupPID(name);
+        deleteConfiguration(name, pid);
+    }
+
+    @Override
+    public void removePropertyBasedStrategy(final String name) {
+        requireNonNull(name, "Strategy name cannot be null");
+        final String pid = getStrategyPID(name);
         deleteConfiguration(name, pid);
     }
 
@@ -406,6 +431,19 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         //@formatter:on
     }
 
+    private String getStrategyPID(final String strategyName) {
+        //@formatter:off
+        return allStrategies.values().stream()
+                .sorted()
+                .filter(x -> x.instance.getName().equalsIgnoreCase(strategyName))
+                .findFirst()
+                .map(f -> f.props)
+                .map(m -> m.get(SERVICE_PID))
+                .map(String.class::cast)
+                .orElse("");
+        //@formatter:on
+    }
+
     protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(pid, "?");
@@ -432,6 +470,20 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         props.put(STRATEGY.value(), strategy);
         props.put(ENABLED.value(), isEnabled);
         props.putAll(serviceProperties);
+        return props;
+    }
+
+    private Map<String, Object> extractStrategyData(final StrategyFactory factory) {
+        final String name = factory.getName();
+        final String description = factory.getDescription().orElse(null);
+        final String key = factory.getKey().orElse(null);
+        final String value = factory.getValue().orElse(null);
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put(NAME.value(), name);
+        props.put(DESCRIPTION.value(), description);
+        props.put(PROPERTY_KEY.value(), key);
+        props.put(PROPERTY_VALUE.value(), value);
         return props;
     }
 

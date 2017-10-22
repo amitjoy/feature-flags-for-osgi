@@ -23,9 +23,9 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationEvent;
 import org.osgi.service.cm.ConfigurationListener;
 
-import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
+import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -35,10 +35,10 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
     private final FeatureManager manager;
     private final ServiceReference reference;
     private final List<ConfigurationListener> listeners = Lists.newCopyOnWriteArrayList();
-    private final Strategizable instance;
+    private final Object instance;
 
     public ConfigurationAdminMock(final FeatureManager manager, final ServiceReference reference,
-            final Strategizable instance) {
+            final Object instance) {
         this.manager = manager;
         this.reference = reference;
         this.instance = instance;
@@ -82,10 +82,10 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
         private final String name;
         private final FeatureManager manager;
         private final ServiceReference reference;
-        private final Strategizable instance;
+        private final Object instance;
 
         public ConfigurationMock(final String name, final FeatureManager manager, final ServiceReference reference,
-                final Strategizable instance) {
+                final Object instance) {
             this.name = name;
             this.manager = manager;
             this.reference = reference;
@@ -103,12 +103,14 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
         }
 
         @Override
-        public void update(final Dictionary properties) throws IOException {
+        public synchronized void update(final Dictionary properties) throws IOException {
             final Enumeration<String> enums = properties.keys();
             boolean isFeature = false;
             boolean isGroup = false;
+            boolean isStrategy = false;
             Feature f = null;
             FeatureGroup g = null;
+            ActivationStrategy s = null;
             if (instance instanceof Feature) {
                 isFeature = true;
                 f = (Feature) instance;
@@ -117,8 +119,13 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
                 isGroup = true;
                 g = (FeatureGroup) instance;
             }
+            if (instance instanceof ActivationStrategy) {
+                isStrategy = true;
+                s = (ActivationStrategy) instance;
+            }
             Feature newFeature = null;
             FeatureGroup newGroup = null;
+            ActivationStrategy newStrategy = null;
             final Map<String, Object> otherProps = Maps.newHashMap();
             while (enums.hasMoreElements()) {
                 final String key = enums.nextElement();
@@ -145,6 +152,20 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
                 final Map<String, Object> props = TestHelper.createServiceProperties(2, 5, "pid1");
                 manager.unbindFeatureGroup(g, props);
                 manager.bindFeatureGroup(newGroup, props);
+            }
+            if (isStrategy) {
+                if (isStrategy && s != null) {
+                    if (s instanceof SystemPropertyActivationStrategy) {
+                        newStrategy = TestHelper.createSystemPropertyActivationStrategy(s.getName(),
+                                s.getDescription().get(), "dummyKey", "dummyValue");
+                    } else {
+                        newStrategy = TestHelper.createServicePropertyActivationStrategy(s.getName(),
+                                s.getDescription().get(), "dummyKey", "dummyValue");
+                    }
+                }
+                final Map<String, Object> props = TestHelper.createServiceProperties(2, 5, "pid1");
+                manager.unbindStrategy(s, props);
+                manager.bindStrategy(newStrategy, props);
             }
             final ConfigurationEvent event = new ConfigurationEvent(reference, 1, "", name);
             listeners.forEach(l -> l.configurationEvent(event));
