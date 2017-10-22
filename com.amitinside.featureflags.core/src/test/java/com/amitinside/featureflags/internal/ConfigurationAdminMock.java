@@ -103,7 +103,7 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
         }
 
         @Override
-        public synchronized void update(final Dictionary properties) throws IOException {
+        public void update(final Dictionary properties) throws IOException {
             final Enumeration<String> enums = properties.keys();
             boolean isFeature = false;
             boolean isGroup = false;
@@ -125,50 +125,70 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
             }
             Feature newFeature = null;
             FeatureGroup newGroup = null;
-            ActivationStrategy newStrategy = null;
             final Map<String, Object> otherProps = Maps.newHashMap();
             while (enums.hasMoreElements()) {
                 final String key = enums.nextElement();
                 final Object value = properties.get(key);
                 if (key.equalsIgnoreCase("enabled")) {
-                    if (isFeature && f != null) {
-                        newFeature = TestHelper.createFeature(f.getName(), f.getDescription().get(), (boolean) value,
-                                f.getGroups().findAny().orElse(null), f.getStrategy().orElse(null));
-                    }
-                    if (isGroup && g != null) {
-                        newGroup = TestHelper.createFeatureGroup(g.getName(), g.getDescription().get(), (boolean) value,
-                                g.getStrategy().orElse(null));
-                    }
+                    newFeature = updateNewFeature(isFeature, f, value);
+                    newGroup = updateNewGroup(isGroup, g, value);
                 } else {
                     otherProps.put(key, value);
                 }
             }
-            if (isFeature) {
-                final Map<String, Object> props = TestHelper.createServiceProperties(2, 5, "pid1");
-                manager.unbindFeature(f, props);
-                manager.bindFeature(newFeature, props);
+            doIfFeature(isFeature, f, newFeature);
+            doIfGroup(isGroup, g, newGroup);
+            doIfStrategy(isStrategy, s);
+            final ConfigurationEvent event = new ConfigurationEvent(reference, 1, "", name);
+            listeners.forEach(l -> l.configurationEvent(event));
+        }
+
+        private FeatureGroup updateNewGroup(final boolean isGroup, final FeatureGroup g, final Object value) {
+            if (isGroup && g != null) {
+                return TestHelper.createFeatureGroup(g.getName(), g.getDescription().get(), (boolean) value,
+                        g.getStrategy().orElse(null));
             }
+            return null;
+        }
+
+        private Feature updateNewFeature(final boolean isFeature, final Feature f, final Object value) {
+            if (isFeature && f != null) {
+                return TestHelper.createFeature(f.getName(), f.getDescription().get(), (boolean) value,
+                        f.getGroups().findAny().orElse(null), f.getStrategy().orElse(null));
+            }
+            return null;
+        }
+
+        private void doIfGroup(final boolean isGroup, final FeatureGroup g, final FeatureGroup newGroup) {
             if (isGroup) {
                 final Map<String, Object> props = TestHelper.createServiceProperties(2, 5, "pid1");
                 manager.unbindFeatureGroup(g, props);
                 manager.bindFeatureGroup(newGroup, props);
             }
-            if (isStrategy) {
-                if (isStrategy && s != null) {
-                    if (s instanceof SystemPropertyActivationStrategy) {
-                        newStrategy = TestHelper.createSystemPropertyActivationStrategy(s.getName(),
-                                s.getDescription().get(), "dummyKey", "dummyValue");
-                    } else {
-                        newStrategy = TestHelper.createServicePropertyActivationStrategy(s.getName(),
-                                s.getDescription().get(), "dummyKey", "dummyValue");
-                    }
+        }
+
+        private void doIfFeature(final boolean isFeature, final Feature f, final Feature newFeature) {
+            if (isFeature) {
+                final Map<String, Object> props = TestHelper.createServiceProperties(2, 5, "pid1");
+                manager.unbindFeature(f, props);
+                manager.bindFeature(newFeature, props);
+            }
+        }
+
+        private void doIfStrategy(final boolean isStrategy, final ActivationStrategy s) {
+            ActivationStrategy newStrategy;
+            if (isStrategy && s != null) {
+                if (s instanceof SystemPropertyActivationStrategy) {
+                    newStrategy = TestHelper.createSystemPropertyActivationStrategy(s.getName(),
+                            s.getDescription().get(), "dummyKey", "dummyValue");
+                } else {
+                    newStrategy = TestHelper.createServicePropertyActivationStrategy(s.getName(),
+                            s.getDescription().get(), "dummyKey", "dummyValue");
                 }
                 final Map<String, Object> props = TestHelper.createServiceProperties(2, 5, "pid1");
                 manager.unbindStrategy(s, props);
                 manager.bindStrategy(newStrategy, props);
             }
-            final ConfigurationEvent event = new ConfigurationEvent(reference, 1, "", name);
-            listeners.forEach(l -> l.configurationEvent(event));
         }
 
         @Override
