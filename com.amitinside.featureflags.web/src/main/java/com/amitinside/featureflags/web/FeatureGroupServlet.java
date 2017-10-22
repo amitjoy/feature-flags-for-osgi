@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.FeatureService;
@@ -36,10 +38,14 @@ import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
-@Component(name = "FeatureGroupServlet", service = FeatureFlagsServlet.class, immediate = true)
+@Component(name = "FeatureGroupServlet", immediate = true)
 public final class FeatureGroupServlet extends HttpServlet implements FeatureFlagsServlet {
 
+    private static final String ALIAS = "groups";
     private static final long serialVersionUID = 7683703693369965631L;
+
+    /** Logger Instance */
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private FeatureService featureService;
     private final Gson gson = new Gson();
@@ -49,22 +55,30 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
-        if (uris.size() == 1 && uris.get(0).equalsIgnoreCase("groups")) {
+        if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final List<GroupData> data = featureService.getGroups().map(this::mapToGroupData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
             resp.setStatus(HttpServletResponse.SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+            } catch (final IOException e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
         }
-        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase("features")) {
+        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final GroupData data = featureService.getGroup(uris.get(1)).map(this::mapToGroupData).orElse(null);
 
             final String json = gson.toJson(data);
             resp.setStatus(HttpServletResponse.SC_OK);
             try (PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+            } catch (final IOException e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
         }
     }
@@ -73,7 +87,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
-        if (uris.size() == 1 && uris.get(0).equalsIgnoreCase("groups")) {
+        if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final StringBuilder stringBuilder = new StringBuilder();
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
                 final char[] charBuffer = new char[1024];
@@ -81,7 +95,8 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                 while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
                     stringBuilder.append(charBuffer, 0, bytesRead);
                 }
-            } catch (final IOException ex) {
+            } catch (final IOException e) {
+                logger.error("{}", e.getMessage(), e);
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
@@ -98,6 +113,10 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                 resp.setStatus(HttpServletResponse.SC_OK);
                 try (PrintWriter writer = resp.getWriter()) {
                     writer.write(pid.get());
+                } catch (final IOException e) {
+                    logger.error("{}", e.getMessage(), e);
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    return;
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -110,7 +129,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
-        if (uris.size() == 3 && uris.get(0).equalsIgnoreCase("groups")) {
+        if (uris.size() == 3 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String flag = uris.get(2);
             final boolean isEnabled = Boolean.parseBoolean(flag);
             final String name = uris.get(1);
@@ -127,7 +146,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
-        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase("groups")) {
+        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String name = uris.get(1);
             featureService.removeFeature(name);
             resp.setStatus(HttpServletResponse.SC_OK);
@@ -227,6 +246,6 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
 
     @Override
     public String getAlias() {
-        return "/groups";
+        return "/" + ALIAS;
     }
 }
