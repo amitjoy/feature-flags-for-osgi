@@ -7,8 +7,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.web;
+package com.amitinside.featureflags.web.servlets;
 
+import static com.amitinside.featureflags.StrategyFactory.StrategyType.SERVICE_PROPERTY;
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
@@ -21,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,10 +34,11 @@ import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.StrategyFactory;
-import com.amitinside.featureflags.StrategyFactory.StrategyType;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
+import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
 import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 
 @Component(name = "StrategyServlet", immediate = true)
@@ -53,19 +55,18 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
     private final Map<ActivationStrategy, Map<String, Object>> strategyProperties = Maps.newHashMap();
 
     @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final List<StrategyData> data = featureService.getStrategies().map(this::mapToStrategyData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
         }
@@ -73,67 +74,63 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
             final StrategyData data = featureService.getStrategy(uris.get(1)).map(this::mapToStrategyData).orElse(null);
 
             final String json = gson.toJson(data);
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
             try (PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
         }
     }
 
     @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-            final StringBuilder stringBuilder = new StringBuilder();
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
-                final char[] charBuffer = new char[1024];
-                int bytesRead;
-                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                    stringBuilder.append(charBuffer, 0, bytesRead);
-                }
+
+            String data = null;
+            try (final BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(req.getInputStream()))) {
+                data = CharStreams.toString(() -> bufferedReader);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final StrategyData data = gson.fromJson(stringBuilder.toString(), StrategyData.class);
+            final StrategyData json = gson.fromJson(data, StrategyData.class);
             //@formatter:off
-            final StrategyFactory factory = StrategyFactory.make(data.getName(), StrategyType.SERVICE_PROPERTY,
-                                      c -> c.withDescription(data.getDescription())
-                                            .withKey(data.getKey())
-                                            .withValue(data.getValue())
+            final StrategyFactory factory = StrategyFactory.make(json.getName(), SERVICE_PROPERTY,
+                                      c -> c.withDescription(json.getDescription())
+                                            .withKey(json.getKey())
+                                            .withValue(json.getValue())
                                             .build());
             //@formatter:on
             final Optional<String> pid = featureService.createPropertyBasedStrategy(factory);
             if (pid.isPresent()) {
-                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setStatus(SC_OK);
                 try (PrintWriter writer = resp.getWriter()) {
                     writer.write(pid.get());
                 } catch (final IOException e) {
                     logger.error("{}", e.getMessage(), e);
-                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                     return;
                 }
             } else {
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
             }
         }
 
     }
 
     @Override
-    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase("features")) {
             final String name = uris.get(1);
             featureService.removePropertyBasedStrategy(name);
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
         }
     }
 

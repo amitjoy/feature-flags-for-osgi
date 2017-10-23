@@ -10,6 +10,5 @@
 package com.amitinside.featureflags.web;
 
 public interface FeatureFlagsServlet {
-
     String getAlias();
 }

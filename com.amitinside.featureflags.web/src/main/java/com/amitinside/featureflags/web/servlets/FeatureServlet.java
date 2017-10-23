@@ -7,8 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.web;
+package com.amitinside.featureflags.web.servlets;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
@@ -21,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,8 +34,10 @@ import org.slf4j.LoggerFactory;
 import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.feature.Feature;
+import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
 import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 
 @Component(name = "FeatureServlet", immediate = true)
@@ -52,19 +54,18 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
     private final Map<Feature, Map<String, Object>> featureProperties = Maps.newHashMap();
 
     @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final List<FeatureData> data = featureService.getFeatures().map(this::mapToFeatureData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
         }
@@ -72,35 +73,31 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
             final FeatureData data = featureService.getFeature(uris.get(1)).map(this::mapToFeatureData).orElse(null);
 
             final String json = gson.toJson(data);
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
             try (PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
         }
     }
 
     @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-            final StringBuilder stringBuilder = new StringBuilder();
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
-                final char[] charBuffer = new char[1024];
-                int bytesRead;
-                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                    stringBuilder.append(charBuffer, 0, bytesRead);
-                }
-            } catch (final IOException ex) {
-                logger.error("{}", ex.getMessage(), ex);
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            String jsonData = null;
+            try (final BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(req.getInputStream()))) {
+                jsonData = CharStreams.toString(() -> bufferedReader);
+            } catch (final IOException e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final FeatureData data = gson.fromJson(stringBuilder.toString(), FeatureData.class);
+            final FeatureData data = gson.fromJson(jsonData, FeatureData.class);
             //@formatter:off
             final Factory factory = Factory.make(data.getName(), c -> c.withDescription(data.getDescription())
                                                                  .withStrategy(data.getStrategy())
@@ -111,24 +108,23 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
             //@formatter:on
             final Optional<String> pid = featureService.createFeature(factory);
             if (pid.isPresent()) {
-                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setStatus(SC_OK);
                 try (PrintWriter writer = resp.getWriter()) {
                     writer.write(pid.get());
                 } catch (final IOException ex) {
                     logger.error("{}", ex.getMessage(), ex);
-                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                     return;
                 }
             } else {
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
             }
         }
 
     }
 
     @Override
-    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 3 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String flag = uris.get(2);
@@ -144,13 +140,12 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
     }
 
     @Override
-    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String name = uris.get(1);
             featureService.removeFeature(name);
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
         }
     }
 

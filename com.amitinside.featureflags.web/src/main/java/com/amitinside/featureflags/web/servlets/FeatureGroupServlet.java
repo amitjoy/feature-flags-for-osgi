@@ -7,8 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.web;
+package com.amitinside.featureflags.web.servlets;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
@@ -34,8 +35,10 @@ import org.slf4j.LoggerFactory;
 import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
+import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
 import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 
 @Component(name = "FeatureGroupServlet", immediate = true)
@@ -52,19 +55,18 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     private final Map<FeatureGroup, Map<String, Object>> groupProperties = Maps.newHashMap();
 
     @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final List<GroupData> data = featureService.getGroups().map(this::mapToGroupData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
         }
@@ -72,35 +74,31 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             final GroupData data = featureService.getGroup(uris.get(1)).map(this::mapToGroupData).orElse(null);
 
             final String json = gson.toJson(data);
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
             try (PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
         }
     }
 
     @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-            final StringBuilder stringBuilder = new StringBuilder();
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
-                final char[] charBuffer = new char[1024];
-                int bytesRead;
-                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                    stringBuilder.append(charBuffer, 0, bytesRead);
-                }
+            String jsonData = null;
+            try (final BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(req.getInputStream()))) {
+                jsonData = CharStreams.toString(() -> bufferedReader);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final GroupData data = gson.fromJson(stringBuilder.toString(), GroupData.class);
+            final GroupData data = gson.fromJson(jsonData, GroupData.class);
             //@formatter:off
             final Factory factory = Factory.make(data.getName(), c -> c.withDescription(data.getDescription())
                                                                  .withStrategy(data.getStrategy())
@@ -115,11 +113,11 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                     writer.write(pid.get());
                 } catch (final IOException e) {
                     logger.error("{}", e.getMessage(), e);
-                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                     return;
                 }
             } else {
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -138,18 +136,17 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             } else {
                 featureService.disableGroup(name);
             }
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
         }
     }
 
     @Override
-    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String name = uris.get(1);
             featureService.removeFeature(name);
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
         }
     }
 
@@ -197,7 +194,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     }
 
     /**
-     * Internal class used to represent Feature JSON data
+     * Internal class used to represent Group JSON data
      */
     private static final class GroupData {
         private final String name;
