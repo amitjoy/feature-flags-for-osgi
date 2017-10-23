@@ -17,6 +17,7 @@ import java.util.List;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.http.HttpService;
@@ -34,6 +35,18 @@ public final class FeatureFlagsServletsController {
 
     private final List<FeatureFlagsServlet> servlets = Lists.newCopyOnWriteArrayList();
     private HttpService httpService;
+
+    /**
+     * Component activation callback
+     */
+    @Activate
+    protected void activate() {
+        try {
+            httpService.registerResources("/featureflags", "/files", new DisableAuthenticationHttpContext());
+        } catch (final NamespaceException e) {
+            logger.error("{}", e.getMessage(), e);
+        }
+    }
 
     /**
      * {@link FeatureFlagsServlet} service binding callback

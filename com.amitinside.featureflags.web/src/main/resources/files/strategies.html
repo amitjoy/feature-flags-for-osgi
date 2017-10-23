@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta name="robots" content="index, follow" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=7">
+
+<meta name="language" content="en-EN" />
+<title>Feature Flags Administration</title>
+
+<link rel="stylesheet" href="bulma.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+	<header class="hero is-light">
+		<div class="hero-head">
+			<nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
+				<div class="navbar-brand">
+
+					<a class="navbar-item">
+						<img src="logo.png" alt="Feature Flags Administration">
+					</a>
+					<a class="navbar-item is-tab is-hidden-mobile is-active">
+						<span class="icon is-medium">
+							<i class="fa fa-home"></i>
+						</span>
+						Home
+					</a>
+					<a class="navbar-item is-tab is-hidden-mobile">About</a>
+
+					<button class="button navbar-burger" data-target="navMenu">
+						<span></span>
+						<span></span>
+						<span></span>
+					</button>
+
+				</div>
+
+
+				<div class="navbar-menu navbar-end" id="navMenu">
+					<a class="navbar-item is-tab is-hidden-tablet is-active">Home</a>
+					<a class="navbar-item is-tab is-hidden-tablet">About</a>
+				</div>
+			</nav>
+		</div>
+	</header>
+
+	<div class="section">
+		<div class="columns">
+			<aside class="column is-2">
+				<nav class="menu">
+					<p class="menu-label">General</p>
+					<ul class="menu-list">
+						<li>
+							<a href="index.html">
+								<span class="icon is-small">
+									<i class="fa fa-tachometer"></i>
+								</span>
+								Dashboard
+							</a>
+						</li>
+					</ul>
+					<p class="menu-label">Administration</p>
+					<ul class="menu-list">
+						<li>
+							<a class="is-active" href="strategies.html">
+								<span class="icon is-small">
+									<i class="fa fa-pencil-square-o"></i>
+								</span>
+								Strategies
+							</a>
+						</li>
+						<li>
+							<a href="groups.html">
+								<span class="icon is-small">
+									<i class="fa fa-desktop"></i>
+								</span>
+								Groups
+							</a>
+						</li>
+						<li>
+							<a href="features.html">
+								<span class="icon is-small">
+									<i class="fa fa-table"></i>
+								</span>
+								Features
+							</a>
+						</li>
+
+						<li>
+							<a class="">
+								<i class="fa fa-cog"></i>
+								</span>
+								Settings
+							</a>
+							<ul>
+								<li>
+									<a href="add_strategy.html">Add a Strategy</a>
+								</li>
+								<li>
+									<a href="add_group.html">Add a Group</a>
+								</li>
+								<li>
+									<a href="add_feature.html">Add a Feature</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+			</aside>
+
+			<main class="column">
+			<div class="level">
+				<div class="level-left">
+					<div class="level-item">
+						<div class="title">All Registered Strategies</div>
+					</div>
+				</div>
+				<div class="level-right">
+					<div class="level-item">
+						<button type="button" class="button is-small">
+							<script>
+                                document.write(new Date().toDateString());
+                            </script>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="columns is-multiline">
+				<div class="column">
+					<table class="table is-striped is-narrow is-fullwidth is-hoverable">
+						<thead>
+							<tr>
+								<th>
+									<abbr title="SerialNo">#</abbr>
+								</th>
+								<th>
+									<abbr title="Name">Name</abbr>
+								</th>
+								<th>
+									<abbr title="Description">Description</abbr>
+								</th>
+								<th>
+                                    <abbr title="Type">Type</abbr>
+                                </th>
+								<th>
+									<abbr title="Key">Key</abbr>
+								</th>
+								<th>
+									<abbr title="Value">Value</abbr>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<th>1</th>
+								<td>
+									<a href="https://en.wikipedia.org/wiki/Leicester_City_F.C." title="Leicester City F.C.">Leicester City</a>
+									<strong>(C)</strong>
+								</td>
+								<td>38</td>
+								<td>SYSTEM</td>
+								<td>12</td>
+								<td>3</td>
+							</tr>
+							<tr>
+								<th>2</th>
+								<td>
+									<a href="https://en.wikipedia.org/wiki/Arsenal_F.C." title="Arsenal F.C.">Arsenal</a>
+								</td>
+								<td>38</td>
+								<td>SERVICE</td>
+								<td>11</td>
+								<td>7</td>
+							</tr>
+							<tr>
+								<th>3</th>
+								<td>
+									<a href="https://en.wikipedia.org/wiki/Tottenham_Hotspur_F.C." title="Tottenham Hotspur F.C.">Tottenham Hotspur</a>
+								</td>
+								<td>38</td>
+								<td>SYSTEM</td>
+								<td>13</td>
+								<td>6</td>
+							</tr>
+							<tr>
+								<th>4</th>
+								<td>
+									<a href="https://en.wikipedia.org/wiki/Manchester_City_F.C." title="Manchester City F.C.">Manchester City</a>
+								</td>
+								<td>38</td>
+								<td>SYSTEM</td>
+								<td>9</td>
+								<td>10</td>
+							</tr>
+							<tr>
+								<th>5</th>
+								<td>
+									<a href="https://en.wikipedia.org/wiki/Manchester_United_F.C." title="Manchester United F.C.">Manchester United</a>
+								</td>
+								<td>38</td>
+								<td>SERVICE</td>
+								<td>9</td>
+								<td>10</td>
+							</tr>
+						</tbody>
+					</table>
+					<!-- nav class="pagination is-centered" role="navigation" aria-label="pagination">
+						<a class="pagination-previous">Previous</a>
+						<a class="pagination-next">Next page</a>
+						<ul class="pagination-list">
+							<li>
+								<a class="pagination-link" aria-label="Goto page 1">1</a>
+							</li>
+							<li>
+								<span class="pagination-ellipsis">&hellip;</span>
+							</li>
+							<li>
+								<a class="pagination-link" aria-label="Goto page 45">45</a>
+							</li>
+							<li>
+								<a class="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a>
+							</li>
+							<li>
+								<a class="pagination-link" aria-label="Goto page 47">47</a>
+							</li>
+							<li>
+								<span class="pagination-ellipsis">&hellip;</span>
+							</li>
+							<li>
+								<a class="pagination-link" aria-label="Goto page 86">86</a>
+							</li>
+						</ul>
+					</nav-->
+				</div>
+			</div>
+
+			</main>
+		</div>
+	</div>
+</body>
+</html>

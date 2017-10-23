@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta name="robots" content="index, follow" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=7">
+
+<meta name="language" content="en-EN" />
+<title>Feature Flags Administration</title>
+
+<link rel="stylesheet" href="bulma.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+	<header class="hero is-light">
+		<div class="hero-head">
+			<nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
+				<div class="navbar-brand">
+
+					<a class="navbar-item">
+						<img src="logo.png" alt="Feature Flags Administration">
+					</a>
+					<a class="navbar-item is-tab is-hidden-mobile is-active">
+						<span class="icon is-medium">
+							<i class="fa fa-home"></i>
+						</span>
+						Home
+					</a>
+					<a class="navbar-item is-tab is-hidden-mobile">About</a>
+
+					<button class="button navbar-burger" data-target="navMenu">
+						<span></span>
+						<span></span>
+						<span></span>
+					</button>
+				</div>
+
+				<div class="navbar-menu navbar-end" id="navMenu">
+					<a class="navbar-item is-tab is-hidden-tablet is-active">Home</a>
+					<a class="navbar-item is-tab is-hidden-tablet">About</a>
+				</div>
+			</nav>
+		</div>
+	</header>
+
+	<div class="section">
+		<div class="columns">
+			<aside class="column is-2">
+				<nav class="menu">
+					<p class="menu-label">General</p>
+					<ul class="menu-list">
+						<li>
+							<a href="index.html">
+								<span class="icon is-small">
+									<i class="fa fa-tachometer"></i>
+								</span>
+								Dashboard
+							</a>
+						</li>
+					</ul>
+					<p class="menu-label">Administration</p>
+					<ul class="menu-list">
+						<li>
+							<a href="strategies.html">
+								<span class="icon is-small">
+									<i class="fa fa-pencil-square-o"></i>
+								</span>
+								Strategies
+							</a>
+						</li>
+						<li>
+							<a href="groups.html">
+								<span class="icon is-small">
+									<i class="fa fa-desktop"></i>
+								</span>
+								Groups
+							</a>
+						</li>
+						<li>
+							<a href="features.html">
+								<span class="icon is-small">
+									<i class="fa fa-table"></i>
+								</span>
+								Features
+							</a>
+						</li>
+
+						<li>
+							<a class="">
+								<i class="fa fa-cog"></i>
+								</span>
+								Settings
+							</a>
+							<ul>
+								<li>
+									<a class="is-active" href="add_strategy.html">Add a Strategy</a>
+								</li>
+								<li>
+									<a href="add_group.html">Add a Group</a>
+								</li>
+								<li>
+									<a href="add_feature.html">Add a Feature</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+			</aside>
+
+			<main class="column">
+			<div class="level">
+				<div class="level-left">
+					<div class="level-item">
+						<div class="title">Add a Strategy</div>
+					</div>
+				</div>
+				<div class="level-right">
+					<div class="level-item">
+						<button type="button" class="button is-small">
+							<script>
+                                document.write(new Date().toDateString());
+                            </script>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="columns is-multiline">
+				<div class="column is-9">
+
+					<div class="field is-horizontal">
+						<div class="field-label is-normal">
+							<label class="label">Type</label>
+						</div>
+						<div class="field-body">
+							<div class="field is-narrow">
+								<div class="control">
+									<div class="select is-fullwidth">
+										<select>
+											<option>Service Property</option>
+											<option>System Property</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="field is-horizontal">
+						<div class="field-label is-normal">
+							<label class="label">Name</label>
+						</div>
+						<div class="field-body">
+							<div class="field">
+								<div class="control">
+									<input class="input is-danger" type="text" placeholder="User-friendly Name">
+								</div>
+								<p class="help is-danger">This field is required</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="field is-horizontal">
+						<div class="field-label is-normal">
+							<label class="label">Description</label>
+						</div>
+						<div class="field-body">
+							<div class="field">
+								<div class="control">
+									<textarea class="textarea" placeholder="Detailed Description of Activation Strategy"></textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="field is-horizontal">
+						<div class="field-label is-normal">
+							<label class="label">Property Key</label>
+						</div>
+						<div class="field-body">
+							<div class="field">
+								<div class="control">
+									<input class="input is-danger" type="text" placeholder="Key to Find in the Properties">
+								</div>
+								<p class="help is-danger">This field is required</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="field is-horizontal">
+						<div class="field-label is-normal">
+							<label class="label">Property Value</label>
+						</div>
+						<div class="field-body">
+							<div class="field">
+								<div class="control">
+									<input class="input is-danger" type="text" placeholder="Value to match with the value associated with the specified key">
+								</div>
+								<p class="help is-danger">This field is required</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="field is-horizontal">
+						<div class="field-label">
+							<!-- Left empty for spacing -->
+						</div>
+						<div class="field-body">
+							<div class="field">
+								<div class="control">
+									<button class="button is-primary">Create</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+			</div>
+
+			</main>
+		</div>
+	</div>
+</body>
+</html>
