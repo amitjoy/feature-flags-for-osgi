@@ -520,6 +520,41 @@ public final class FeatureServiceTest {
     }
 
     @Test(expected = NullPointerException.class)
+    public void testNullArgumentUpdateFeature1() throws IOException {
+        manager.updateFeature(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentUpdateFeature2() throws IOException {
+        //@formatter:off
+        final Factory factory = Factory.make(null, c -> c.withDescription("")
+                                                         .withStrategy("")
+                                                         .withGroups(Lists.newArrayList())
+                                                         .withProperties(Maps.newHashMap())
+                                                         .withEnabled(false)
+                                                         .build());
+        //@formatter:on
+        manager.updateFeature(factory);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentUpdateFeatureGroup1() throws IOException {
+        manager.updateGroup(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentUpdateFeatureGroup2() throws IOException {
+        //@formatter:off
+        final Factory factory = Factory.make(null, c -> c.withDescription("")
+                                                         .withStrategy("")
+                                                         .withProperties(Maps.newHashMap())
+                                                         .withEnabled(false)
+                                                         .build());
+        //@formatter:on
+        manager.updateGroup(factory);
+    }
+
+    @Test(expected = NullPointerException.class)
     public void testNullArgumentCreateFeatureGroup1() throws IOException {
         manager.createGroup(null);
     }
@@ -537,8 +572,37 @@ public final class FeatureServiceTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNullArgumentCreateStrategy() throws IOException {
+    public void testNullArgumentCreateStrategy1() throws IOException {
         manager.createPropertyBasedStrategy(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentCreateStrategy2() throws IOException {
+        //@formatter:off
+        final StrategyFactory factory = StrategyFactory.make(null, StrategyType.SERVICE_PROPERTY, c ->
+                                                                    c.withDescription("dummy")
+                                                                     .withKey("key")
+                                                                     .withValue("val")
+                                                                     .build());
+        //@formatter:on
+        manager.createPropertyBasedStrategy(factory);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentUpdateStrategy1() throws IOException {
+        manager.updatePropertyBasedStrategy(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArgumentUpdateStrategy2() throws IOException {
+        //@formatter:off
+        final StrategyFactory factory = StrategyFactory.make(null, StrategyType.SERVICE_PROPERTY, c ->
+                                                                    c.withDescription("dummy")
+                                                                     .withKey("key")
+                                                                     .withValue("val")
+                                                                     .build());
+        //@formatter:on
+        manager.updatePropertyBasedStrategy(factory);
     }
 
     @Test(expected = NullPointerException.class)
