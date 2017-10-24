@@ -149,28 +149,76 @@ public interface FeatureService {
      * Removes a feature.
      *
      * @param name The name of the feature. (cannot be {@code null})
+     * @return {@code true} if the named feature is known and removed by this operation.
+     *         Specifically {@code false} is also returned if the named feature
+     *         is not known or the operation failed to remove the feature
      *
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
      */
-    void removeFeature(String name);
+    boolean removeFeature(String name);
 
     /**
      * Removes a group.
      *
      * @param name The name of the group. (cannot be {@code null})
+     * @return {@code true} if the named group is known and removed by this operation.
+     *         Specifically {@code false} is also returned if the named group
+     *         is not known or the operation failed to remove the group
      *
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
      */
-    void removeGroup(String name);
+    boolean removeGroup(String name);
 
     /**
      * Removes a property based strategy.
      *
      * @param name The name of the property based strategy. (cannot be {@code null})
+     * @return {@code true} if the named strategy is known and removed by this operation.
+     *         Specifically {@code false} is also returned if the named strategy
+     *         is not known or the operation failed to remove the strategy
      *
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
      */
-    void removePropertyBasedStrategy(String name);
+    boolean removePropertyBasedStrategy(String name);
+
+    /**
+     * Updates a feature with the provided configuration.
+     *
+     * @param featureFactory The factory to be used to update the feature. (cannot be {@code null})
+     * @return {@code true} if the named feature is known and updated by this operation.
+     *         Specifically {@code false} is also returned if the named feature
+     *         is not known or the operation failed to update the feature
+     *
+     * @throws NullPointerException if the specified argument {@code featureFactory} is {@code null}
+     *             or the factory has been configured with a {@code null} name
+     */
+    boolean updateFeature(Factory featureFactory);
+
+    /**
+     * Updates a group with the provided configuration.
+     *
+     * @param groupFactory The factory to be used to update the group. (cannot be {@code null})
+     * @return {@code true} if the named group is known and updated by this operation.
+     *         Specifically {@code false} is also returned if the named group
+     *         is not known or the operation failed to update the group
+     *
+     * @throws NullPointerException if the specified argument {@code groupFactory} is {@code null}
+     *             or the factory has been configured with a {@code null} name
+     */
+    boolean updateGroup(Factory groupFactory);
+
+    /**
+     * Updates a property based strategy.
+     *
+     * @param strategyFactory The factory to be used to update the property based strategy. (cannot be {@code null})
+     * @return {@code true} if the named strategy is known and updated by this operation.
+     *         Specifically {@code false} is also returned if the named strategy
+     *         is not known or the operation failed to update the strategy
+     *
+     * @throws NullPointerException if the specified argument {@code strategyFactory} is {@code null}
+     *             or the factory has been configured with a {@code null} name
+     */
+    boolean updatePropertyBasedStrategy(StrategyFactory strategyFactory);
 
     /**
      * Returns {@code true} if a feature with the given name is known and

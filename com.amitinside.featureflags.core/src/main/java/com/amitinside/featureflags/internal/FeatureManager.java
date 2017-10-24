@@ -219,24 +219,77 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
-    public void removeFeature(final String name) {
+    public boolean updateFeature(final Factory featureFactory) {
+        requireNonNull(featureFactory, "Feature factory cannot be null");
+        final List<String> groups = featureFactory.getGroups();
+        final Map<String, Object> props = extractData(featureFactory);
+        props.put(GROUPS.value(), groups.toArray(new String[0]));
+        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
+        final String name = featureFactory.getName();
+        final String pid = getFeaturePID(name);
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(pid);
+            configuration.update(new Hashtable<>(filteredProps));
+            return true;
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve configuration for {}", name, e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateGroup(final Factory groupFactory) {
+        requireNonNull(groupFactory, "Group factory cannot be null");
+        final Map<String, Object> props = extractData(groupFactory);
+        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
+        final String name = groupFactory.getName();
+        final String pid = getGroupPID(name);
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(pid);
+            configuration.update(new Hashtable<>(filteredProps));
+            return true;
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve configuration for {}", name, e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updatePropertyBasedStrategy(final StrategyFactory strategyFactory) {
+        requireNonNull(strategyFactory, "Strategy factory cannot be null");
+        final Map<String, Object> props = extractStrategyData(strategyFactory);
+        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
+        final String name = strategyFactory.getName();
+        final String pid = getStrategyPID(name);
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(pid);
+            configuration.update(new Hashtable<>(filteredProps));
+            return true;
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve configuration for {}", name, e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean removeFeature(final String name) {
         requireNonNull(name, "Feature name cannot be null");
         final String pid = getFeaturePID(name);
-        deleteConfiguration(name, pid);
+        return deleteConfiguration(name, pid);
     }
 
     @Override
-    public void removeGroup(final String name) {
+    public boolean removeGroup(final String name) {
         requireNonNull(name, "Feature Group name cannot be null");
         final String pid = getGroupPID(name);
-        deleteConfiguration(name, pid);
+        return deleteConfiguration(name, pid);
     }
 
     @Override
-    public void removePropertyBasedStrategy(final String name) {
+    public boolean removePropertyBasedStrategy(final String name) {
         requireNonNull(name, "Strategy name cannot be null");
         final String pid = getStrategyPID(name);
-        deleteConfiguration(name, pid);
+        return deleteConfiguration(name, pid);
     }
 
     /**
@@ -424,7 +477,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
                 .sorted()
                 .filter(x -> x.instance.getName().equalsIgnoreCase(groupName))
                 .findFirst()
-                .map(f -> f.props)
+                .map(g -> g.props)
                 .map(m -> m.get(SERVICE_PID))
                 .map(String.class::cast)
                 .orElse("");
@@ -437,7 +490,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
                 .sorted()
                 .filter(x -> x.instance.getName().equalsIgnoreCase(strategyName))
                 .findFirst()
-                .map(f -> f.props)
+                .map(s -> s.props)
                 .map(m -> m.get(SERVICE_PID))
                 .map(String.class::cast)
                 .orElse("");
@@ -544,12 +597,14 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         //@formatter:on
     }
 
-    private void deleteConfiguration(final String name, final String pid) {
+    private boolean deleteConfiguration(final String name, final String pid) {
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(pid);
             configuration.delete();
+            return true;
         } catch (final IOException e) {
             logger.trace("Cannot retrieve configuration for {}", name, e);
+            return false;
         }
     }
 

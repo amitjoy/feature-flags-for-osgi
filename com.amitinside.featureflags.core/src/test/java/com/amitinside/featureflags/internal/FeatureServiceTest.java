@@ -786,8 +786,8 @@ public final class FeatureServiceTest {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
-        manager.activate(context);
         manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
 
         final Map<String, Object> props = Maps.newHashMap();
         props.put("p", "test");
@@ -805,8 +805,8 @@ public final class FeatureServiceTest {
 
     @Test
     public void testCreateFeatureIOException() throws IOException {
-        manager.activate(context);
         manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
 
         final Map<String, Object> props = Maps.newHashMap();
         props.put("p", "test");
@@ -824,12 +824,58 @@ public final class FeatureServiceTest {
     }
 
     @Test
+    public void testUpdateFeature() throws IOException {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put("p", "test");
+
+        //@formatter:off
+        final Factory factory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
+                                                               .withStrategy("strategy1")
+                                                               .withGroups(Lists.newArrayList("group1"))
+                                                               .withProperties(props)
+                                                               .withEnabled(false)
+                                                               .build());
+        //@formatter:on
+        assertTrue(manager.updateFeature(factory));
+    }
+
+    @Test
+    public void testUpdateFeatureIOException() throws IOException {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        final Map<String, Object> serviceProps = createServiceProperties(3, 5, "myPid");
+
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.bindFeature(feature, serviceProps);
+        manager.activate(context);
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put("p", "test");
+        doThrow(IOException.class).when(configurationAdmin).getConfiguration("myPid");
+
+        //@formatter:off
+        final Factory factory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
+                                                               .withStrategy("strategy1")
+                                                               .withGroups(Lists.newArrayList("group1"))
+                                                               .withProperties(props)
+                                                               .withEnabled(false)
+                                                               .build());
+        //@formatter:on
+        assertFalse(manager.updateFeature(factory));
+    }
+
+    @Test
     public void testCreateFeatureGroup() throws IOException {
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
         configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
 
-        manager.activate(context);
         manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
 
         final Map<String, Object> props = Maps.newHashMap();
         props.put("p", "test");
@@ -846,8 +892,8 @@ public final class FeatureServiceTest {
 
     @Test
     public void testCreateFeatureGroupIOException() throws IOException {
-        manager.activate(context);
         manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
 
         final Map<String, Object> props = Maps.newHashMap();
         props.put("p", "test");
@@ -864,17 +910,61 @@ public final class FeatureServiceTest {
     }
 
     @Test
+    public void testUpdateFeatureGroup() throws IOException {
+        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
+        configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
+
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put("p", "test");
+
+        //@formatter:off
+        final Factory factory = Factory.make("group1", c -> c.withDescription("My Group 1")
+                                                             .withStrategy("strategy1")
+                                                             .withProperties(props)
+                                                             .withEnabled(false)
+                                                             .build());
+        //@formatter:on
+        assertTrue(manager.updateGroup(factory));
+    }
+
+    @Test
+    public void testUpdateFeatureGroupIOException() throws IOException {
+        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
+        final Map<String, Object> serviceProps = createServiceProperties(3, 5, "myPid");
+
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.bindFeatureGroup(group, serviceProps);
+        manager.activate(context);
+
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put("p", "test");
+        doThrow(IOException.class).when(configurationAdmin).getConfiguration("myPid");
+
+        //@formatter:off
+        final Factory factory = Factory.make("group1", c -> c.withDescription("My Group 1")
+                                                             .withStrategy("strategy1")
+                                                             .withProperties(props)
+                                                             .withEnabled(false)
+                                                             .build());
+        //@formatter:on
+        assertFalse(manager.updateGroup(factory));
+    }
+
+    @Test
     public void testCreateServicePropertyBasedStrategy() throws IOException {
         final ActivationStrategy strategy = createServicePropertyActivationStrategy("strategy1", "My Strategy 1", "key",
                 "value");
         configurationAdmin = new ConfigurationAdminMock(manager, reference, strategy);
 
-        manager.activate(context);
         manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
 
         //@formatter:off
         final StrategyFactory factory = StrategyFactory.make("ServiceStrategy", StrategyType.SERVICE_PROPERTY,
-                                                                             c -> c.withDescription("My Group 1")
+                                                                             c -> c.withDescription("My Strategy 1")
                                                                                    .withKey("propKey")
                                                                                    .withValue("propValue")
                                                                                    .build());
@@ -884,16 +974,13 @@ public final class FeatureServiceTest {
 
     @Test
     public void testCreateServicePropertyBasedStrategyIOException() throws IOException {
-        manager.activate(context);
         manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
 
-        final Map<String, Object> props = Maps.newHashMap();
-        props.put("p", "test");
         doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(STRATEGY_SERVICE_PROPERTY_PID);
-
         //@formatter:off
         final StrategyFactory factory = StrategyFactory.make("ServiceStrategy", StrategyType.SERVICE_PROPERTY,
-                                                                             c -> c.withDescription("My Group 1")
+                                                                             c -> c.withDescription("My Strategy 1")
                                                                                    .withKey("propKey")
                                                                                    .withValue("propValue")
                                                                                    .build());
@@ -902,13 +989,53 @@ public final class FeatureServiceTest {
     }
 
     @Test
-    public void testCreateSystemPropertyBasedStrategy() throws IOException {
-        final ActivationStrategy strategy = createSystemPropertyActivationStrategy("strategy1", "My Strategy 1", "key",
+    public void testUpdateServicePropertyBasedStrategy() throws IOException {
+        final ActivationStrategy strategy = createServicePropertyActivationStrategy("strategy1", "My Strategy 1", "key",
                 "value");
         configurationAdmin = new ConfigurationAdminMock(manager, reference, strategy);
 
-        manager.activate(context);
         manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
+
+        //@formatter:off
+        final StrategyFactory factory = StrategyFactory.make("ServiceStrategy", StrategyType.SERVICE_PROPERTY,
+                                                                             c -> c.withDescription("My Strategy 1")
+                                                                                   .withKey("propKey")
+                                                                                   .withValue("propValue")
+                                                                                   .build());
+        //@formatter:on
+        assertTrue(manager.updatePropertyBasedStrategy(factory));
+    }
+
+    @Test
+    public void testUpdateServicePropertyBasedStrategyIOException() throws IOException {
+        final ActivationStrategy strategy = createServicePropertyActivationStrategy("ServiceStrategy", "My Strategy 1",
+                "key", "value");
+        final Map<String, Object> serviceProps = createServiceProperties(3, 5, "myPid");
+
+        manager.bindStrategy(strategy, serviceProps);
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
+
+        doThrow(IOException.class).when(configurationAdmin).getConfiguration("myPid");
+        //@formatter:off
+        final StrategyFactory factory = StrategyFactory.make("ServiceStrategy", StrategyType.SERVICE_PROPERTY,
+                                                                            c -> c.withDescription("My Strategy 1")
+                                                                            .withKey("propKey")
+                                                                            .withValue("propValue")
+                                                                            .build());
+        //@formatter:on
+        assertFalse(manager.updatePropertyBasedStrategy(factory));
+    }
+
+    @Test
+    public void testCreateSystemPropertyBasedStrategy() throws IOException {
+        final ActivationStrategy strategy = createSystemPropertyActivationStrategy("SystemStrategy", "My Strategy 1",
+                "key", "value");
+        configurationAdmin = new ConfigurationAdminMock(manager, reference, strategy);
+
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
 
         //@formatter:off
         final StrategyFactory factory = StrategyFactory.make("SystemStrategy", StrategyType.SYSTEM_PROPERTY,
@@ -922,28 +1049,65 @@ public final class FeatureServiceTest {
 
     @Test
     public void testCreateSystemPropertyBasedStrategyIOException() throws IOException {
-        manager.activate(context);
         manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
 
-        final Map<String, Object> props = Maps.newHashMap();
-        props.put("p", "test");
         doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(STRATEGY_SYSTEM_PROPERTY_PID);
-
         //@formatter:off
         final StrategyFactory factory = StrategyFactory.make("SystemStrategy", StrategyType.SYSTEM_PROPERTY,
-                c -> c.withDescription("My Strategy 1")
-                .withKey("propKey")
-                .withValue("propValue")
-                .build());
+                                                                            c -> c.withDescription("My Strategy 1")
+                                                                            .withKey("propKey")
+                                                                            .withValue("propValue")
+                                                                            .build());
         //@formatter:on
         assertFalse(manager.createPropertyBasedStrategy(factory).isPresent());
     }
 
     @Test
+    public void testUpdateSystemPropertyBasedStrategy() throws IOException {
+        final ActivationStrategy strategy = createServicePropertyActivationStrategy("strategy1", "My Strategy 1", "key",
+                "value");
+        configurationAdmin = new ConfigurationAdminMock(manager, reference, strategy);
+
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
+
+        //@formatter:off
+        final StrategyFactory factory = StrategyFactory.make("ServiceStrategy", StrategyType.SYSTEM_PROPERTY,
+                                                                             c -> c.withDescription("My Strategy 1")
+                                                                                   .withKey("propKey")
+                                                                                   .withValue("propValue")
+                                                                                   .build());
+        //@formatter:on
+        assertTrue(manager.updatePropertyBasedStrategy(factory));
+    }
+
+    @Test
+    public void testUpdateSystemPropertyBasedStrategyIOException() throws IOException {
+        final ActivationStrategy strategy = createServicePropertyActivationStrategy("SystemStrategy", "My Strategy 1",
+                "key", "value");
+        final Map<String, Object> serviceProps = createServiceProperties(3, 5, "myPid");
+
+        manager.bindStrategy(strategy, serviceProps);
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
+
+        doThrow(IOException.class).when(configurationAdmin).getConfiguration("myPid");
+        //@formatter:off
+        final StrategyFactory factory = StrategyFactory.make("SystemStrategy", StrategyType.SYSTEM_PROPERTY,
+                                                                            c -> c.withDescription("My Strategy 1")
+                                                                            .withKey("propKey")
+                                                                            .withValue("propValue")
+                                                                            .build());
+        //@formatter:on
+        assertFalse(manager.updatePropertyBasedStrategy(factory));
+    }
+
+    @Test
     public void testRemoveFeatureIOException() throws IOException {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
-
         final Map<String, Object> props = createServiceProperties(3, 5, "myPid");
+
         manager.bindFeature(feature, props);
         manager.setConfigurationAdmin(configurationAdmin);
 
