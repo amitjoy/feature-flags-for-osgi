@@ -12,8 +12,8 @@
 	<groupId>com.amitinside</groupId>
 	<artifactId>com.amitinside.featureflags.parent</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>Feature Flags for OSGi</name>
-	<description>Feature Flags for OSGi</description>
+	<name>Feature Flags for OSGi Parent</name>
+	<description>Feature Flags for OSGi Parent</description>
 	<url>https://github.com/amitjoy/feature-flags-osgi</url>
 	<packaging>pom</packaging>
 
@@ -49,6 +49,11 @@
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+
+	<modules>
+		<module>com.amitinside.featureflags.core</module>
+		<module>com.amitinside.featureflags.web</module>
+	</modules>
 
 	<dependencies>
 		<dependency>

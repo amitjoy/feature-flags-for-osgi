@@ -8,9 +8,6 @@ jdk:
 branches:
   only:
     - master
-
-before_install:
-      - "cd com.amitinside.featureflags.core"
       
 install: mvn install -Dgpg.skip
 
