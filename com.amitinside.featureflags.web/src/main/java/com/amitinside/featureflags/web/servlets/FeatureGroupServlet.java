@@ -135,6 +135,31 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             }
             resp.setStatus(SC_OK);
         }
+        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
+            String jsonData = null;
+            try (final BufferedReader reader = req.getReader()) {
+                jsonData = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            } catch (final IOException e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            final GroupData data = gson.fromJson(jsonData, GroupData.class);
+            //@formatter:off
+            final Factory factory = Factory.make(uris.get(1), c -> c.withDescription(data.getDescription())
+                                                                 .withStrategy(data.getStrategy())
+                                                                 .withProperties(data.getProperties())
+                                                                 .withEnabled(data.isEnabled())
+                                                                 .build());
+            //@formatter:on
+            final boolean isUpdated = featureService.updateGroup(factory);
+            if (isUpdated) {
+                resp.setStatus(SC_OK);
+            } else {
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+        }
     }
 
     @Override

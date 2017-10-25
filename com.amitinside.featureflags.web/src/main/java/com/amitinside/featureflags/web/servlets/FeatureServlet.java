@@ -118,7 +118,6 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
             }
         }
-
     }
 
     @Override
@@ -133,7 +132,33 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
             } else {
                 featureService.disableFeature(name);
             }
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(SC_OK);
+        }
+        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
+            String jsonData = null;
+            try (final BufferedReader reader = req.getReader()) {
+                jsonData = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            } catch (final IOException e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            final FeatureData data = gson.fromJson(jsonData, FeatureData.class);
+            //@formatter:off
+            final Factory factory = Factory.make(uris.get(1), c -> c.withDescription(data.getDescription())
+                                                                 .withStrategy(data.getStrategy())
+                                                                 .withGroups(data.getGroups())
+                                                                 .withProperties(data.getProperties())
+                                                                 .withEnabled(data.isEnabled())
+                                                                 .build());
+            //@formatter:on
+            final boolean isUpdated = featureService.updateFeature(factory);
+            if (isUpdated) {
+                resp.setStatus(SC_OK);
+            } else {
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
         }
     }
 

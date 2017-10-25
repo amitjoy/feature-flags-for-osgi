@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -127,6 +128,37 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
             final String name = uris.get(1);
             featureService.removePropertyBasedStrategy(name);
             resp.setStatus(SC_OK);
+        }
+    }
+
+    @Override
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
+        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
+            String jsonData = null;
+            try (final BufferedReader reader = req.getReader()) {
+                jsonData = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            } catch (final IOException e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            final StrategyData json = gson.fromJson(jsonData, StrategyData.class);
+            //@formatter:off
+            final StrategyFactory factory = StrategyFactory.make(uris.get(1), SERVICE_PROPERTY,
+                                      c -> c.withDescription(json.getDescription())
+                                            .withKey(json.getKey())
+                                            .withValue(json.getValue())
+                                            .build());
+            //@formatter:on
+            final boolean isUpdated = featureService.updatePropertyBasedStrategy(factory);
+            if (isUpdated) {
+                resp.setStatus(SC_OK);
+            } else {
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
         }
     }
 
