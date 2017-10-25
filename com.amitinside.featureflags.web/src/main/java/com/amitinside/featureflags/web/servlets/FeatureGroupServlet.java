@@ -15,7 +15,6 @@ import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
 import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 
 @Component(name = "FeatureGroupServlet", immediate = true)
@@ -90,9 +88,8 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             String jsonData = null;
-            try (final BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(req.getInputStream()))) {
-                jsonData = CharStreams.toString(() -> bufferedReader);
+            try (final BufferedReader reader = req.getReader()) {
+                jsonData = reader.lines().collect(Collectors.joining(System.lineSeparator()));
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);

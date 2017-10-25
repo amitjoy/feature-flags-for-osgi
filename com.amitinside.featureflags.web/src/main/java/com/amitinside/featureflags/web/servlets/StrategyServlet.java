@@ -16,7 +16,6 @@ import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
 import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 
 @Component(name = "StrategyServlet", immediate = true)
@@ -89,17 +87,15 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-
-            String data = null;
-            try (final BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(req.getInputStream()))) {
-                data = CharStreams.toString(() -> bufferedReader);
+            String jsonData = null;
+            try (final BufferedReader reader = req.getReader()) {
+                jsonData = reader.lines().collect(Collectors.joining(System.lineSeparator()));
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final StrategyData json = gson.fromJson(data, StrategyData.class);
+            final StrategyData json = gson.fromJson(jsonData, StrategyData.class);
             //@formatter:off
             final StrategyFactory factory = StrategyFactory.make(json.getName(), SERVICE_PROPERTY,
                                       c -> c.withDescription(json.getDescription())
