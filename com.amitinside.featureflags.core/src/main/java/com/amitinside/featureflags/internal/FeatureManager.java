@@ -229,12 +229,14 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         final String pid = getFeaturePID(name);
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(pid);
-            configuration.update(new Hashtable<>(filteredProps));
-            return true;
+            if (configuration != null) {
+                configuration.update(new Hashtable<>(filteredProps));
+                return true;
+            }
         } catch (final IOException e) {
             logger.trace("Cannot retrieve configuration for {}", name, e);
-            return false;
         }
+        return false;
     }
 
     @Override
@@ -246,12 +248,14 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         final String pid = getGroupPID(name);
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(pid);
-            configuration.update(new Hashtable<>(filteredProps));
-            return true;
+            if (configuration != null) {
+                configuration.update(new Hashtable<>(filteredProps));
+                return true;
+            }
         } catch (final IOException e) {
             logger.trace("Cannot retrieve configuration for {}", name, e);
-            return false;
         }
+        return false;
     }
 
     @Override
@@ -263,12 +267,14 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         final String pid = getStrategyPID(name);
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(pid);
-            configuration.update(new Hashtable<>(filteredProps));
-            return true;
+            if (configuration != null) {
+                configuration.update(new Hashtable<>(filteredProps));
+                return true;
+            }
         } catch (final IOException e) {
             logger.trace("Cannot retrieve configuration for {}", name, e);
-            return false;
         }
+        return false;
     }
 
     @Override
@@ -600,12 +606,14 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     private boolean deleteConfiguration(final String name, final String pid) {
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(pid);
-            configuration.delete();
-            return true;
+            if (configuration != null) {
+                configuration.delete();
+                return true;
+            }
         } catch (final IOException e) {
             logger.trace("Cannot retrieve configuration for {}", name, e);
-            return false;
         }
+        return false;
     }
 
     /**
