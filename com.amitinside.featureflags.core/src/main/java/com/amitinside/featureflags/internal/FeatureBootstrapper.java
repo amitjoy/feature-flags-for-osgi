@@ -110,6 +110,7 @@ import com.google.gson.Gson;
  * These properties will be added as your feature's service properties. You can also create feature
  * groups by specifying groups in the JSON resource.
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Component(service = FeatureBootstrapper.class, name = "FeatureBootstrapper", immediate = true)
 public final class FeatureBootstrapper implements BundleTrackerCustomizer, ConfigurationListener {
 
