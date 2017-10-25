@@ -55,8 +55,8 @@ public final class FeaturesByStrategyServlet extends HttpServlet implements Feat
             final List<FeatureData> data = featureService.getFeaturesByStrategy(uris.get(1)).map(this::mapToFeatureData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
-            resp.setStatus(SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
+                resp.setStatus(SC_OK);
                 writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);

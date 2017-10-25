@@ -58,9 +58,9 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
             final List<FeatureData> data = featureService.getFeatures().map(this::mapToFeatureData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
-            resp.setStatus(SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+                resp.setStatus(SC_OK);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -68,12 +68,13 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
             }
         }
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-            final FeatureData data = featureService.getFeature(uris.get(1)).map(this::mapToFeatureData).orElse(null);
+            final Optional<Feature> feature = featureService.getFeature(uris.get(1));
+            final FeatureData data = feature.map(this::mapToFeatureData).orElse(null);
 
             final String json = gson.toJson(data);
-            resp.setStatus(SC_OK);
             try (PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+                resp.setStatus(SC_OK);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -105,9 +106,9 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
             //@formatter:on
             final Optional<String> pid = featureService.createFeature(factory);
             if (pid.isPresent()) {
-                resp.setStatus(SC_OK);
                 try (PrintWriter writer = resp.getWriter()) {
                     writer.write(pid.get());
+                    resp.setStatus(SC_OK);
                 } catch (final IOException ex) {
                     logger.error("{}", ex.getMessage(), ex);
                     resp.setStatus(SC_INTERNAL_SERVER_ERROR);

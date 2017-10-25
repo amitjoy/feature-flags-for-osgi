@@ -55,9 +55,9 @@ public final class GroupsByStrategyServlet extends HttpServlet implements Featur
             final List<GroupData> data = featureService.getGroupsByStrategy(uris.get(1)).map(this::mapToGroupData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
-            resp.setStatus(SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+                resp.setStatus(SC_OK);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);

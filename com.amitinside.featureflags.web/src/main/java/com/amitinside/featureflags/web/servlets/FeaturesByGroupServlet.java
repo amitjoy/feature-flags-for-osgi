@@ -55,9 +55,9 @@ public final class FeaturesByGroupServlet extends HttpServlet implements Feature
             final List<FeatureData> data = featureService.getFeaturesByGroup(uris.get(1)).map(this::mapToFeatureData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
-            resp.setStatus(SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+                resp.setStatus(SC_OK);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);

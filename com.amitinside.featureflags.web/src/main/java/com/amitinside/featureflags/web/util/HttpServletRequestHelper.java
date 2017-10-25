@@ -9,6 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.web.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
 import java.io.UnsupportedEncodingException;
@@ -71,12 +72,11 @@ public final class HttpServletRequestHelper {
 
     public static List<String> parseFullUrl(final HttpServletRequest request) {
         requireNonNull(request, "Servlet Request cannot be null");
-        final String pathAfterContext = request.getRequestURI()
-                .substring(request.getContextPath().length() + request.getServletPath().length() + 1);
         final List<String> parts = Lists.newArrayList();
-        for (final String val : pathAfterContext.split("/")) {
+        final String pathInfo = request.getRequestURI().substring(request.getContextPath().length() + 1);
+        for (final String val : pathInfo.split("/")) {
             try {
-                parts.add(URLDecoder.decode(val, "UTF-8"));
+                parts.add(URLDecoder.decode(val, UTF_8.name()));
             } catch (final UnsupportedEncodingException e) {
                 return parts;
             }
@@ -85,7 +85,7 @@ public final class HttpServletRequestHelper {
         if (query != null) {
             for (final String val : query.split("&")) {
                 try {
-                    parts.add(URLDecoder.decode(val, "UTF-8"));
+                    parts.add(URLDecoder.decode(val, UTF_8.name()));
                 } catch (final UnsupportedEncodingException e) {
                     return parts;
                 }

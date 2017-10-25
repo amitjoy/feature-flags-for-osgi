@@ -59,9 +59,9 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             final List<GroupData> data = featureService.getGroups().map(this::mapToGroupData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
-            resp.setStatus(SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+                resp.setStatus(SC_OK);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -72,9 +72,9 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             final GroupData data = featureService.getGroup(uris.get(1)).map(this::mapToGroupData).orElse(null);
 
             final String json = gson.toJson(data);
-            resp.setStatus(SC_OK);
             try (PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+                resp.setStatus(SC_OK);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);

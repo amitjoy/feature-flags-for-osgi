@@ -59,9 +59,9 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
             final List<StrategyData> data = featureService.getStrategies().map(this::mapToStrategyData)
                     .collect(Collectors.toList());
             final String json = gson.toJson(new DataHolder(data));
-            resp.setStatus(SC_OK);
             try (final PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+                resp.setStatus(SC_OK);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -72,9 +72,9 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
             final StrategyData data = featureService.getStrategy(uris.get(1)).map(this::mapToStrategyData).orElse(null);
 
             final String json = gson.toJson(data);
-            resp.setStatus(SC_OK);
             try (PrintWriter writer = resp.getWriter()) {
                 writer.write(json);
+                resp.setStatus(SC_OK);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -105,9 +105,9 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
             //@formatter:on
             final Optional<String> pid = featureService.createPropertyBasedStrategy(factory);
             if (pid.isPresent()) {
-                resp.setStatus(SC_OK);
                 try (PrintWriter writer = resp.getWriter()) {
                     writer.write(pid.get());
+                    resp.setStatus(SC_OK);
                 } catch (final IOException e) {
                     logger.error("{}", e.getMessage(), e);
                     resp.setStatus(SC_INTERNAL_SERVER_ERROR);
