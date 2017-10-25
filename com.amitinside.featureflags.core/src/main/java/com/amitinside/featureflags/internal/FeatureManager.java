@@ -103,19 +103,19 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     @Override
     public Optional<Feature> getFeature(final String featureName) {
         requireNonNull(featureName, "Feature name cannot be null");
-        return Optional.ofNullable(activeFeatures.get(featureName));
+        return Optional.ofNullable(activeFeatures.get(featureName.toLowerCase()));
     }
 
     @Override
     public Optional<ActivationStrategy> getStrategy(final String strategyName) {
         requireNonNull(strategyName, "Strategy name cannot be null");
-        return Optional.ofNullable(activeStrategies.get(strategyName));
+        return Optional.ofNullable(activeStrategies.get(strategyName.toLowerCase()));
     }
 
     @Override
     public Optional<FeatureGroup> getGroup(final String groupName) {
         requireNonNull(groupName, "Group name cannot be null");
-        return Optional.ofNullable(activeFeatureGroups.get(groupName));
+        return Optional.ofNullable(activeFeatureGroups.get(groupName.toLowerCase()));
     }
 
     @Override
