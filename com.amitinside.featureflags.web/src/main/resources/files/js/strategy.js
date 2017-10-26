@@ -33,6 +33,11 @@ $(document).ready(function() {
                 $("#prop_key").val(key);
                 $("#value").val(value);
                 $("#create").text("Update");
+                $("#create").prop("onclick",null).off("click");
+                $("#create").click(function() {
+                    alert('clicked');
+                    updateStrategy();
+                });
                 $("#delete").show();
             }
         });
@@ -100,4 +105,8 @@ function addStrategy() {
             }, 3000);
         }
     });
+}
+
+function updateStrategy() {
+    
 }

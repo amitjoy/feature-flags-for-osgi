@@ -29,7 +29,7 @@ $(document).ready(function() {
                 var tag = isEnabled ? "is-success" : "is-danger";
                 var enabled = "<span class='tag " + tag + "'>" + isEnabled + "</span>";
                 var strategy = groups[i].strategy === undefined ? "" : groups[i].strategy;
-                $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + groups[i].name + ">" + groups[i].name + "</a></td><td>" + groups[i].description + "</td><td>" + strategy + "</td><td>" + enabled "</td></tr>");
+                $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + groups[i].name + ">" + groups[i].name + "</a></td><td>" + groups[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
             }
         }
     });
@@ -61,6 +61,11 @@ $(document).ready(function() {
                 $("#properties").val(properties);
                 $("#create").text("Update");
                 $("#delete").show();
+                $("#create").prop("onclick",null).off("click");
+                $("#create").click(function() {
+                    alert('clicked');
+                    updateGroup();
+                });
             }
         });
     }
@@ -129,4 +134,8 @@ function addGroup() {
             }, 3000);
         }
     });
+}
+
+function updateGroup() {
+    
 }

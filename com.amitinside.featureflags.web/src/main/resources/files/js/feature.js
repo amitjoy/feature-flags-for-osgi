@@ -78,6 +78,11 @@ $(document).ready(function() {
                 $("#properties").val(properties);
                 $("#groups").val(groups);
                 $("#create").text("Update");
+                $("#create").prop("onclick",null).off("click");
+                $("#create").click(function() {
+                    alert('clicked');
+                    updateFeature();
+                });
                 $("#delete").show();
             }
         });
@@ -150,4 +155,8 @@ function addFeature() {
             }, 3000);
         }
     });
+}
+
+function updateFeature() {
+    
 }
