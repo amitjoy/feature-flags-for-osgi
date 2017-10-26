@@ -439,7 +439,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     private <T> void unbindInstance(final T instance, final String name, final Map<String, Object> props,
             final Multimap<String, Description<T>> allInstances, final Map<String, T> activeInstances) {
         final Description<T> info = new Description<>(instance, props);
-        allInstances.remove(name, info);
+        allInstances.remove(name.toLowerCase(), info);
         calculateActiveInstances(allInstances, activeInstances);
     }
 
