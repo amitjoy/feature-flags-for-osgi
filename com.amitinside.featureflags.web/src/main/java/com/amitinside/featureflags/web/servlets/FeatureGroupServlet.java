@@ -63,6 +63,10 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                                             .collect(Collectors.toList());
             //@formatter:on
             final String json = gson.toJson(new DataHolder(data));
+            if (json == null || json.equalsIgnoreCase("null")) {
+                resp.setStatus(SC_NO_CONTENT);
+                return;
+            }
             try (final PrintWriter writer = resp.getWriter()) {
                 resp.setStatus(SC_OK);
                 writer.write(json);
@@ -79,6 +83,10 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                                         .orElse(null);
             //@formatter:on
             final String json = gson.toJson(data);
+            if (json == null || json.equalsIgnoreCase("null")) {
+                resp.setStatus(SC_NO_CONTENT);
+                return;
+            }
             try (PrintWriter writer = resp.getWriter()) {
                 resp.setStatus(SC_OK);
                 writer.write(json);

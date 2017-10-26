@@ -59,6 +59,10 @@ public final class GroupsByStrategyServlet extends HttpServlet implements Featur
                                             .collect(Collectors.toList());
             //@formatter:on
             final String json = gson.toJson(new DataHolder(data));
+            if (json == null || json.equalsIgnoreCase("null")) {
+                resp.setStatus(SC_NO_CONTENT);
+                return;
+            }
             try (final PrintWriter writer = resp.getWriter()) {
                 resp.setStatus(SC_OK);
                 writer.write(json);
