@@ -110,13 +110,25 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final FeatureData data = gson.fromJson(jsonData, FeatureData.class);
+            FeatureData json = null;
+            try {
+                json = gson.fromJson(jsonData, FeatureData.class);
+            } catch (final Exception e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            final String description = json.getDescription();
+            final String strategy = json.getStrategy();
+            final List<String> groups = json.getGroups();
+            final Map<String, Object> properties = json.getProperties();
+            final boolean enabled = json.isEnabled();
             //@formatter:off
-            final Factory factory = Factory.make(data.getName(), c -> c.withDescription(data.getDescription())
-                                                                 .withStrategy(data.getStrategy())
-                                                                 .withGroups(data.getGroups())
-                                                                 .withProperties(data.getProperties())
-                                                                 .withEnabled(data.isEnabled())
+            final Factory factory = Factory.make(json.getName(), c -> c.withDescription(description)
+                                                                 .withStrategy(strategy)
+                                                                 .withGroups(groups)
+                                                                 .withProperties(properties)
+                                                                 .withEnabled(enabled)
                                                                  .build());
             //@formatter:on
             final Optional<String> pid = featureService.createFeature(factory);

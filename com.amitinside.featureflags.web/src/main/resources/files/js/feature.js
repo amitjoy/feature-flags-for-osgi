@@ -1,7 +1,7 @@
 $(document).ready(function() {
     var features = null;
     var param = getParameterByName('name');
-    
+
     $.ajax({
         type : "GET",
         dataType : "json",
@@ -10,13 +10,13 @@ $(document).ready(function() {
             groups = data.groups;
             for (var i = 0; i < groups.length; i++) {
                 $('#groups').append($('<option>', {
-                    value: groups[i].name,
-                    text: groups[i].name
+                    value : groups[i].name,
+                    text : groups[i].name
                 }));
             }
         }
     });
-    
+
     $.ajax({
         type : "GET",
         dataType : "json",
@@ -25,8 +25,8 @@ $(document).ready(function() {
             strategies = data.strategies;
             for (var i = 0; i < strategies.length; i++) {
                 $('#strategy').append($('<option>', {
-                    value: strategies[i].name,
-                    text: strategies[i].name
+                    value : strategies[i].name,
+                    text : strategies[i].name
                 }));
             }
         }
@@ -45,11 +45,11 @@ $(document).ready(function() {
                 var enabled = "<span class='tag " + tag + "'>" + isEnabled + "</span>";
                 var strategy = features[i].strategy === undefined ? "" : features[i].strategy;
                 var groups = JSON.stringify(features[i].groups)
-                $('#features-table tr:last').after('<tr><th>' + ++j + '</th><td><a href=add_feature.html?name=' + features[i].name + '>' + features[i].name + '</a></td><td>' + features[i].description + '</td><td>' + strategy + '</td><td>' + groups + '</td><td>'+ enabled + '</td></tr>');
+                $('#features-table tr:last').after('<tr><th>' + ++j + '</th><td><a href=add_feature.html?name=' + features[i].name + '>' + features[i].name + '</a></td><td>' + features[i].description + '</td><td>' + strategy + '</td><td>' + groups + '</td><td>' + enabled + '</td></tr>');
             }
         }
     });
-    
+
     if (param != null) {
         $.ajax({
             type : "GET",
@@ -115,4 +115,36 @@ function removeFeature() {
             }
         });
     }
+}
+
+function addFeature() {
+    var name = $('#name').val();
+    var description = $('#description').val();
+    var strategyValue = $('#strategy').val();
+    var strategy = strategyValue === "not_set" ? null : strategyValue;
+    var groupsValue = $('#groups').val();
+    var groups = groupsValue === "not_set" ? null : groupsValue;
+    var propertiesValue = $('#properties').val();
+    var properties = propertiesValue === "" ? null : propertiesValue;
+    var enabled = $('#enabledYes').is(':checked') ? true : false;
+
+    $.ajax({
+        type : "POST",
+        data : JSON.stringify({
+            "name" : name,
+            "description" : description,
+            "strategy" : strategy,
+            "groups" : groups,
+            "enabled" : enabled,
+            "properties" : properties
+        }),
+        url : "http://localhost:8080/features",
+        success : function(data) {
+            $('#feature-added').show();
+            window.setTimeout(function() {
+                url = "features.html";
+                $(location).attr("href", url);
+            }, 3000);
+        }
+    });
 }

@@ -107,10 +107,16 @@ function addGroup() {
     var propertiesValue = $('#properties').val();
     var properties = propertiesValue === "" ? null : propertiesValue;
     var enabled = $('#enabledYes').is(':checked') ? true : false;
-    
+
     $.ajax({
         type : "POST",
-        data : JSON.stringify({ "name": name, "description" : description, "strategy" : strategy, "enabled" : enabled, "properties" : properties }),
+        data : JSON.stringify({
+            "name" : name,
+            "description" : description,
+            "strategy" : strategy,
+            "enabled" : enabled,
+            "properties" : properties
+        }),
         url : "http://localhost:8080/groups",
         success : function(data) {
             $('#group-added').show();

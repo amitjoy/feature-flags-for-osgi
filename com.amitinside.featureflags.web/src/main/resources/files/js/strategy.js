@@ -78,10 +78,16 @@ function addStrategy() {
     var type = $('#type').val();
     var key = $('#prop_key').val();
     var value = $('#value').val();
-    
+
     $.ajax({
         type : "POST",
-        data : JSON.stringify({ "name": name, "description" : description, "type" : type, "key" : key, "value" : value }),
+        data : JSON.stringify({
+            "name" : name,
+            "description" : description,
+            "type" : type,
+            "key" : key,
+            "value" : value
+        }),
         url : "http://localhost:8080/strategies",
         success : function(data) {
             $('#strategy-added').show();

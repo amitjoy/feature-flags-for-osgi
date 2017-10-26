@@ -238,7 +238,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<button id="create" class="button is-primary">Create</button>
+									<button id="create" class="button is-primary" onclick="addFeature();">Create</button>
 									<button id="delete" class="button is-danger" style="display: none;" onclick="removeFeature();">Remove</button>
 								</div>
 							</div>
@@ -252,6 +252,12 @@
 				</div>
 				<div class="message-body">Group Successfully Deleted</div>
 			</article>
+			<article id="feature-added" class="message is-success" style="display: none;">
+                <div class="message-header">
+                    <p>Success</p>
+                </div>
+                <div class="message-body">Feature Successfully Added</div>
+            </article>
 			</main>
 		</div>
 	</div>
