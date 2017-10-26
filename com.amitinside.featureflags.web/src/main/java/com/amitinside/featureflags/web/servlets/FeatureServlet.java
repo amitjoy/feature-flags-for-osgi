@@ -181,7 +181,7 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
         final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String name = uris.get(1);
-            if (featureService.removeGroup(name)) {
+            if (featureService.removeFeature(name)) {
                 resp.setStatus(SC_OK);
             } else {
                 resp.setStatus(SC_NOT_MODIFIED);

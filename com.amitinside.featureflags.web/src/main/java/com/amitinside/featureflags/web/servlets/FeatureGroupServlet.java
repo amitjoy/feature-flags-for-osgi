@@ -111,12 +111,26 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final GroupData data = gson.fromJson(jsonData, GroupData.class);
+
+            GroupData json = null;
+            try {
+                json = gson.fromJson(jsonData, GroupData.class);
+            } catch (final Exception e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            final String name = json.getName();
+            final String desc = json.getDescription();
+            final String strategy = json.getStrategy();
+            final boolean enabled = json.isEnabled();
+            final Map<String, Object> properties = json.getProperties();
+
             //@formatter:off
-            final Factory factory = Factory.make(data.getName(), c -> c.withDescription(data.getDescription())
-                                                                 .withStrategy(data.getStrategy())
-                                                                 .withProperties(data.getProperties())
-                                                                 .withEnabled(data.isEnabled())
+            final Factory factory = Factory.make(name, c -> c.withDescription(desc)
+                                                                 .withStrategy(strategy)
+                                                                 .withProperties(properties)
+                                                                 .withEnabled(enabled)
                                                                  .build());
             //@formatter:on
             final Optional<String> pid = featureService.createGroup(factory);
@@ -181,7 +195,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
         final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String name = uris.get(1);
-            if (featureService.removeFeature(name)) {
+            if (featureService.removeGroup(name)) {
                 resp.setStatus(SC_OK);
             } else {
                 resp.setStatus(SC_NOT_MODIFIED);

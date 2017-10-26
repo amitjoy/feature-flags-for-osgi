@@ -11,6 +11,7 @@
 <title>Feature Flags Administration</title>
 
 <script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/strategy.js"></script>
 
 <link rel="stylesheet" href="../css/bulma.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -141,9 +142,9 @@
 							<div class="field is-narrow">
 								<div class="control">
 									<div class="select is-fullwidth">
-										<select>
-											<option>Service Property</option>
-											<option>System Property</option>
+										<select id="type">
+											<option value="Service">Service Property</option>
+											<option value="System">System Property</option>
 										</select>
 									</div>
 								</div>
@@ -158,7 +159,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<input class="input is-danger" type="text" placeholder="User-friendly Name">
+									<input id="name" class="input is-danger" type="text" placeholder="User-friendly Name">
 								</div>
 								<p class="help is-danger">This field is required</p>
 							</div>
@@ -172,7 +173,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<textarea class="textarea" placeholder="Detailed Description of Activation Strategy"></textarea>
+									<textarea id="description" class="textarea" placeholder="Detailed Description of Activation Strategy"></textarea>
 								</div>
 							</div>
 						</div>
@@ -185,7 +186,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<input class="input is-danger" type="text" placeholder="Key to Find in the Properties">
+									<input id="prop_key" class="input is-danger" type="text" placeholder="Key to Find in the Properties">
 								</div>
 								<p class="help is-danger">This field is required</p>
 							</div>
@@ -199,7 +200,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<input class="input is-danger" type="text" placeholder="Value to match with the value associated with the specified key">
+									<input id="value" class="input is-danger" type="text" placeholder="Value to match with the value associated with the specified key">
 								</div>
 								<p class="help is-danger">This field is required</p>
 							</div>
@@ -213,16 +214,27 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<button class="button is-primary">Create</button>
+									<button id="create" class="button is-primary" onclick="addStrategy();">Create</button>
+									<button id="delete" class="button is-danger" style="display: none;" onclick="removeStrategy();">Remove</button>
 								</div>
 							</div>
 						</div>
 					</div>
 
-
 				</div>
 			</div>
-
+			<article id="strategy-deleted" class="message is-success" style="display: none;">
+				<div class="message-header">
+					<p>Success</p>
+				</div>
+				<div class="message-body">Strategy Successfully Deleted</div>
+			</article>
+			<article id="strategy-added" class="message is-success" style="display: none;">
+				<div class="message-header">
+					<p>Success</p>
+				</div>
+				<div class="message-body">Strategy Successfully Added</div>
+			</article>
 			</main>
 		</div>
 	</div>

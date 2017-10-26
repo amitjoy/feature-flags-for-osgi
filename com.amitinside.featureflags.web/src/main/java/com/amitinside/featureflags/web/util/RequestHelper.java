@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import com.amitinside.featureflags.Constants;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
@@ -102,14 +103,21 @@ public final class RequestHelper {
      * Class used to represent Strategy JSON data
      */
     public static final class StrategyData {
-        private final String name;
-        private final String description;
-        private final String key;
-        private final String value;
+        private String name;
+        private String description;
+        private String type;
+        private String key;
+        private String value;
 
-        public StrategyData(final String name, final String description, final String key, final String value) {
+        public StrategyData() {
+            // required for GSON
+        }
+
+        public StrategyData(final String name, final String description, final String type, final String key,
+                final String value) {
             this.name = name;
             this.description = description;
+            this.type = type;
             this.key = key;
             this.value = value;
         }
@@ -130,17 +138,25 @@ public final class RequestHelper {
             return value;
         }
 
+        public String getType() {
+            return type;
+        }
+
     }
 
     /**
      * Class used to represent Group JSON data
      */
     public static final class GroupData {
-        private final String name;
-        private final String description;
-        private final String strategy;
-        private final boolean enabled;
-        private final Map<String, Object> properties;
+        private String name;
+        private String description;
+        private String strategy;
+        private boolean enabled;
+        private Map<String, Object> properties;
+
+        public GroupData() {
+            // required for GSON
+        }
 
         public GroupData(final String name, final String description, final String strategy, final boolean enabled,
                 final Map<String, Object> properties) {
@@ -176,12 +192,16 @@ public final class RequestHelper {
      * Class used to represent Feature Group JSON data
      */
     public static final class FeatureData {
-        private final String name;
-        private final String description;
-        private final String strategy;
-        private final List<String> groups;
-        private final boolean enabled;
-        private final Map<String, Object> properties;
+        private String name;
+        private String description;
+        private String strategy;
+        private List<String> groups;
+        private boolean enabled;
+        private Map<String, Object> properties;
+
+        public FeatureData() {
+            // required for GSON
+        }
 
         public FeatureData(final String name, final String description, final String strategy,
                 final List<String> groups, final boolean enabled, final Map<String, Object> properties) {
@@ -242,7 +262,19 @@ public final class RequestHelper {
         final String name = strategy.getName();
         final String description = strategy.getDescription().orElse(null);
         final Map<String, Object> props = strategyProperties.get(strategy);
-        return new StrategyData(name, description, (String) props.get("property_key"),
-                (String) props.get("property_value"));
+        String type = null;
+        String key = null;
+        String value = null;
+        if (props != null) {
+            final String factoryPid = (String) props.get("service.factoryPid");
+            if (Constants.STRATEGY_SERVICE_PROPERTY_PID.equalsIgnoreCase(factoryPid)) {
+                type = "Service";
+            } else {
+                type = "System";
+            }
+            key = (String) props.get("property_key");
+            value = (String) props.get("property_value");
+        }
+        return new StrategyData(name, description, type, key, value);
     }
 }

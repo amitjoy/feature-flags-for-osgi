@@ -11,6 +11,7 @@
 <title>Feature Flags Administration</title>
 
 <script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/group.js"></script>
 
 <link rel="stylesheet" href="../css/bulma.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -142,7 +143,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<input class="input is-danger" type="text" placeholder="User-friendly Name">
+									<input id="name" class="input is-danger" type="text" placeholder="User-friendly Name">
 								</div>
 								<p class="help is-danger">This field is required</p>
 							</div>
@@ -156,7 +157,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<textarea class="textarea" placeholder="Detailed Description of Feature Group"></textarea>
+									<textarea id="description" class="textarea" placeholder="Detailed Description of Feature Group"></textarea>
 								</div>
 							</div>
 						</div>
@@ -170,11 +171,8 @@
 							<div class="field is-narrow">
 								<div class="control">
 									<div class="select is-fullwidth">
-										<select>
-											<option>-- SELECT --</option>
-											<option>Strategy 1</option>
-											<option>Strategy 2</option>
-											<option>Strategy 3</option>
+										<select id="strategy">
+											<option value="not_set">-- SELECT --</option>
 										</select>
 									</div>
 								</div>
@@ -189,7 +187,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<textarea class="textarea" placeholder="JSON Data"></textarea>
+									<textarea id="properties" class="textarea" placeholder="JSON Data"></textarea>
 								</div>
 							</div>
 						</div>
@@ -203,11 +201,11 @@
 							<div class="field is-narrow">
 								<div class="control">
 									<label class="radio">
-										<input checked type="radio" name="member">
+										<input id="enabledYes" type="radio" name="member">
 										Yes
 									</label>
 									<label class="radio">
-										<input type="radio" name="member">
+										<input id="enabledNo" type="radio" name="member">
 										No
 									</label>
 								</div>
@@ -222,16 +220,27 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<button class="button is-primary">Create</button>
+									<button id="create" class="button is-primary" onclick="addGroup();">Create</button>
+									<button id="delete" class="button is-danger" style="display: none;" onclick="removeGroup();">Remove</button>
 								</div>
 							</div>
 						</div>
 					</div>
 
-
 				</div>
 			</div>
-
+			<article id="group-deleted" class="message is-success" style="display: none;">
+				<div class="message-header">
+					<p>Success</p>
+				</div>
+				<div class="message-body">Group Successfully Deleted</div>
+			</article>
+			<article id="group-added" class="message is-success" style="display: none;">
+                <div class="message-header">
+                    <p>Success</p>
+                </div>
+                <div class="message-body">Group Successfully Added</div>
+            </article>
 			</main>
 		</div>
 	</div>

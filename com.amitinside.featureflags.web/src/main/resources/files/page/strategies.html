@@ -11,6 +11,7 @@
 <title>Feature Flags Administration</title>
 
 <script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/strategy.js"></script>
 
 <link rel="stylesheet" href="../css/bulma.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -38,9 +39,7 @@
 						<span></span>
 						<span></span>
 					</button>
-
 				</div>
-
 
 				<div class="navbar-menu navbar-end" id="navMenu">
 					<a class="navbar-item is-tab is-hidden-tablet is-active">Home</a>
@@ -134,7 +133,7 @@
 
 			<div class="columns is-multiline">
 				<div class="column">
-					<table class="table is-striped is-narrow is-fullwidth is-hoverable">
+					<table id="strategies-table" class="table is-striped is-narrow is-fullwidth is-hoverable">
 						<thead>
 							<tr>
 								<th>
@@ -147,8 +146,8 @@
 									<abbr title="Description">Description</abbr>
 								</th>
 								<th>
-                                    <abbr title="Type">Type</abbr>
-                                </th>
+									<abbr title="Type">Type</abbr>
+								</th>
 								<th>
 									<abbr title="Key">Key</abbr>
 								</th>
@@ -158,86 +157,8 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<th>1</th>
-								<td>
-									<a href="https://en.wikipedia.org/wiki/Leicester_City_F.C." title="Leicester City F.C.">Leicester City</a>
-									<strong>(C)</strong>
-								</td>
-								<td>38</td>
-								<td>SYSTEM</td>
-								<td>12</td>
-								<td>3</td>
-							</tr>
-							<tr>
-								<th>2</th>
-								<td>
-									<a href="https://en.wikipedia.org/wiki/Arsenal_F.C." title="Arsenal F.C.">Arsenal</a>
-								</td>
-								<td>38</td>
-								<td>SERVICE</td>
-								<td>11</td>
-								<td>7</td>
-							</tr>
-							<tr>
-								<th>3</th>
-								<td>
-									<a href="https://en.wikipedia.org/wiki/Tottenham_Hotspur_F.C." title="Tottenham Hotspur F.C.">Tottenham Hotspur</a>
-								</td>
-								<td>38</td>
-								<td>SYSTEM</td>
-								<td>13</td>
-								<td>6</td>
-							</tr>
-							<tr>
-								<th>4</th>
-								<td>
-									<a href="https://en.wikipedia.org/wiki/Manchester_City_F.C." title="Manchester City F.C.">Manchester City</a>
-								</td>
-								<td>38</td>
-								<td>SYSTEM</td>
-								<td>9</td>
-								<td>10</td>
-							</tr>
-							<tr>
-								<th>5</th>
-								<td>
-									<a href="https://en.wikipedia.org/wiki/Manchester_United_F.C." title="Manchester United F.C.">Manchester United</a>
-								</td>
-								<td>38</td>
-								<td>SERVICE</td>
-								<td>9</td>
-								<td>10</td>
-							</tr>
 						</tbody>
 					</table>
-					<!-- nav class="pagination is-centered" role="navigation" aria-label="pagination">
-						<a class="pagination-previous">Previous</a>
-						<a class="pagination-next">Next page</a>
-						<ul class="pagination-list">
-							<li>
-								<a class="pagination-link" aria-label="Goto page 1">1</a>
-							</li>
-							<li>
-								<span class="pagination-ellipsis">&hellip;</span>
-							</li>
-							<li>
-								<a class="pagination-link" aria-label="Goto page 45">45</a>
-							</li>
-							<li>
-								<a class="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a>
-							</li>
-							<li>
-								<a class="pagination-link" aria-label="Goto page 47">47</a>
-							</li>
-							<li>
-								<span class="pagination-ellipsis">&hellip;</span>
-							</li>
-							<li>
-								<a class="pagination-link" aria-label="Goto page 86">86</a>
-							</li>
-						</ul>
-					</nav-->
 				</div>
 			</div>
 

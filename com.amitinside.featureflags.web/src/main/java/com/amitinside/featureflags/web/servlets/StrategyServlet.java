@@ -9,7 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.web.servlets;
 
-import static com.amitinside.featureflags.StrategyFactory.StrategyType.SERVICE_PROPERTY;
+import static com.amitinside.featureflags.StrategyFactory.StrategyType.*;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.StrategyFactory;
+import com.amitinside.featureflags.StrategyFactory.StrategyType;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.RequestHelper;
@@ -113,12 +114,24 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final StrategyData json = gson.fromJson(jsonData, StrategyData.class);
+            StrategyData json = null;
+            try {
+                json = gson.fromJson(jsonData, StrategyData.class);
+            } catch (final Exception e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            final StrategyType type = json.getType().equalsIgnoreCase("system") ? SYSTEM_PROPERTY : SERVICE_PROPERTY;
+            final String name = json.getName();
+            final String desc = json.getDescription();
+            final String key = json.getKey();
+            final String value = json.getValue();
             //@formatter:off
-            final StrategyFactory factory = StrategyFactory.make(json.getName(), SERVICE_PROPERTY,
-                                      c -> c.withDescription(json.getDescription())
-                                            .withKey(json.getKey())
-                                            .withValue(json.getValue())
+            final StrategyFactory factory = StrategyFactory.make(name, type,
+                                      c -> c.withDescription(desc)
+                                            .withKey(key)
+                                            .withValue(value)
                                             .build());
             //@formatter:on
             final Optional<String> pid = featureService.createPropertyBasedStrategy(factory);
@@ -141,7 +154,7 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
     @Override
     protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) {
         final List<String> uris = RequestHelper.parseFullUrl(req);
-        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase("features")) {
+        if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String name = uris.get(1);
             if (featureService.removePropertyBasedStrategy(name)) {
                 resp.setStatus(SC_OK);
