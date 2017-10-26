@@ -1,6 +1,6 @@
 $(document).ready(function() {
     var strategies = null;
-    var param = getParameterByName('name');
+    var param = getParameterByName("name");
 
     $.ajax({
         type : "GET",
@@ -10,7 +10,7 @@ $(document).ready(function() {
             strategies = data.strategies;
             for (var i = 0; i < strategies.length; i++) {
                 var j = i;
-                $('#strategies-table tr:last').after('<tr><th>' + ++j + '</th><td><a href=add_strategy.html?name=' + strategies[i].name + '>' + strategies[i].name + '</a></td><td>' + strategies[i].description + '</td><td>' + strategies[i].type + '</td><td>' + strategies[i].key + '</td><td>' + strategies[i].value + '</td></tr>');
+                $("#strategies-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_strategy.html?name=" + strategies[i].name + ">" + strategies[i].name + "</a></td><td>" + strategies[i].description + "</td><td>" + strategies[i].type + "</td><td>" + strategies[i].key + "</td><td>" + strategies[i].value + "</td></tr>");
             }
         }
     });
@@ -26,28 +26,31 @@ $(document).ready(function() {
                 var type = data.type;
                 var key = data.key;
                 var value = data.value;
-                $('#name').val(name);
-                $("#name").prop('disabled', true);
-                $('#description').val(description);
-                $('#type').val(type);
-                $('#prop_key').val(key);
-                $('#value').val(value);
-                $('#create').text("Update");
-                $('#delete').show();
+                $("#name").val(name);
+                $("#name").prop("disabled", true);
+                $("#description").val(description);
+                $("#type").val(type);
+                $("#prop_key").val(key);
+                $("#value").val(value);
+                $("#create").text("Update");
+                $("#delete").show();
             }
         });
     }
 });
 
 function getParameterByName(name, url) {
-    if (!url)
+    if (!url) {
         url = window.location.href;
+    }
     name = name.replace(/[\[\]]/g, "\\$&");
     var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex.exec(url);
-    if (!results)
+    if (!results) {
         return null;
-    if (!results[2])
-        return '';
+    }
+    if (!results[2]) {
+        return "";
+    }
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
@@ -62,9 +65,9 @@ function removeStrategy() {
             type : "DELETE",
             url : "http://localhost:8080/strategies/" + param,
             success : function(data) {
-                $('#strategy-deleted').show();
+                $("#strategy-deleted").show();
                 window.setTimeout(function() {
-                    url = "strategies.html";
+                    var url = "strategies.html";
                     $(location).attr("href", url);
                 }, 3000);
             }
@@ -73,11 +76,11 @@ function removeStrategy() {
 }
 
 function addStrategy() {
-    var name = $('#name').val();
-    var description = $('#description').val();
-    var type = $('#type').val();
-    var key = $('#prop_key').val();
-    var value = $('#value').val();
+    var name = $("#name").val();
+    var description = $("#description").val();
+    var type = $("#type").val();
+    var key = $("#prop_key").val();
+    var value = $("#value").val();
 
     $.ajax({
         type : "POST",
@@ -90,9 +93,9 @@ function addStrategy() {
         }),
         url : "http://localhost:8080/strategies",
         success : function(data) {
-            $('#strategy-added').show();
+            $("#strategy-added").show();
             window.setTimeout(function() {
-                url = "strategies.html";
+                var url = "strategies.html";
                 $(location).attr("href", url);
             }, 3000);
         }

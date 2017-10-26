@@ -5,7 +5,7 @@ $(document).ready(function() {
         url : "http://localhost:8080/strategies",
         success : function(data) {
             var count = data.strategies.length;
-            $('#noOfStrategies').html(count);
+            $("#noOfStrategies").html(count);
         }
     });
     $.ajax({
@@ -14,7 +14,7 @@ $(document).ready(function() {
         url : "http://localhost:8080/features",
         success : function(data) {
             var count = data.features.length;
-            $('#noOfFeatures').html(count);
+            $("#noOfFeatures").html(count);
         }
     });
     $.ajax({
@@ -23,7 +23,7 @@ $(document).ready(function() {
         url : "http://localhost:8080/groups",
         success : function(data) {
             var count = data.groups.length;
-            $('#noOfGroups').html(count);
+            $("#noOfGroups").html(count);
         }
     });
 });

@@ -1,15 +1,15 @@
 $(document).ready(function() {
     var features = null;
-    var param = getParameterByName('name');
+    var param = getParameterByName("name");
 
     $.ajax({
         type : "GET",
         dataType : "json",
         url : "http://localhost:8080/groups",
         success : function(data) {
-            groups = data.groups;
+            var groups = data.groups;
             for (var i = 0; i < groups.length; i++) {
-                $('#groups').append($('<option>', {
+                $("#groups").append($("<option>", {
                     value : groups[i].name,
                     text : groups[i].name
                 }));
@@ -22,9 +22,9 @@ $(document).ready(function() {
         dataType : "json",
         url : "http://localhost:8080/strategies",
         success : function(data) {
-            strategies = data.strategies;
+            var strategies = data.strategies;
             for (var i = 0; i < strategies.length; i++) {
-                $('#strategy').append($('<option>', {
+                $("#strategy").append($("<option>", {
                     value : strategies[i].name,
                     text : strategies[i].name
                 }));
@@ -41,11 +41,11 @@ $(document).ready(function() {
             for (var i = 0; i < features.length; i++) {
                 var j = i;
                 var isEnabled = Boolean(features[i].enabled);
-                var tag = isEnabled ? 'is-success' : 'is-danger';
+                var tag = isEnabled ? "is-success" : "is-danger";
                 var enabled = "<span class='tag " + tag + "'>" + isEnabled + "</span>";
                 var strategy = features[i].strategy === undefined ? "" : features[i].strategy;
-                var groups = JSON.stringify(features[i].groups)
-                $('#features-table tr:last').after('<tr><th>' + ++j + '</th><td><a href=add_feature.html?name=' + features[i].name + '>' + features[i].name + '</a></td><td>' + features[i].description + '</td><td>' + strategy + '</td><td>' + groups + '</td><td>' + enabled + '</td></tr>');
+                var groups = JSON.stringify(features[i].groups);
+                $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + features[i].name + ">" + features[i].name + "</a></td><td>" + features[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
             }
         }
     });
@@ -67,32 +67,35 @@ $(document).ready(function() {
                 } else {
                     $("#enabledNo").prop("checked", true);
                 }
-                $('#name').val(name);
-                $("#name").prop('disabled', true);
-                $('#description').val(description);
+                $("#name").val(name);
+                $("#name").prop("disabled", true);
+                $("#description").val(description);
                 if (strategy === undefined) {
-                    $('#strategy').val("not_set");
+                    $("#strategy").val("not_set");
                 } else {
-                    $('#strategy').val(strategy);
+                    $("#strategy").val(strategy);
                 }
-                $('#properties').val(properties);
-                $('#groups').val(groups);
-                $('#create').text("Update");
-                $('#delete').show();
+                $("#properties").val(properties);
+                $("#groups").val(groups);
+                $("#create").text("Update");
+                $("#delete").show();
             }
         });
     }
 });
 
 function getParameterByName(name, url) {
-    if (!url)
+    if (!url) {
         url = window.location.href;
+    }
     name = name.replace(/[\[\]]/g, "\\$&");
     var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex.exec(url);
-    if (!results)
+    if (!results) {
         return null;
-    if (!results[2])
-        return '';
+    }
+    if (!results[2]) {
+        return "";
+    }
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
@@ -107,9 +110,9 @@ function removeFeature() {
             type : "DELETE",
             url : "http://localhost:8080/features/" + param,
             success : function(data) {
-                $('#feature-deleted').show();
+                $("#feature-deleted").show();
                 window.setTimeout(function() {
-                    url = "features.html";
+                    var url = "features.html";
                     $(location).attr("href", url);
                 }, 3000);
             }
@@ -118,15 +121,15 @@ function removeFeature() {
 }
 
 function addFeature() {
-    var name = $('#name').val();
-    var description = $('#description').val();
-    var strategyValue = $('#strategy').val();
+    var name = $("#name").val();
+    var description = $("#description").val();
+    var strategyValue = $("#strategy").val();
     var strategy = strategyValue === "not_set" ? null : strategyValue;
-    var groupsValue = $('#groups').val();
+    var groupsValue = $("#groups").val();
     var groups = groupsValue === "not_set" ? null : groupsValue;
-    var propertiesValue = $('#properties').val();
+    var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
-    var enabled = $('#enabledYes').is(':checked') ? true : false;
+    var enabled = $("#enabledYes").is(":checked") ? true : false;
 
     $.ajax({
         type : "POST",
@@ -140,9 +143,9 @@ function addFeature() {
         }),
         url : "http://localhost:8080/features",
         success : function(data) {
-            $('#feature-added').show();
+            $("#feature-added").show();
             window.setTimeout(function() {
-                url = "features.html";
+                var url = "features.html";
                 $(location).attr("href", url);
             }, 3000);
         }
