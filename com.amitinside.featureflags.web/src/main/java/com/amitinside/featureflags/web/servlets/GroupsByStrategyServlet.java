@@ -31,7 +31,8 @@ import org.slf4j.LoggerFactory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
-import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
+import com.amitinside.featureflags.web.util.RequestHelper;
+import com.amitinside.featureflags.web.util.RequestHelper.GroupData;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
@@ -50,14 +51,17 @@ public final class GroupsByStrategyServlet extends HttpServlet implements Featur
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
-        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-            final List<GroupData> data = featureService.getGroupsByStrategy(uris.get(1)).map(this::mapToGroupData)
-                    .collect(Collectors.toList());
+            //@formatter:off
+            final List<GroupData> data = featureService.getGroupsByStrategy(uris.get(1))
+                                            .map(g -> RequestHelper.mapToGroupData(g, groupsProperties))
+                                            .collect(Collectors.toList());
+            //@formatter:on
             final String json = gson.toJson(new DataHolder(data));
             try (final PrintWriter writer = resp.getWriter()) {
-                writer.write(json);
                 resp.setStatus(SC_OK);
+                writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -106,55 +110,6 @@ public final class GroupsByStrategyServlet extends HttpServlet implements Featur
         public List<GroupData> getGroups() {
             return groups;
         }
-    }
-
-    /**
-     * Internal class used to represent Group JSON data
-     */
-    @SuppressWarnings("unused")
-    private static final class GroupData {
-        private final String name;
-        private final String description;
-        private final String strategy;
-        private final boolean enabled;
-        private final Map<String, Object> properties;
-
-        public GroupData(final String name, final String description, final String strategy, final boolean enabled,
-                final Map<String, Object> properties) {
-            this.name = name;
-            this.description = description;
-            this.strategy = strategy;
-            this.enabled = enabled;
-            this.properties = properties;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getStrategy() {
-            return strategy;
-        }
-
-        public Map<String, Object> getProperties() {
-            return properties;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-    }
-
-    private GroupData mapToGroupData(final FeatureGroup group) {
-        final String name = group.getName();
-        final String strategy = group.getStrategy().orElse(null);
-        final String description = group.getDescription().orElse(null);
-        final boolean isEnabled = group.isEnabled();
-        return new GroupData(name, description, strategy, isEnabled, groupsProperties.get(group));
     }
 
     @Override

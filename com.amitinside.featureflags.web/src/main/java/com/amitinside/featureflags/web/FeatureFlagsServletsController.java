@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
@@ -29,6 +30,8 @@ import com.google.common.collect.Lists;
 
 @Component(name = "FeatureFlagsServletsController", immediate = true)
 public final class FeatureFlagsServletsController {
+
+    private static final String ALIAS = "/featureflags";
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -42,10 +45,18 @@ public final class FeatureFlagsServletsController {
     @Activate
     protected void activate() {
         try {
-            httpService.registerResources("/featureflags", "/files", new DisableAuthenticationHttpContext());
+            httpService.registerResources(ALIAS, "/files", new DisableAuthenticationHttpContext());
         } catch (final NamespaceException e) {
             logger.error("{}", e.getMessage(), e);
         }
+    }
+
+    /**
+     * Component activation callback
+     */
+    @Deactivate
+    protected void deactivate() {
+        httpService.unregister(ALIAS);
     }
 
     /**

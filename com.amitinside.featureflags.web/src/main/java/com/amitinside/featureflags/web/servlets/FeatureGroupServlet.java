@@ -35,7 +35,8 @@ import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
-import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
+import com.amitinside.featureflags.web.util.RequestHelper;
+import com.amitinside.featureflags.web.util.RequestHelper.GroupData;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
@@ -54,14 +55,17 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
-        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-            final List<GroupData> data = featureService.getGroups().map(this::mapToGroupData)
-                    .collect(Collectors.toList());
+            //@formatter:off
+            final List<GroupData> data = featureService.getGroups()
+                                            .map(g -> RequestHelper.mapToGroupData(g, groupProperties))
+                                            .collect(Collectors.toList());
+            //@formatter:on
             final String json = gson.toJson(new DataHolder(data));
             try (final PrintWriter writer = resp.getWriter()) {
-                writer.write(json);
                 resp.setStatus(SC_OK);
+                writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -69,23 +73,25 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             }
         }
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-            final GroupData data = featureService.getGroup(uris.get(1)).map(this::mapToGroupData).orElse(null);
-
+            //@formatter:off
+            final GroupData data = featureService.getGroup(uris.get(1))
+                                        .map(g -> RequestHelper.mapToGroupData(g, groupProperties))
+                                        .orElse(null);
+            //@formatter:on
             final String json = gson.toJson(data);
             try (PrintWriter writer = resp.getWriter()) {
-                writer.write(json);
                 resp.setStatus(SC_OK);
+                writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
-                return;
             }
         }
     }
 
     @Override
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
-        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             String jsonData = null;
             try (final BufferedReader reader = req.getReader()) {
@@ -105,16 +111,15 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             //@formatter:on
             final Optional<String> pid = featureService.createGroup(factory);
             if (pid.isPresent()) {
-                resp.setStatus(HttpServletResponse.SC_OK);
-                try (PrintWriter writer = resp.getWriter()) {
+                try (final PrintWriter writer = resp.getWriter()) {
+                    resp.setStatus(SC_CREATED);
                     writer.write(pid.get());
                 } catch (final IOException e) {
                     logger.error("{}", e.getMessage(), e);
                     resp.setStatus(SC_INTERNAL_SERVER_ERROR);
-                    return;
                 }
             } else {
-                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_NO_CONTENT);
             }
         }
 
@@ -123,7 +128,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
     @Override
     protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
-        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 3 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String flag = uris.get(2);
             final boolean isEnabled = Boolean.parseBoolean(flag);
@@ -156,19 +161,21 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
             if (isUpdated) {
                 resp.setStatus(SC_OK);
             } else {
-                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
-                return;
+                resp.setStatus(SC_NOT_MODIFIED);
             }
         }
     }
 
     @Override
     protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) {
-        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final String name = uris.get(1);
-            featureService.removeFeature(name);
-            resp.setStatus(SC_OK);
+            if (featureService.removeFeature(name)) {
+                resp.setStatus(SC_OK);
+            } else {
+                resp.setStatus(SC_NOT_MODIFIED);
+            }
         }
     }
 
@@ -213,54 +220,6 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
         public List<GroupData> getGroups() {
             return groups;
         }
-    }
-
-    /**
-     * Internal class used to represent Group JSON data
-     */
-    private static final class GroupData {
-        private final String name;
-        private final String description;
-        private final String strategy;
-        private final boolean enabled;
-        private final Map<String, Object> properties;
-
-        public GroupData(final String name, final String description, final String strategy, final boolean enabled,
-                final Map<String, Object> properties) {
-            this.name = name;
-            this.description = description;
-            this.strategy = strategy;
-            this.enabled = enabled;
-            this.properties = properties;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getStrategy() {
-            return strategy;
-        }
-
-        public Map<String, Object> getProperties() {
-            return properties;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-    }
-
-    private GroupData mapToGroupData(final FeatureGroup group) {
-        final String name = group.getName();
-        final String strategy = group.getStrategy().orElse(null);
-        final String description = group.getDescription().orElse(null);
-        final boolean isEnabled = group.isEnabled();
-        return new GroupData(name, description, strategy, isEnabled, groupProperties.get(group));
     }
 
     @Override

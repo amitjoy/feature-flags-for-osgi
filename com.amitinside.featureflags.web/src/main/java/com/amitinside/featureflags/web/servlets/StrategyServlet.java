@@ -36,7 +36,8 @@ import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.StrategyFactory;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
-import com.amitinside.featureflags.web.util.HttpServletRequestHelper;
+import com.amitinside.featureflags.web.util.RequestHelper;
+import com.amitinside.featureflags.web.util.RequestHelper.StrategyData;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
@@ -55,14 +56,17 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
-        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-            final List<StrategyData> data = featureService.getStrategies().map(this::mapToStrategyData)
-                    .collect(Collectors.toList());
+            //@formatter:off
+            final List<StrategyData> data = featureService.getStrategies()
+                                                    .map(s -> RequestHelper.mapToStrategyData(s, strategyProperties))
+                                                    .collect(Collectors.toList());
+            //@formatter:on
             final String json = gson.toJson(new DataHolder(data));
             try (final PrintWriter writer = resp.getWriter()) {
-                writer.write(json);
                 resp.setStatus(SC_OK);
+                writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -70,12 +74,15 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
             }
         }
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
-            final StrategyData data = featureService.getStrategy(uris.get(1)).map(this::mapToStrategyData).orElse(null);
-
+            //@formatter:off
+            final StrategyData data = featureService.getStrategy(uris.get(1))
+                                                .map(s -> RequestHelper.mapToStrategyData(s, strategyProperties))
+                                                .orElse(null);
+            //@formatter:on
             final String json = gson.toJson(data);
             try (PrintWriter writer = resp.getWriter()) {
-                writer.write(json);
                 resp.setStatus(SC_OK);
+                writer.write(json);
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -86,7 +93,7 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
 
     @Override
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
-        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             String jsonData = null;
             try (final BufferedReader reader = req.getReader()) {
@@ -107,15 +114,15 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
             final Optional<String> pid = featureService.createPropertyBasedStrategy(factory);
             if (pid.isPresent()) {
                 try (PrintWriter writer = resp.getWriter()) {
+                    resp.setStatus(SC_CREATED);
                     writer.write(pid.get());
-                    resp.setStatus(SC_OK);
                 } catch (final IOException e) {
                     logger.error("{}", e.getMessage(), e);
                     resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                     return;
                 }
             } else {
-                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_NO_CONTENT);
             }
         }
 
@@ -123,18 +130,21 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
 
     @Override
     protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) {
-        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase("features")) {
             final String name = uris.get(1);
-            featureService.removePropertyBasedStrategy(name);
-            resp.setStatus(SC_OK);
+            if (featureService.removePropertyBasedStrategy(name)) {
+                resp.setStatus(SC_OK);
+            } else {
+                resp.setStatus(SC_NOT_MODIFIED);
+            }
         }
     }
 
     @Override
     protected void doPut(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
-        final List<String> uris = HttpServletRequestHelper.parseFullUrl(req);
+        final List<String> uris = RequestHelper.parseFullUrl(req);
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             String jsonData = null;
             try (final BufferedReader reader = req.getReader()) {
@@ -156,7 +166,7 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
             if (isUpdated) {
                 resp.setStatus(SC_OK);
             } else {
-                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                resp.setStatus(SC_NO_CONTENT);
                 return;
             }
         }
@@ -203,48 +213,6 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
         public List<StrategyData> getFeatures() {
             return strategies;
         }
-    }
-
-    /**
-     * Internal class used to represent Strategy JSON data
-     */
-    private static final class StrategyData {
-        private final String name;
-        private final String description;
-        private final String key;
-        private final String value;
-
-        public StrategyData(final String name, final String description, final String key, final String value) {
-            this.name = name;
-            this.description = description;
-            this.key = key;
-            this.value = value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-    }
-
-    private StrategyData mapToStrategyData(final ActivationStrategy strategy) {
-        final String name = strategy.getName();
-        final String description = strategy.getDescription().orElse(null);
-        final Map<String, Object> props = strategyProperties.get(strategy);
-        return new StrategyData(name, description, (String) props.get("property_key"),
-                (String) props.get("property_value"));
     }
 
     @Override
