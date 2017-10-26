@@ -6,5 +6,5 @@ This is a Felix Distribution that comprises all the necessary and useful depende
 
 1. Fork this project
 2. Open terminal
-3. Execute `cd [forked directory]\felix-distro\felix-framework-5.6.8-packaged-for-feature-flags`
+3. Execute `cd [forked directory]/felix-distro/felix-framework-5.6.8-packaged-for-feature-flags`
 4. Run `java -jar bin/felix.jar`
