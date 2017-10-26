@@ -64,6 +64,7 @@ public final class GroupsByStrategyServlet extends HttpServlet implements Featur
                 return;
             }
             try (final PrintWriter writer = resp.getWriter()) {
+                resp.setContentType("application/json");
                 resp.setStatus(SC_OK);
                 writer.write(json);
             } catch (final IOException e) {

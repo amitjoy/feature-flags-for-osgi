@@ -68,6 +68,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                 return;
             }
             try (final PrintWriter writer = resp.getWriter()) {
+                resp.setContentType("application/json");
                 resp.setStatus(SC_OK);
                 writer.write(json);
             } catch (final IOException e) {
@@ -88,6 +89,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                 return;
             }
             try (PrintWriter writer = resp.getWriter()) {
+                resp.setContentType("application/json");
                 resp.setStatus(SC_OK);
                 writer.write(json);
             } catch (final IOException e) {

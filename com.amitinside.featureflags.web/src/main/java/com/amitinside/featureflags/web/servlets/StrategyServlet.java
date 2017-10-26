@@ -69,6 +69,7 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
                 return;
             }
             try (final PrintWriter writer = resp.getWriter()) {
+                resp.setContentType("application/json");
                 resp.setStatus(SC_OK);
                 writer.write(json);
             } catch (final IOException e) {
@@ -89,6 +90,7 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
                 return;
             }
             try (PrintWriter writer = resp.getWriter()) {
+                resp.setContentType("application/json");
                 resp.setStatus(SC_OK);
                 writer.write(json);
             } catch (final IOException e) {
