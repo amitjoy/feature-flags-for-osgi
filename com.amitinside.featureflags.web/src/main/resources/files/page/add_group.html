@@ -10,7 +10,9 @@
 <meta name="language" content="en-EN" />
 <title>Feature Flags Administration</title>
 
-<link rel="stylesheet" href="bulma.min.css">
+<script src="../js/jquery-3.2.1.min.js"></script>
+
+<link rel="stylesheet" href="../css/bulma.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
@@ -21,7 +23,7 @@
 				<div class="navbar-brand">
 
 					<a class="navbar-item">
-						<img src="logo.png" alt="Feature Flags Administration">
+						<img src="../logo/logo.png" alt="Feature Flags Administration">
 					</a>
 					<a class="navbar-item is-tab is-hidden-mobile is-active">
 						<span class="icon is-medium">
@@ -101,10 +103,10 @@
 									<a href="add_strategy.html">Add a Strategy</a>
 								</li>
 								<li>
-									<a href="add_group.html">Add a Group</a>
+									<a class="is-active" href="add_group.html">Add a Group</a>
 								</li>
 								<li>
-									<a class="is-active" href="add_feature.html">Add a Feature</a>
+									<a href="add_feature.html">Add a Feature</a>
 								</li>
 							</ul>
 						</li>
@@ -116,7 +118,7 @@
 			<div class="level">
 				<div class="level-left">
 					<div class="level-item">
-						<div class="title">Add a Feature</div>
+						<div class="title">Add a Group</div>
 					</div>
 				</div>
 				<div class="level-right">
@@ -154,28 +156,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<textarea class="textarea" placeholder="Detailed Description of Feature"></textarea>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="field is-horizontal">
-						<div class="field-label is-normal">
-							<label class="label">Group</label>
-						</div>
-						<div class="field-body">
-							<div class="field is-narrow">
-								<div class="control">
-									<div class="select is-multiple is-fullwidth">
-										<select multiple size="3">
-											<option>-- SELECT --</option>
-											<option>Group 1</option>
-											<option>Group 2</option>
-											<option>Group 3</option>
-										</select>
-									</div>
-									<p class="help is-success">Please note that use groups only if you have multiple features to group together and whose enablements and disablements happen together. If you do have multiple features whose enablements and disablements are not at all related, do not specify any feature group for those features.</p>
+									<textarea class="textarea" placeholder="Detailed Description of Feature Group"></textarea>
 								</div>
 							</div>
 						</div>

@@ -10,7 +10,9 @@
 <meta name="language" content="en-EN" />
 <title>Feature Flags Administration</title>
 
-<link rel="stylesheet" href="bulma.min.css">
+<script src="../js/jquery-3.2.1.min.js"></script>
+
+<link rel="stylesheet" href="../css/bulma.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
@@ -21,7 +23,7 @@
 				<div class="navbar-brand">
 
 					<a class="navbar-item">
-						<img src="logo.png" alt="Feature Flags Administration">
+						<img src="../logo/logo.png" alt="Feature Flags Administration">
 					</a>
 					<a class="navbar-item is-tab is-hidden-mobile is-active">
 						<span class="icon is-medium">
@@ -36,7 +38,9 @@
 						<span></span>
 						<span></span>
 					</button>
+
 				</div>
+
 
 				<div class="navbar-menu navbar-end" id="navMenu">
 					<a class="navbar-item is-tab is-hidden-tablet is-active">Home</a>
@@ -96,13 +100,13 @@
 							</a>
 							<ul>
 								<li>
-									<a class="is-active" href="add_strategy.html">Add a Strategy</a>
+									<a href="add_strategy.html">Add a Strategy</a>
 								</li>
 								<li>
 									<a href="add_group.html">Add a Group</a>
 								</li>
 								<li>
-									<a href="add_feature.html">Add a Feature</a>
+									<a class="is-active" href="add_feature.html">Add a Feature</a>
 								</li>
 							</ul>
 						</li>
@@ -114,7 +118,7 @@
 			<div class="level">
 				<div class="level-left">
 					<div class="level-item">
-						<div class="title">Add a Strategy</div>
+						<div class="title">Add a Feature</div>
 					</div>
 				</div>
 				<div class="level-right">
@@ -130,24 +134,6 @@
 
 			<div class="columns is-multiline">
 				<div class="column is-9">
-
-					<div class="field is-horizontal">
-						<div class="field-label is-normal">
-							<label class="label">Type</label>
-						</div>
-						<div class="field-body">
-							<div class="field is-narrow">
-								<div class="control">
-									<div class="select is-fullwidth">
-										<select>
-											<option>Service Property</option>
-											<option>System Property</option>
-										</select>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
 
 					<div class="field is-horizontal">
 						<div class="field-label is-normal">
@@ -170,7 +156,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<textarea class="textarea" placeholder="Detailed Description of Activation Strategy"></textarea>
+									<textarea class="textarea" placeholder="Detailed Description of Feature"></textarea>
 								</div>
 							</div>
 						</div>
@@ -178,28 +164,74 @@
 
 					<div class="field is-horizontal">
 						<div class="field-label is-normal">
-							<label class="label">Property Key</label>
+							<label class="label">Group</label>
 						</div>
 						<div class="field-body">
-							<div class="field">
+							<div class="field is-narrow">
 								<div class="control">
-									<input class="input is-danger" type="text" placeholder="Key to Find in the Properties">
+									<div class="select is-multiple is-fullwidth">
+										<select multiple size="3">
+											<option>-- SELECT --</option>
+											<option>Group 1</option>
+											<option>Group 2</option>
+											<option>Group 3</option>
+										</select>
+									</div>
+									<p class="help is-success">Please note that use groups only if you have multiple features to group together and whose enablements and disablements happen together. If you do have multiple features whose enablements and disablements are not at all related, do not specify any feature group for those features.</p>
 								</div>
-								<p class="help is-danger">This field is required</p>
 							</div>
 						</div>
 					</div>
 
 					<div class="field is-horizontal">
 						<div class="field-label is-normal">
-							<label class="label">Property Value</label>
+							<label class="label">Strategy</label>
+						</div>
+						<div class="field-body">
+							<div class="field is-narrow">
+								<div class="control">
+									<div class="select is-fullwidth">
+										<select>
+											<option>-- SELECT --</option>
+											<option>Strategy 1</option>
+											<option>Strategy 2</option>
+											<option>Strategy 3</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="field is-horizontal">
+						<div class="field-label is-normal">
+							<label class="label">Properties</label>
 						</div>
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<input class="input is-danger" type="text" placeholder="Value to match with the value associated with the specified key">
+									<textarea class="textarea" placeholder="JSON Data"></textarea>
 								</div>
-								<p class="help is-danger">This field is required</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="field is-horizontal">
+						<div class="field-label">
+							<label class="label">Enabled?</label>
+						</div>
+						<div class="field-body">
+							<div class="field is-narrow">
+								<div class="control">
+									<label class="radio">
+										<input checked type="radio" name="member">
+										Yes
+									</label>
+									<label class="radio">
+										<input type="radio" name="member">
+										No
+									</label>
+								</div>
 							</div>
 						</div>
 					</div>

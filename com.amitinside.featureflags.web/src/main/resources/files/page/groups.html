@@ -10,7 +10,9 @@
 <meta name="language" content="en-EN" />
 <title>Feature Flags Administration</title>
 
-<link rel="stylesheet" href="bulma.min.css">
+<script src="../js/jquery-3.2.1.min.js"></script>
+
+<link rel="stylesheet" href="../css/bulma.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
@@ -21,7 +23,7 @@
 				<div class="navbar-brand">
 
 					<a class="navbar-item">
-						<img src="logo.png" alt="Feature Flags Administration">
+						<img src="../logo/logo.png" alt="Feature Flags Administration">
 					</a>
 					<a class="navbar-item is-tab is-hidden-mobile is-active">
 						<span class="icon is-medium">
@@ -66,7 +68,7 @@
 					<p class="menu-label">Administration</p>
 					<ul class="menu-list">
 						<li>
-							<a class="is-active" href="strategies.html">
+							<a href="strategies.html">
 								<span class="icon is-small">
 									<i class="fa fa-pencil-square-o"></i>
 								</span>
@@ -74,7 +76,7 @@
 							</a>
 						</li>
 						<li>
-							<a href="groups.html">
+							<a class="is-active" href="groups.html">
 								<span class="icon is-small">
 									<i class="fa fa-desktop"></i>
 								</span>
@@ -116,7 +118,7 @@
 			<div class="level">
 				<div class="level-left">
 					<div class="level-item">
-						<div class="title">All Registered Strategies</div>
+						<div class="title">All Registered Groups</div>
 					</div>
 				</div>
 				<div class="level-right">
@@ -145,13 +147,10 @@
 									<abbr title="Description">Description</abbr>
 								</th>
 								<th>
-                                    <abbr title="Type">Type</abbr>
-                                </th>
-								<th>
-									<abbr title="Key">Key</abbr>
+									<abbr title="Strategy">Strategy</abbr>
 								</th>
 								<th>
-									<abbr title="Value">Value</abbr>
+									<abbr title="Enabled">Enabled</abbr>
 								</th>
 							</tr>
 						</thead>
@@ -163,9 +162,8 @@
 									<strong>(C)</strong>
 								</td>
 								<td>38</td>
-								<td>SYSTEM</td>
-								<td>12</td>
-								<td>3</td>
+								<td>23</td>
+								<td><span class="tag is-success">true</span></td>
 							</tr>
 							<tr>
 								<th>2</th>
@@ -173,9 +171,8 @@
 									<a href="https://en.wikipedia.org/wiki/Arsenal_F.C." title="Arsenal F.C.">Arsenal</a>
 								</td>
 								<td>38</td>
-								<td>SERVICE</td>
-								<td>11</td>
-								<td>7</td>
+								<td>20</td>
+								<td><span class="tag is-danger">false</span></td>
 							</tr>
 							<tr>
 								<th>3</th>
@@ -183,9 +180,8 @@
 									<a href="https://en.wikipedia.org/wiki/Tottenham_Hotspur_F.C." title="Tottenham Hotspur F.C.">Tottenham Hotspur</a>
 								</td>
 								<td>38</td>
-								<td>SYSTEM</td>
-								<td>13</td>
-								<td>6</td>
+								<td></td>
+								<td><span class="tag is-danger">false</span></td>
 							</tr>
 							<tr>
 								<th>4</th>
@@ -193,9 +189,8 @@
 									<a href="https://en.wikipedia.org/wiki/Manchester_City_F.C." title="Manchester City F.C.">Manchester City</a>
 								</td>
 								<td>38</td>
-								<td>SYSTEM</td>
-								<td>9</td>
-								<td>10</td>
+								<td>19</td>
+								<td><span class="tag is-success">true</span></td>
 							</tr>
 							<tr>
 								<th>5</th>
@@ -203,9 +198,8 @@
 									<a href="https://en.wikipedia.org/wiki/Manchester_United_F.C." title="Manchester United F.C.">Manchester United</a>
 								</td>
 								<td>38</td>
-								<td>SERVICE</td>
-								<td>9</td>
-								<td>10</td>
+								<td></td>
+								<td><span class="tag is-success">true</span></td>
 							</tr>
 						</tbody>
 					</table>
@@ -238,7 +232,6 @@
 					</nav-->
 				</div>
 			</div>
-
 			</main>
 		</div>
 	</div>

@@ -10,7 +10,9 @@
 <meta name="language" content="en-EN" />
 <title>Feature Flags Administration</title>
 
-<link rel="stylesheet" href="bulma.min.css">
+<script src="../js/jquery-3.2.1.min.js"></script>
+
+<link rel="stylesheet" href="../css/bulma.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
@@ -21,7 +23,7 @@
 				<div class="navbar-brand">
 
 					<a class="navbar-item">
-						<img src="logo.png" alt="Feature Flags Administration">
+						<img src="../logo/logo.png" alt="Feature Flags Administration">
 					</a>
 					<a class="navbar-item is-tab is-hidden-mobile is-active">
 						<span class="icon is-medium">
@@ -36,9 +38,7 @@
 						<span></span>
 						<span></span>
 					</button>
-
 				</div>
-
 
 				<div class="navbar-menu navbar-end" id="navMenu">
 					<a class="navbar-item is-tab is-hidden-tablet is-active">Home</a>
@@ -98,10 +98,10 @@
 							</a>
 							<ul>
 								<li>
-									<a href="add_strategy.html">Add a Strategy</a>
+									<a class="is-active" href="add_strategy.html">Add a Strategy</a>
 								</li>
 								<li>
-									<a class="is-active" href="add_group.html">Add a Group</a>
+									<a href="add_group.html">Add a Group</a>
 								</li>
 								<li>
 									<a href="add_feature.html">Add a Feature</a>
@@ -116,7 +116,7 @@
 			<div class="level">
 				<div class="level-left">
 					<div class="level-item">
-						<div class="title">Add a Group</div>
+						<div class="title">Add a Strategy</div>
 					</div>
 				</div>
 				<div class="level-right">
@@ -132,6 +132,24 @@
 
 			<div class="columns is-multiline">
 				<div class="column is-9">
+
+					<div class="field is-horizontal">
+						<div class="field-label is-normal">
+							<label class="label">Type</label>
+						</div>
+						<div class="field-body">
+							<div class="field is-narrow">
+								<div class="control">
+									<div class="select is-fullwidth">
+										<select>
+											<option>Service Property</option>
+											<option>System Property</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
 					<div class="field is-horizontal">
 						<div class="field-label is-normal">
@@ -154,7 +172,7 @@
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<textarea class="textarea" placeholder="Detailed Description of Feature Group"></textarea>
+									<textarea class="textarea" placeholder="Detailed Description of Activation Strategy"></textarea>
 								</div>
 							</div>
 						</div>
@@ -162,53 +180,28 @@
 
 					<div class="field is-horizontal">
 						<div class="field-label is-normal">
-							<label class="label">Strategy</label>
-						</div>
-						<div class="field-body">
-							<div class="field is-narrow">
-								<div class="control">
-									<div class="select is-fullwidth">
-										<select>
-											<option>-- SELECT --</option>
-											<option>Strategy 1</option>
-											<option>Strategy 2</option>
-											<option>Strategy 3</option>
-										</select>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="field is-horizontal">
-						<div class="field-label is-normal">
-							<label class="label">Properties</label>
+							<label class="label">Property Key</label>
 						</div>
 						<div class="field-body">
 							<div class="field">
 								<div class="control">
-									<textarea class="textarea" placeholder="JSON Data"></textarea>
+									<input class="input is-danger" type="text" placeholder="Key to Find in the Properties">
 								</div>
+								<p class="help is-danger">This field is required</p>
 							</div>
 						</div>
 					</div>
 
 					<div class="field is-horizontal">
-						<div class="field-label">
-							<label class="label">Enabled?</label>
+						<div class="field-label is-normal">
+							<label class="label">Property Value</label>
 						</div>
 						<div class="field-body">
-							<div class="field is-narrow">
+							<div class="field">
 								<div class="control">
-									<label class="radio">
-										<input checked type="radio" name="member">
-										Yes
-									</label>
-									<label class="radio">
-										<input type="radio" name="member">
-										No
-									</label>
+									<input class="input is-danger" type="text" placeholder="Value to match with the value associated with the specified key">
 								</div>
+								<p class="help is-danger">This field is required</p>
 							</div>
 						</div>
 					</div>
