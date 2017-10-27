@@ -1,3 +1,5 @@
+var redirectTimeout = 2000;
+
 $(document).ready(function() {
     var strategies = null;
     var param = getParameterByName("name");
@@ -73,18 +75,24 @@ function removeStrategy() {
                 window.setTimeout(function() {
                     var url = "strategies.html";
                     $(location).attr("href", url);
-                }, 3000);
+                }, redirectTimeout);
             }
         });
     }
 }
 
 function addStrategy() {
-    var name = $("#name").val();
-    var description = $("#description").val();
+    var name = $.trim($("#name").val());
+    var description = $.trim($("#description").val());
     var type = $("#type").val();
-    var key = $("#prop_key").val();
-    var value = $("#value").val();
+    var key = $.trim($("#prop_key").val());
+    var value = $.trim($("#value").val());
+
+    var flag = !name || !key || !value;
+    if (flag) {
+        $("#error-message").show();
+        return false;
+    }
 
     $.ajax({
         type : "POST",
@@ -102,7 +110,7 @@ function addStrategy() {
             window.setTimeout(function() {
                 var url = "strategies.html";
                 $(location).attr("href", url);
-            }, 3000);
+            }, redirectTimeout);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
             $("#error-message").show();
@@ -111,11 +119,17 @@ function addStrategy() {
 }
 
 function updateStrategy() {
-    var name = $("#name").val();
-    var description = $("#description").val();
+    var name = $.trim($("#name").val());
+    var description = $.trim($("#description").val());
     var type = $("#type").val();
-    var key = $("#prop_key").val();
-    var value = $("#value").val();
+    var key = $.trim($("#prop_key").val());
+    var value = $.trim($("#value").val());
+
+    var flag = !name || !key || !value;
+    if (flag) {
+        $("#error-message").show();
+        return false;
+    }
 
     $.ajax({
         type : "PUT",
@@ -133,7 +147,7 @@ function updateStrategy() {
             window.setTimeout(function() {
                 var url = "strategies.html";
                 $(location).attr("href", url);
-            }, 3000);
+            }, redirectTimeout);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
             $("#error-message").show();

@@ -1,3 +1,5 @@
+var redirectTimeout = 2000;
+
 $(document).ready(function() {
     var features = null;
     var param = getParameterByName("name");
@@ -118,14 +120,14 @@ function removeFeature() {
                 window.setTimeout(function() {
                     var url = "features.html";
                     $(location).attr("href", url);
-                }, 3000);
+                }, redirectTimeout);
             }
         });
     }
 }
 
 function addFeature() {
-    var name = $("#name").val();
+    var name = $.trim($("#name").val());
     var description = $("#description").val();
     var strategyValue = $("#strategy").val();
     var strategy = strategyValue === "not_set" ? null : strategyValue;
@@ -143,6 +145,11 @@ function addFeature() {
         "properties" : "dummy"
     };
     data.properties = JSON.parse(properties);
+    
+    if (!name) {
+        $("#error-message").show();
+        return false;
+    }
 
     $.ajax({
         type : "POST",
@@ -154,7 +161,7 @@ function addFeature() {
             window.setTimeout(function() {
                 var url = "features.html";
                 $(location).attr("href", url);
-            }, 3000);
+            }, redirectTimeout);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
             $("#error-message").show();
@@ -192,7 +199,7 @@ function updateFeature() {
             window.setTimeout(function() {
                 var url = "features.html";
                 $(location).attr("href", url);
-            }, 3000);
+            }, redirectTimeout);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
             $("#error-message").show();

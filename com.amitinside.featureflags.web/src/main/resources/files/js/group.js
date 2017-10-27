@@ -1,3 +1,5 @@
+var redirectTimeout = 2000;
+
 $(document).ready(function() {
     var groups = null;
     var param = getParameterByName("name");
@@ -101,14 +103,14 @@ function removeGroup() {
                 window.setTimeout(function() {
                     var url = "groups.html";
                     $(location).attr("href", url);
-                }, 3000);
+                }, redirectTimeout);
             }
         });
     }
 }
 
 function addGroup() {
-    var name = $("#name").val();
+    var name = $.trim($("#name").val());
     var description = $("#description").val();
     var strategyValue = $("#strategy").val();
     var strategy = strategyValue === "not_set" ? null : strategyValue;
@@ -123,6 +125,10 @@ function addGroup() {
         "properties" : "dummy"
     };
     data.properties = JSON.parse(properties);
+    if (!name) {
+        $("#error-message").show();
+        return false;
+    }
 
     $.ajax({
         type : "POST",
@@ -134,7 +140,7 @@ function addGroup() {
             window.setTimeout(function() {
                 var url = "groups.html";
                 $(location).attr("href", url);
-            }, 3000);
+            }, redirectTimeout);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
             $("#error-message").show();
@@ -169,7 +175,7 @@ function updateGroup() {
             window.setTimeout(function() {
                 var url = "groups.html";
                 $(location).attr("href", url);
-            }, 3000);
+            }, redirectTimeout);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
             $("#error-message").show();
