@@ -5,12 +5,12 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "http://localhost:8080/strategies",
+        url : "/strategies",
         success : function(data) {
             strategies = data.strategies;
             for (var i = 0; i < strategies.length; i++) {
                 var j = i;
-                $("#strategies-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_strategy.html?name=" + strategies[i].name + ">" + strategies[i].name + "</a></td><td>" + strategies[i].description + "</td><td>" + strategies[i].type + "</td><td>" + strategies[i].key + "</td><td>" + strategies[i].value + "</td></tr>");
+                $("#strategies-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_strategy.html?name=" + encodeURIComponent(strategies[i].name) + ">" + strategies[i].name + "</a></td><td>" + strategies[i].description + "</td><td>" + strategies[i].type + "</td><td>" + strategies[i].key + "</td><td>" + strategies[i].value + "</td></tr>");
             }
         }
     });
@@ -19,7 +19,7 @@ $(document).ready(function() {
         $.ajax({
             type : "GET",
             dataType : "json",
-            url : "http://localhost:8080/strategies/" + param,
+            url : "/strategies/" + param,
             success : function(data) {
                 var name = data.name;
                 var description = data.description;
@@ -67,7 +67,7 @@ function removeStrategy() {
     if (param != null) {
         $.ajax({
             type : "DELETE",
-            url : "http://localhost:8080/strategies/" + param,
+            url : "/strategies/" + param,
             success : function(data) {
                 $("#strategy-deleted").show();
                 window.setTimeout(function() {
@@ -95,7 +95,7 @@ function addStrategy() {
             "key" : key,
             "value" : value
         }),
-        url : "http://localhost:8080/strategies",
+        url : "/strategies",
         success : function(data) {
             $("#strategy-added").show();
             $('#error-message').hide();
@@ -126,7 +126,7 @@ function updateStrategy() {
             "key" : key,
             "value" : value
         }),
-        url : "http://localhost:8080/strategies/" + name,
+        url : "/strategies/" + name,
         success : function(data) {
             $("#strategy-updated").show();
             $('#error-message').hide();

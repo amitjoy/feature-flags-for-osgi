@@ -5,7 +5,7 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "http://localhost:8080/strategies",
+        url : "/strategies",
         success : function(data) {
             var strategies = data.strategies;
             for (var i = 0; i < strategies.length; i++) {
@@ -20,7 +20,7 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "http://localhost:8080/groups",
+        url : "/groups",
         success : function(data) {
             groups = data.groups;
             for (var i = 0; i < groups.length; i++) {
@@ -29,7 +29,7 @@ $(document).ready(function() {
                 var tag = isEnabled ? "is-success" : "is-danger";
                 var enabled = "<span class='tag " + tag + "'>" + isEnabled + "</span>";
                 var strategy = groups[i].strategy === undefined ? "" : groups[i].strategy;
-                $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + groups[i].name + ">" + groups[i].name + "</a></td><td>" + groups[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
+                $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(groups[i].name) + ">" + groups[i].name + "</a></td><td>" + groups[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
             }
         }
     });
@@ -38,7 +38,7 @@ $(document).ready(function() {
         $.ajax({
             type : "GET",
             dataType : "json",
-            url : "http://localhost:8080/groups/" + param,
+            url : "/groups/" + param,
             success : function(data) {
                 var name = data.name;
                 var description = data.description;
@@ -95,7 +95,7 @@ function removeGroup() {
     if (param != null) {
         $.ajax({
             type : "DELETE",
-            url : "http://localhost:8080/groups/" + param,
+            url : "/groups/" + param,
             success : function(data) {
                 $("#group-deleted").show();
                 window.setTimeout(function() {
@@ -127,7 +127,7 @@ function addGroup() {
     $.ajax({
         type : "POST",
         data : JSON.stringify(data),
-        url : "http://localhost:8080/groups",
+        url : "/groups",
         success : function(data) {
             $('#group-added').show();
             $('#error-message').hide();
@@ -162,7 +162,7 @@ function updateGroup() {
     $.ajax({
         type : "PUT",
         data : JSON.stringify(data),
-        url : "http://localhost:8080/groups/" + name,
+        url : "/groups/" + name,
         success : function(data) {
             $('#group-updated').show();
             $('#error-message').hide();

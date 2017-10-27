@@ -5,7 +5,7 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "http://localhost:8080/groups",
+        url : "/groups",
         success : function(data) {
             var groups = data.groups;
             for (var i = 0; i < groups.length; i++) {
@@ -20,7 +20,7 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "http://localhost:8080/strategies",
+        url : "/strategies",
         success : function(data) {
             var strategies = data.strategies;
             for (var i = 0; i < strategies.length; i++) {
@@ -35,7 +35,7 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "http://localhost:8080/features",
+        url : "/features",
         success : function(data) {
             features = data.features;
             for (var i = 0; i < features.length; i++) {
@@ -45,7 +45,7 @@ $(document).ready(function() {
                 var enabled = "<span class='tag " + tag + "'>" + isEnabled + "</span>";
                 var strategy = features[i].strategy === undefined ? "" : features[i].strategy;
                 var groups = JSON.stringify(features[i].groups);
-                $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + features[i].name + ">" + features[i].name + "</a></td><td>" + features[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
+                $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + features[i].name + ">" + encodeURIComponent(features[i].name) + "</a></td><td>" + features[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
             }
         }
     });
@@ -54,7 +54,7 @@ $(document).ready(function() {
         $.ajax({
             type : "GET",
             dataType : "json",
-            url : "http://localhost:8080/features/" + param,
+            url : "/features/" + param,
             success : function(data) {
                 var name = data.name;
                 var description = data.description;
@@ -112,7 +112,7 @@ function removeFeature() {
     if (param != null) {
         $.ajax({
             type : "DELETE",
-            url : "http://localhost:8080/features/" + param,
+            url : "/features/" + param,
             success : function(data) {
                 $("#feature-deleted").show();
                 window.setTimeout(function() {
@@ -147,7 +147,7 @@ function addFeature() {
     $.ajax({
         type : "POST",
         data : JSON.stringify(data),
-        url : "http://localhost:8080/features",
+        url : "/features",
         success : function(data) {
             $("#feature-added").show();
             $('#error-message').hide();
@@ -185,7 +185,7 @@ function updateFeature() {
     $.ajax({
         type : "PUT",
         data : JSON.stringify(data),
-        url : "http://localhost:8080/features/" + name,
+        url : "/features/" + name,
         success : function(data) {
             $("#feature-updated").show();
             $('#error-message').hide();
