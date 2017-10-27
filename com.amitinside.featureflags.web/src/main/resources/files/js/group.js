@@ -3,6 +3,11 @@ var redirectTimeout = 2000;
 $(document).ready(function() {
     var groups = null;
     var param = getParameterByName("name");
+    $("#name").alphanum({
+        allow :    '-.',
+        allowSpace : false,
+        maxLength : 15
+    });
 
     $.ajax({
         type : "GET",

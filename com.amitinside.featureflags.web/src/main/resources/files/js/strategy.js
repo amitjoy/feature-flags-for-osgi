@@ -3,6 +3,13 @@ var redirectTimeout = 2000;
 $(document).ready(function() {
     var strategies = null;
     var param = getParameterByName("name");
+    $("#name").alphanum({
+        allow :    '-.',
+        allowSpace : false,
+        maxLength : 15
+    });
+    $("#prop_key").alphanum();
+    $("#value").alphanum();
 
     $.ajax({
         type : "GET",

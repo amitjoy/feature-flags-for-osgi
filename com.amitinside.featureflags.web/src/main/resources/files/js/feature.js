@@ -3,6 +3,11 @@ var redirectTimeout = 2000;
 $(document).ready(function() {
     var features = null;
     var param = getParameterByName("name");
+    $("#name").alphanum({
+        allow :    '-.',
+        allowSpace : false,
+        maxLength : 15
+    });
 
     $.ajax({
         type : "GET",
@@ -46,7 +51,7 @@ $(document).ready(function() {
                 var tag = isEnabled ? "is-success" : "is-danger";
                 var enabled = "<span class='tag " + tag + "'>" + isEnabled + "</span>";
                 var strategy = features[i].strategy === undefined ? "" : features[i].strategy;
-                var groups = JSON.stringify(features[i].groups);
+                var groups = features[i].groups === undefined ? "" : features[i].groups.join();
                 $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + features[i].name + ">" + encodeURIComponent(features[i].name) + "</a></td><td>" + features[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
             }
         }
@@ -145,7 +150,7 @@ function addFeature() {
         "properties" : "dummy"
     };
     data.properties = JSON.parse(properties);
-    
+
     if (!name) {
         $("#error-message").show();
         return false;
