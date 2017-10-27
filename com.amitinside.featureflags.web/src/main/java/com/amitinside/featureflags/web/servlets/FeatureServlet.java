@@ -10,8 +10,6 @@
 package com.amitinside.featureflags.web.servlets;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
-import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +34,6 @@ import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.RequestHelper;
 import com.amitinside.featureflags.web.util.RequestHelper.FeatureData;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 @Component(name = "FeatureServlet", immediate = true)
@@ -50,7 +47,6 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
 
     private FeatureService featureService;
     private final Gson gson = new Gson();
-    private final Map<Feature, Map<String, Object>> featureProperties = Maps.newHashMap();
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
@@ -58,7 +54,7 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             //@formatter:off
             final List<FeatureData> data = featureService.getFeatures()
-                                                .map(f -> RequestHelper.mapToFeatureData(f, featureProperties))
+                                                .map(RequestHelper::mapToFeatureData)
                                                 .collect(Collectors.toList());
             //@formatter:on
             final String json = gson.toJson(new DataHolder(data));
@@ -79,7 +75,7 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             final Optional<Feature> feature = featureService.getFeature(uris.get(1));
             //@formatter:off
-            final FeatureData data = feature.map(f -> RequestHelper.mapToFeatureData(f, featureProperties))
+            final FeatureData data = feature.map(RequestHelper::mapToFeatureData)
                                             .orElse(null);
             //@formatter:on
             final String json = gson.toJson(data);
@@ -214,21 +210,6 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
      */
     protected void unsetFeatureService(final FeatureService featureService) {
         this.featureService = null;
-    }
-
-    /**
-     * {@link Feature} service binding callback
-     */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindFeature(final Feature feature, final Map<String, Object> props) {
-        featureProperties.put(feature, props);
-    }
-
-    /**
-     * {@link Feature} service unbinding callback
-     */
-    protected void unbindFeature(final Feature feature, final Map<String, Object> props) {
-        featureProperties.remove(feature);
     }
 
     private static final class DataHolder {

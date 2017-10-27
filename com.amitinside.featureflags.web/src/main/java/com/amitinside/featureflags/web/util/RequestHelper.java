@@ -23,11 +23,18 @@ import java.util.stream.Collectors;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+
 import com.amitinside.featureflags.Constants;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public final class RequestHelper {
 
@@ -73,6 +80,30 @@ public final class RequestHelper {
             }
         }
         return m;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static <S, T> Map<String, Object> getServiceProperties(final S actualServiceInstance,
+            final Class<T> serviceClazz) {
+        requireNonNull(actualServiceInstance, "Service Instance cannot be null");
+        requireNonNull(serviceClazz, "Service Class cannot be null");
+        final BundleContext context = FrameworkUtil.getBundle(RequestHelper.class).getBundleContext();
+        final Map<String, Object> props = Maps.newHashMap();
+        try {
+            final ServiceReference[] references = context.getServiceReferences(serviceClazz.getName(), null);
+            for (final ServiceReference reference : references) {
+                final S s = (S) context.getService(reference);
+                if (s == actualServiceInstance) {
+                    for (final String key : reference.getPropertyKeys()) {
+                        props.put(key, reference.getProperty(key));
+                    }
+                    return props;
+                }
+            }
+        } catch (final InvalidSyntaxException e) {
+            // not required
+        }
+        return ImmutableMap.copyOf(props);
     }
 
     public static List<String> parseFullUrl(final HttpServletRequest request) {
@@ -238,30 +269,29 @@ public final class RequestHelper {
         }
     }
 
-    public static FeatureData mapToFeatureData(final Feature feature,
-            final Map<Feature, Map<String, Object>> featureProperties) {
+    public static FeatureData mapToFeatureData(final Feature feature) {
         final String name = feature.getName();
         final String strategy = feature.getStrategy().orElse(null);
         final String description = feature.getDescription().orElse(null);
         final List<String> groups = feature.getGroups().collect(Collectors.toList());
         final boolean isEnabled = feature.isEnabled();
-        return new FeatureData(name, description, strategy, groups, isEnabled, featureProperties.get(feature));
+        final Map<String, Object> props = getServiceProperties(feature, Feature.class);
+        return new FeatureData(name, description, strategy, groups, isEnabled, props);
     }
 
-    public static GroupData mapToGroupData(final FeatureGroup group,
-            final Map<FeatureGroup, Map<String, Object>> groupProperties) {
+    public static GroupData mapToGroupData(final FeatureGroup group) {
         final String name = group.getName();
         final String strategy = group.getStrategy().orElse(null);
         final String description = group.getDescription().orElse(null);
         final boolean isEnabled = group.isEnabled();
-        return new GroupData(name, description, strategy, isEnabled, groupProperties.get(group));
+        final Map<String, Object> props = getServiceProperties(group, FeatureGroup.class);
+        return new GroupData(name, description, strategy, isEnabled, props);
     }
 
-    public static StrategyData mapToStrategyData(final ActivationStrategy strategy,
-            final Map<ActivationStrategy, Map<String, Object>> strategyProperties) {
+    public static StrategyData mapToStrategyData(final ActivationStrategy strategy) {
         final String name = strategy.getName();
         final String description = strategy.getDescription().orElse(null);
-        final Map<String, Object> props = strategyProperties.get(strategy);
+        final Map<String, Object> props = getServiceProperties(strategy, ActivationStrategy.class);
         String type = null;
         String key = null;
         String value = null;

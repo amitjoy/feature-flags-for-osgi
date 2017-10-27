@@ -11,14 +11,11 @@ package com.amitinside.featureflags.web.servlets;
 
 import static com.amitinside.featureflags.StrategyFactory.StrategyType.*;
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
-import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,11 +32,9 @@ import org.slf4j.LoggerFactory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.StrategyFactory;
 import com.amitinside.featureflags.StrategyFactory.StrategyType;
-import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.RequestHelper;
 import com.amitinside.featureflags.web.util.RequestHelper.StrategyData;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 @Component(name = "StrategyServlet", immediate = true)
@@ -53,7 +48,6 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
 
     private FeatureService featureService;
     private final Gson gson = new Gson();
-    private final Map<ActivationStrategy, Map<String, Object>> strategyProperties = Maps.newHashMap();
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
@@ -61,7 +55,7 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             //@formatter:off
             final List<StrategyData> data = featureService.getStrategies()
-                                                    .map(s -> RequestHelper.mapToStrategyData(s, strategyProperties))
+                                                    .map(RequestHelper::mapToStrategyData)
                                                     .collect(Collectors.toList());
             //@formatter:on
             final String json = gson.toJson(new DataHolder(data));
@@ -82,7 +76,7 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             //@formatter:off
             final StrategyData data = featureService.getStrategy(uris.get(1))
-                                                .map(s -> RequestHelper.mapToStrategyData(s, strategyProperties))
+                                                .map(RequestHelper::mapToStrategyData)
                                                 .orElse(null);
             //@formatter:on
             final String json = gson.toJson(data);
@@ -208,21 +202,6 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
      */
     protected void unsetFeatureService(final FeatureService featureService) {
         this.featureService = null;
-    }
-
-    /**
-     * {@link ActivationStrategy} service binding callback
-     */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
-        strategyProperties.put(strategy, props);
-    }
-
-    /**
-     * {@link ActivationStrategy} service unbinding callback
-     */
-    protected void unbindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
-        strategyProperties.remove(strategy);
     }
 
     private static final class DataHolder {

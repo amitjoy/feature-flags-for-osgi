@@ -10,8 +10,6 @@
 package com.amitinside.featureflags.web.servlets;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
-import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,11 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.Factory;
 import com.amitinside.featureflags.FeatureService;
-import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.RequestHelper;
 import com.amitinside.featureflags.web.util.RequestHelper.GroupData;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 @Component(name = "FeatureGroupServlet", immediate = true)
@@ -51,7 +47,6 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
 
     private FeatureService featureService;
     private final Gson gson = new Gson();
-    private final Map<FeatureGroup, Map<String, Object>> groupProperties = Maps.newHashMap();
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
@@ -59,7 +54,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
         if (uris.size() == 1 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             //@formatter:off
             final List<GroupData> data = featureService.getGroups()
-                                            .map(g -> RequestHelper.mapToGroupData(g, groupProperties))
+                                            .map(RequestHelper::mapToGroupData)
                                             .collect(Collectors.toList());
             //@formatter:on
             final String json = gson.toJson(new DataHolder(data));
@@ -80,7 +75,7 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             //@formatter:off
             final GroupData data = featureService.getGroup(uris.get(1))
-                                        .map(g -> RequestHelper.mapToGroupData(g, groupProperties))
+                                        .map(RequestHelper::mapToGroupData)
                                         .orElse(null);
             //@formatter:on
             final String json = gson.toJson(data);
@@ -216,21 +211,6 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
      */
     protected void unsetFeatureService(final FeatureService featureService) {
         this.featureService = null;
-    }
-
-    /**
-     * {@link FeatureGroup} service binding callback
-     */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
-        groupProperties.put(group, props);
-    }
-
-    /**
-     * {@link FeatureGroup} service unbinding callback
-     */
-    protected void unbindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
-        groupProperties.remove(group);
     }
 
     private static final class DataHolder {

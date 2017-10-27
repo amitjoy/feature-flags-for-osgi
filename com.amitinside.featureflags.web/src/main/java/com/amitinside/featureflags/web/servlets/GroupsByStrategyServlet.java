@@ -10,13 +10,10 @@
 package com.amitinside.featureflags.web.servlets;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
-import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServlet;
@@ -29,11 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.FeatureService;
-import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
 import com.amitinside.featureflags.web.util.RequestHelper;
 import com.amitinside.featureflags.web.util.RequestHelper.GroupData;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 @Component(name = "GroupsByStrategyServlet", immediate = true)
@@ -47,7 +42,6 @@ public final class GroupsByStrategyServlet extends HttpServlet implements Featur
 
     private FeatureService featureService;
     private final Gson gson = new Gson();
-    private final Map<FeatureGroup, Map<String, Object>> groupsProperties = Maps.newHashMap();
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
@@ -55,7 +49,7 @@ public final class GroupsByStrategyServlet extends HttpServlet implements Featur
         if (uris.size() == 2 && uris.get(0).equalsIgnoreCase(ALIAS)) {
             //@formatter:off
             final List<GroupData> data = featureService.getGroupsByStrategy(uris.get(1))
-                                            .map(g -> RequestHelper.mapToGroupData(g, groupsProperties))
+                                            .map(RequestHelper::mapToGroupData)
                                             .collect(Collectors.toList());
             //@formatter:on
             final String json = gson.toJson(new DataHolder(data));
@@ -87,21 +81,6 @@ public final class GroupsByStrategyServlet extends HttpServlet implements Featur
      */
     protected void unsetFeatureService(final FeatureService featureService) {
         this.featureService = null;
-    }
-
-    /**
-     * {@link FeatureGroup} service binding callback
-     */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
-        groupsProperties.put(group, props);
-    }
-
-    /**
-     * {@link FeatureGroup} service unbinding callback
-     */
-    protected void unbindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
-        groupsProperties.remove(group);
     }
 
     private static final class DataHolder {
