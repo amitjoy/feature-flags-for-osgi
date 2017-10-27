@@ -32,7 +32,6 @@ import com.amitinside.featureflags.Constants;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -103,7 +102,7 @@ public final class RequestHelper {
         } catch (final InvalidSyntaxException e) {
             // not required
         }
-        return ImmutableMap.copyOf(props);
+        return props;
     }
 
     public static List<String> parseFullUrl(final HttpServletRequest request) {
@@ -276,7 +275,24 @@ public final class RequestHelper {
         final List<String> groups = feature.getGroups().collect(Collectors.toList());
         final boolean isEnabled = feature.isEnabled();
         final Map<String, Object> props = getServiceProperties(feature, Feature.class);
+        removeProperties(props);
         return new FeatureData(name, description, strategy, groups, isEnabled, props);
+    }
+
+    private static void removeProperties(final Map<String, Object> props) {
+        props.remove("component.id");
+        props.remove("component.name");
+        props.remove("service.id");
+        props.remove("objectClass");
+        props.remove("service.scope");
+        props.remove("service.factoryPid");
+        props.remove("service.bundleid");
+        props.remove("service.pid");
+        props.remove("name");
+        props.remove("description");
+        props.remove("strategy");
+        props.remove("groups");
+        props.remove("enabled");
     }
 
     public static GroupData mapToGroupData(final FeatureGroup group) {
@@ -285,6 +301,7 @@ public final class RequestHelper {
         final String description = group.getDescription().orElse(null);
         final boolean isEnabled = group.isEnabled();
         final Map<String, Object> props = getServiceProperties(group, FeatureGroup.class);
+        removeProperties(props);
         return new GroupData(name, description, strategy, isEnabled, props);
     }
 
