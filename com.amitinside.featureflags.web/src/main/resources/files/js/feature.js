@@ -78,9 +78,8 @@ $(document).ready(function() {
                 $("#properties").val(properties);
                 $("#groups").val(groups);
                 $("#create").text("Update");
-                $("#create").prop("onclick",null).off("click");
+                $("#create").prop("onclick", null).off("click");
                 $("#create").click(function() {
-                    alert('clicked');
                     updateFeature();
                 });
                 $("#delete").show();
@@ -158,5 +157,33 @@ function addFeature() {
 }
 
 function updateFeature() {
-    
+    var name = $("#name").val();
+    var description = $("#description").val();
+    var strategyValue = $("#strategy").val();
+    var strategy = strategyValue === "not_set" ? null : strategyValue;
+    var groupsValue = $("#groups").val();
+    var groups = groupsValue === "not_set" ? null : groupsValue;
+    var propertiesValue = $("#properties").val();
+    var properties = propertiesValue === "" ? null : propertiesValue;
+    var enabled = $("#enabledYes").is(":checked") ? true : false;
+
+    $.ajax({
+        type : "PUT",
+        data : JSON.stringify({
+            "name" : name,
+            "description" : description,
+            "strategy" : strategy,
+            "groups" : groups,
+            "enabled" : enabled,
+            "properties" : properties
+        }),
+        url : "http://localhost:8080/features/" + name,
+        success : function(data) {
+            $("#feature-updated").show();
+            window.setTimeout(function() {
+                var url = "features.html";
+                $(location).attr("href", url);
+            }, 3000);
+        }
+    });
 }

@@ -61,9 +61,8 @@ $(document).ready(function() {
                 $("#properties").val(properties);
                 $("#create").text("Update");
                 $("#delete").show();
-                $("#create").prop("onclick",null).off("click");
+                $("#create").prop("onclick", null).off("click");
                 $("#create").click(function() {
-                    alert('clicked');
                     updateGroup();
                 });
             }
@@ -137,5 +136,30 @@ function addGroup() {
 }
 
 function updateGroup() {
-    
+    var name = $("#name").val();
+    var description = $("#description").val();
+    var strategyValue = $("#strategy").val();
+    var strategy = strategyValue === "not_set" ? null : strategyValue;
+    var propertiesValue = $("#properties").val();
+    var properties = propertiesValue === "" ? null : propertiesValue;
+    var enabled = $("#enabledYes").is(":checked") ? true : false;
+
+    $.ajax({
+        type : "PUT",
+        data : JSON.stringify({
+            "name" : name,
+            "description" : description,
+            "strategy" : strategy,
+            "enabled" : enabled,
+            "properties" : properties
+        }),
+        url : "http://localhost:8080/groups/" + name,
+        success : function(data) {
+            $('#group-updated').show();
+            window.setTimeout(function() {
+                var url = "groups.html";
+                $(location).attr("href", url);
+            }, 3000);
+        }
+    });
 }

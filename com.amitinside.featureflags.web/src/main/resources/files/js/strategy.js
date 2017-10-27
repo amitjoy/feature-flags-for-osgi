@@ -33,9 +33,8 @@ $(document).ready(function() {
                 $("#prop_key").val(key);
                 $("#value").val(value);
                 $("#create").text("Update");
-                $("#create").prop("onclick",null).off("click");
+                $("#create").prop("onclick", null).off("click");
                 $("#create").click(function() {
-                    alert('clicked');
                     updateStrategy();
                 });
                 $("#delete").show();
@@ -108,5 +107,28 @@ function addStrategy() {
 }
 
 function updateStrategy() {
-    
+    var name = $("#name").val();
+    var description = $("#description").val();
+    var type = $("#type").val();
+    var key = $("#prop_key").val();
+    var value = $("#value").val();
+
+    $.ajax({
+        type : "PUT",
+        data : JSON.stringify({
+            "name" : name,
+            "description" : description,
+            "type" : type,
+            "key" : key,
+            "value" : value
+        }),
+        url : "http://localhost:8080/strategies/" + name,
+        success : function(data) {
+            $("#strategy-updated").show();
+            window.setTimeout(function() {
+                var url = "strategies.html";
+                $(location).attr("href", url);
+            }, 3000);
+        }
+    });
 }
