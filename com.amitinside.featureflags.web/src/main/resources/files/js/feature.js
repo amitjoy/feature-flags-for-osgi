@@ -150,14 +150,14 @@ function addFeature() {
         url : "/features",
         success : function(data) {
             $("#feature-added").show();
-            $('#error-message').hide();
+            $("#error-message").hide();
             window.setTimeout(function() {
                 var url = "features.html";
                 $(location).attr("href", url);
             }, 3000);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
-            $('#error-message').show();
+            $("#error-message").show();
         }
     });
 }
@@ -188,14 +188,14 @@ function updateFeature() {
         url : "/features/" + name,
         success : function(data) {
             $("#feature-updated").show();
-            $('#error-message').hide();
+            $("#error-message").hide();
             window.setTimeout(function() {
                 var url = "features.html";
                 $(location).attr("href", url);
             }, 3000);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
-            $('#error-message').show();
+            $("#error-message").show();
         }
     });
 }

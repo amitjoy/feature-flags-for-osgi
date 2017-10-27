@@ -63,7 +63,7 @@ function removeStrategy() {
     if (!result) {
         return;
     }
-    var param = getParameterByName('name');
+    var param = getParameterByName("name");
     if (param != null) {
         $.ajax({
             type : "DELETE",
@@ -98,14 +98,14 @@ function addStrategy() {
         url : "/strategies",
         success : function(data) {
             $("#strategy-added").show();
-            $('#error-message').hide();
+            $("#error-message").hide();
             window.setTimeout(function() {
                 var url = "strategies.html";
                 $(location).attr("href", url);
             }, 3000);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
-            $('#error-message').show();
+            $("#error-message").show();
         }
     });
 }
@@ -129,14 +129,14 @@ function updateStrategy() {
         url : "/strategies/" + name,
         success : function(data) {
             $("#strategy-updated").show();
-            $('#error-message').hide();
+            $("#error-message").hide();
             window.setTimeout(function() {
                 var url = "strategies.html";
                 $(location).attr("href", url);
             }, 3000);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
-            $('#error-message').show();
+            $("#error-message").show();
         }
     });
 }

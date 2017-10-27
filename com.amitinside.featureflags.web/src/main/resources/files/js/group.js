@@ -61,7 +61,7 @@ $(document).ready(function() {
                 $("#properties").val(properties);
                 $("#create").text("Update");
                 $("#delete").show();
-                $('#error-message').hide();
+                $("#error-message").hide();
                 $("#create").prop("onclick", null).off("click");
                 $("#create").click(function() {
                     updateGroup();
@@ -129,15 +129,15 @@ function addGroup() {
         data : JSON.stringify(data),
         url : "/groups",
         success : function(data) {
-            $('#group-added').show();
-            $('#error-message').hide();
+            $("#group-added").show();
+            $("#error-message").hide();
             window.setTimeout(function() {
                 var url = "groups.html";
                 $(location).attr("href", url);
             }, 3000);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
-            $('#error-message').show();
+            $("#error-message").show();
         }
     });
 }
@@ -164,15 +164,15 @@ function updateGroup() {
         data : JSON.stringify(data),
         url : "/groups/" + name,
         success : function(data) {
-            $('#group-updated').show();
-            $('#error-message').hide();
+            $("#group-updated").show();
+            $("#error-message").hide();
             window.setTimeout(function() {
                 var url = "groups.html";
                 $(location).attr("href", url);
             }, 3000);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
-            $('#error-message').show();
+            $("#error-message").show();
         }
     });
 }
