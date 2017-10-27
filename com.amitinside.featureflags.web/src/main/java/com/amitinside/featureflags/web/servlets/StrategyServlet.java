@@ -123,10 +123,10 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
             final String value = json.getValue();
             //@formatter:off
             final StrategyFactory factory = StrategyFactory.make(name, type,
-                                      c -> c.withDescription(desc)
-                                            .withKey(key)
-                                            .withValue(value)
-                                            .build());
+                                                              c -> c.withDescription(desc)
+                                                                    .withKey(key)
+                                                                    .withValue(value)
+                                                                    .build());
             //@formatter:on
             final Optional<String> pid = featureService.createPropertyBasedStrategy(factory);
             if (pid.isPresent()) {
@@ -171,13 +171,24 @@ public final class StrategyServlet extends HttpServlet implements FeatureFlagsSe
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final StrategyData json = gson.fromJson(jsonData, StrategyData.class);
+            StrategyData json = null;
+            try {
+                json = gson.fromJson(jsonData, StrategyData.class);
+            } catch (final Exception e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            final StrategyType type = json.getType().equalsIgnoreCase("system") ? SYSTEM_PROPERTY : SERVICE_PROPERTY;
+            final String desc = json.getDescription();
+            final String key = json.getKey();
+            final String value = json.getValue();
             //@formatter:off
-            final StrategyFactory factory = StrategyFactory.make(uris.get(1), SERVICE_PROPERTY,
-                                      c -> c.withDescription(json.getDescription())
-                                            .withKey(json.getKey())
-                                            .withValue(json.getValue())
-                                            .build());
+            final StrategyFactory factory = StrategyFactory.make(uris.get(1), type,
+                                                              c -> c.withDescription(desc)
+                                                                    .withKey(key)
+                                                                    .withValue(value)
+                                                                    .build());
             //@formatter:on
             final boolean isUpdated = featureService.updatePropertyBasedStrategy(factory);
             if (isUpdated) {

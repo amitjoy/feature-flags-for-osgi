@@ -61,6 +61,7 @@ $(document).ready(function() {
                 $("#properties").val(properties);
                 $("#create").text("Update");
                 $("#delete").show();
+                $('#error-message').hide();
                 $("#create").prop("onclick", null).off("click");
                 $("#create").click(function() {
                     updateGroup();
@@ -114,23 +115,29 @@ function addGroup() {
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
     var enabled = $("#enabledYes").is(":checked") ? true : false;
+    var data = {
+        "name" : name,
+        "description" : description,
+        "strategy" : strategy,
+        "enabled" : enabled,
+        "properties" : "dummy"
+    };
+    data.properties = JSON.parse(properties);
 
     $.ajax({
         type : "POST",
-        data : JSON.stringify({
-            "name" : name,
-            "description" : description,
-            "strategy" : strategy,
-            "enabled" : enabled,
-            "properties" : properties
-        }),
+        data : JSON.stringify(data),
         url : "http://localhost:8080/groups",
         success : function(data) {
             $('#group-added').show();
+            $('#error-message').hide();
             window.setTimeout(function() {
                 var url = "groups.html";
                 $(location).attr("href", url);
             }, 3000);
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown) {
+            $('#error-message').show();
         }
     });
 }
@@ -143,23 +150,29 @@ function updateGroup() {
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
     var enabled = $("#enabledYes").is(":checked") ? true : false;
+    var data = {
+        "name" : name,
+        "description" : description,
+        "strategy" : strategy,
+        "enabled" : enabled,
+        "properties" : "dummy"
+    };
+    data.properties = JSON.parse(properties);
 
     $.ajax({
         type : "PUT",
-        data : JSON.stringify({
-            "name" : name,
-            "description" : description,
-            "strategy" : strategy,
-            "enabled" : enabled,
-            "properties" : properties
-        }),
+        data : JSON.stringify(data),
         url : "http://localhost:8080/groups/" + name,
         success : function(data) {
             $('#group-updated').show();
+            $('#error-message').hide();
             window.setTimeout(function() {
                 var url = "groups.html";
                 $(location).attr("href", url);
             }, 3000);
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown) {
+            $('#error-message').show();
         }
     });
 }

@@ -98,10 +98,14 @@ function addStrategy() {
         url : "http://localhost:8080/strategies",
         success : function(data) {
             $("#strategy-added").show();
+            $('#error-message').hide();
             window.setTimeout(function() {
                 var url = "strategies.html";
                 $(location).attr("href", url);
             }, 3000);
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown) {
+            $('#error-message').show();
         }
     });
 }
@@ -125,10 +129,14 @@ function updateStrategy() {
         url : "http://localhost:8080/strategies/" + name,
         success : function(data) {
             $("#strategy-updated").show();
+            $('#error-message').hide();
             window.setTimeout(function() {
                 var url = "strategies.html";
                 $(location).attr("href", url);
             }, 3000);
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown) {
+            $('#error-message').show();
         }
     });
 }

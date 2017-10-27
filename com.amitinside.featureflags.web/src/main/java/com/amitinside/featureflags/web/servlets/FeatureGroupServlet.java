@@ -168,12 +168,23 @@ public final class FeatureGroupServlet extends HttpServlet implements FeatureFla
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            final GroupData data = gson.fromJson(jsonData, GroupData.class);
+            GroupData json = null;
+            try {
+                json = gson.fromJson(jsonData, GroupData.class);
+            } catch (final Exception e) {
+                logger.error("{}", e.getMessage(), e);
+                resp.setStatus(SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            final String desc = json.getDescription();
+            final String strategy = json.getStrategy();
+            final boolean enabled = json.isEnabled();
+            final Map<String, Object> properties = json.getProperties();
             //@formatter:off
-            final Factory factory = Factory.make(uris.get(1), c -> c.withDescription(data.getDescription())
-                                                                 .withStrategy(data.getStrategy())
-                                                                 .withProperties(data.getProperties())
-                                                                 .withEnabled(data.isEnabled())
+            final Factory factory = Factory.make(uris.get(1), c -> c.withDescription(desc)
+                                                                 .withStrategy(strategy)
+                                                                 .withProperties(properties)
+                                                                 .withEnabled(enabled)
                                                                  .build());
             //@formatter:on
             final boolean isUpdated = featureService.updateGroup(factory);

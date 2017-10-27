@@ -134,24 +134,30 @@ function addFeature() {
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
     var enabled = $("#enabledYes").is(":checked") ? true : false;
+    var data = {
+        "name" : name,
+        "description" : description,
+        "strategy" : strategy,
+        "groups" : groups,
+        "enabled" : enabled,
+        "properties" : "dummy"
+    };
+    data.properties = JSON.parse(properties);
 
     $.ajax({
         type : "POST",
-        data : JSON.stringify({
-            "name" : name,
-            "description" : description,
-            "strategy" : strategy,
-            "groups" : groups,
-            "enabled" : enabled,
-            "properties" : properties
-        }),
+        data : JSON.stringify(data),
         url : "http://localhost:8080/features",
         success : function(data) {
             $("#feature-added").show();
+            $('#error-message').hide();
             window.setTimeout(function() {
                 var url = "features.html";
                 $(location).attr("href", url);
             }, 3000);
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown) {
+            $('#error-message').show();
         }
     });
 }
@@ -166,24 +172,30 @@ function updateFeature() {
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
     var enabled = $("#enabledYes").is(":checked") ? true : false;
+    var data = {
+        "name" : name,
+        "description" : description,
+        "strategy" : strategy,
+        "groups" : groups,
+        "enabled" : enabled,
+        "properties" : "dummy"
+    };
+    data.properties = JSON.parse(properties);
 
     $.ajax({
         type : "PUT",
-        data : JSON.stringify({
-            "name" : name,
-            "description" : description,
-            "strategy" : strategy,
-            "groups" : groups,
-            "enabled" : enabled,
-            "properties" : properties
-        }),
+        data : JSON.stringify(data),
         url : "http://localhost:8080/features/" + name,
         success : function(data) {
             $("#feature-updated").show();
+            $('#error-message').hide();
             window.setTimeout(function() {
                 var url = "features.html";
                 $(location).attr("href", url);
             }, 3000);
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown) {
+            $('#error-message').show();
         }
     });
 }
