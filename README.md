@@ -55,7 +55,7 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 1. Checkout this project
 2. Build using `mvn clean install -Dgpg.skip`
-3. Run packaged Apache Felix OSGi framework. See [How-To](https://github.com/amitjoy/feature-flags-osgi/tree/master/felix-distro)
+3. Run packaged Apache Felix OSGi framework. See [How-To](https://github.com/amitjoy/feature-flags-osgi/wiki/Feature-Flags-Web-Administration)
 4. Install `com.amitinside.featureflags.core` and `com.amitinside.featureflags.web`
 5. Open browser and access `http://localhost:8080/featureflags/page/index.html`
 
