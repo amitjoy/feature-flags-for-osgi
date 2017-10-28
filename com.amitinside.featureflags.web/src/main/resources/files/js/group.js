@@ -6,7 +6,7 @@ $(document).ready(function() {
     $("#name").alphanum({
         allow :    '-.',
         allowSpace : false,
-        maxLength : 15
+        maxLength : 20
     });
 
     $.ajax({

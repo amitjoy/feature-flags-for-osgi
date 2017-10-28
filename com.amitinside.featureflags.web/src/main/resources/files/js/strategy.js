@@ -4,12 +4,20 @@ $(document).ready(function() {
     var strategies = null;
     var param = getParameterByName("name");
     $("#name").alphanum({
-        allow :    '-.',
+        allow : "-.",
         allowSpace : false,
-        maxLength : 15
+        maxLength : 20
     });
-    $("#prop_key").alphanum();
-    $("#value").alphanum();
+    $("#prop_key").alphanum({
+        allow : "+-.?*^$[]|\{}()!", // allowing chars for REGEX
+        allowSpace : false,
+        maxLength : 20
+    });
+    $("#value").alphanum({
+        allow : "+-.?*^$[]|\{}()!", // allowing chars for REGEX
+        allowSpace : false,
+        maxLength : 20
+    });
 
     $.ajax({
         type : "GET",
