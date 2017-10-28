@@ -13,6 +13,8 @@ import static com.amitinside.featureflags.Constants.STRATEGY_SYSTEM_PROPERTY_PID
 import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -20,6 +22,7 @@ import org.osgi.service.component.annotations.Modified;
 
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
+import com.google.common.collect.Maps;
 
 /**
  * This strategy is responsible for checking configured property key and value in the
@@ -48,8 +51,15 @@ public final class SystemPropertyActivationStrategy extends AbstractPropertyActi
         if (key == null || value == null) {
             return false;
         }
-        final String entry = System.getProperty(key);
-        return entry == null ? false : true;
+        final Map<String, String> props = Maps.fromProperties(System.getProperties());
+        for (final Entry<String, String> entry : props.entrySet()) {
+            final String k = entry.getKey();
+            final String v = entry.getValue();
+            if (Pattern.matches(key, k) && Pattern.matches(value, v)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

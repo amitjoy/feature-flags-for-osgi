@@ -13,7 +13,8 @@ import static com.amitinside.featureflags.Constants.STRATEGY_SERVICE_PROPERTY_PI
 import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
 
 import java.util.Map;
-import java.util.Objects;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -51,8 +52,12 @@ public final class ServicePropertyActivationStrategy extends AbstractPropertyAct
         if (key == null || value == null) {
             return false;
         }
-        if (properties.containsKey(key)) {
-            return Objects.equals(properties.get(key), value);
+        for (final Entry<String, Object> entry : properties.entrySet()) {
+            final String k = entry.getKey();
+            final String v = String.valueOf(entry.getValue());
+            if (Pattern.matches(key, k) && Pattern.matches(value, v)) {
+                return true;
+            }
         }
         return false;
     }
