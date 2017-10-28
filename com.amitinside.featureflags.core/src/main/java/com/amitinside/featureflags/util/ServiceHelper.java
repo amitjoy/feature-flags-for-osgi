@@ -14,7 +14,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 
@@ -35,6 +34,7 @@ public final class ServiceHelper {
     /**
      * Returns the specified instance's OSGi service properties
      *
+     * @param context The bundle context instance
      * @param actualServiceInstance The service instance whose service properties will be retrieved.
      * @param serviceClazz The service class to look for in the OSGi service registry.
      * @param filter The filter expression or {@code null} for all services.
@@ -42,11 +42,11 @@ public final class ServiceHelper {
      *
      * @throws NullPointerException if {@code actualServiceInstance} or {@code serviceClazz} is {@code null}
      */
-    public static <S, T> Map<String, Object> getServiceProperties(final S actualServiceInstance,
-            final Class<T> serviceClazz, final String filter) {
+    public static <S, T> Map<String, Object> getServiceProperties(final BundleContext context,
+            final S actualServiceInstance, final Class<T> serviceClazz, final String filter) {
+        requireNonNull(context, "Bundle Context cannot be null");
         requireNonNull(actualServiceInstance, "Service Instance cannot be null");
         requireNonNull(serviceClazz, "Service Class cannot be null");
-        final BundleContext context = FrameworkUtil.getBundle(ServiceHelper.class).getBundleContext();
         final Map<String, Object> props = Maps.newHashMap();
         try {
             final ServiceReference[] references = context.getServiceReferences(serviceClazz.getName(), filter);

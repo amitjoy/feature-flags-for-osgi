@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+
 import com.amitinside.featureflags.Constants;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
@@ -32,6 +35,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public final class RequestHelper {
+
+    private static final BundleContext context = FrameworkUtil.getBundle(RequestHelper.class).getBundleContext();
 
     /** Constructor */
     private RequestHelper() {
@@ -247,7 +252,7 @@ public final class RequestHelper {
         final List<String> groups = feature.getGroups().collect(Collectors.toList());
         final boolean isEnabled = feature.isEnabled();
         final Map<String, Object> props = Maps
-                .newHashMap(ServiceHelper.getServiceProperties(feature, Feature.class, null));
+                .newHashMap(ServiceHelper.getServiceProperties(context, feature, Feature.class, null));
         removeProperties(props);
         return new FeatureData(name, description, strategy, groups, isEnabled, props);
     }
@@ -274,7 +279,7 @@ public final class RequestHelper {
         final String description = group.getDescription().orElse(null);
         final boolean isEnabled = group.isEnabled();
         final Map<String, Object> props = Maps
-                .newHashMap(ServiceHelper.getServiceProperties(group, FeatureGroup.class, null));
+                .newHashMap(ServiceHelper.getServiceProperties(context, group, FeatureGroup.class, null));
         removeProperties(props);
         return new GroupData(name, description, strategy, isEnabled, props);
     }
@@ -283,7 +288,7 @@ public final class RequestHelper {
         final String name = strategy.getName();
         final String description = strategy.getDescription().orElse(null);
         final Map<String, Object> props = Maps
-                .newHashMap(ServiceHelper.getServiceProperties(strategy, ActivationStrategy.class, null));
+                .newHashMap(ServiceHelper.getServiceProperties(context, strategy, ActivationStrategy.class, null));
         String type = null;
         String key = null;
         String value = null;

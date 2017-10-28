@@ -583,11 +583,11 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     private Map<String, Object> getFeatureProperties(final Feature feature) {
-        return ServiceHelper.getServiceProperties(feature, Feature.class, null);
+        return ServiceHelper.getServiceProperties(context, feature, Feature.class, null);
     }
 
     private Map<String, Object> getFeatureGroupProperties(final FeatureGroup group) {
-        return ServiceHelper.getServiceProperties(group, FeatureGroup.class, null);
+        return ServiceHelper.getServiceProperties(context, group, FeatureGroup.class, null);
     }
 
     private boolean deleteConfiguration(final String name, final String pid) {

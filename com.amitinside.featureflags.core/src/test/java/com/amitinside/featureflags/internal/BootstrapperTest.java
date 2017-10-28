@@ -18,6 +18,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,6 +30,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.util.tracker.BundleTracker;
@@ -36,6 +38,7 @@ import org.osgi.util.tracker.BundleTracker;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.storage.StorageService;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Resources;
 
@@ -80,31 +83,31 @@ public final class BootstrapperTest {
     }
 
     @Test
-    public void testBundleTrackerNullCheckOnDeactivate() throws ClassNotFoundException, NoSuchFieldException, SecurityException,
-            IllegalArgumentException, IllegalAccessException {
-        bootstrapper.activate(context); //instantiates tracker
+    public void testBundleTrackerNullCheckOnDeactivate() throws ClassNotFoundException, NoSuchFieldException,
+            SecurityException, IllegalArgumentException, IllegalAccessException {
+        bootstrapper.activate(context); // instantiates tracker
         final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
         final Field trackerField = clazz.getDeclaredField("bundleTracker");
         trackerField.setAccessible(true);
         Object tracker = trackerField.get(bootstrapper);
         assertTrue(tracker != null);
         assertTrue(tracker instanceof BundleTracker);
-        
-        //set tracker to our mock instance
+
+        // set tracker to our mock instance
         trackerField.set(bootstrapper, bundleTracker);
-        
-        //set to null
+
+        // set to null
         trackerField.set(bootstrapper, null);
         tracker = trackerField.get(bootstrapper);
-        
+
         assertTrue(tracker == null);
         bootstrapper.deactivate(context);
         verify(bundleTracker, times(0)).close();
     }
-    
+
     @Test
     public void testBundleTrackerNonNull() throws ClassNotFoundException, NoSuchFieldException, SecurityException,
-    IllegalArgumentException, IllegalAccessException {
+            IllegalArgumentException, IllegalAccessException {
         bootstrapper.activate(context);
         final Class<?> clazz = Class.forName(FeatureBootstrapper.class.getName());
         final Field trackerField = clazz.getDeclaredField("bundleTracker");
@@ -112,7 +115,7 @@ public final class BootstrapperTest {
         Object tracker = trackerField.get(bootstrapper);
         assertTrue(tracker != null);
         assertTrue(tracker instanceof BundleTracker);
-        
+
         bootstrapper.deactivate(context);
         tracker = trackerField.get(bootstrapper);
         assertTrue(tracker == null);
@@ -403,7 +406,7 @@ public final class BootstrapperTest {
     }
 
     @Test
-    public void testConfigListenerForFeatureGroup1() {
+    public void testConfigListenerForFeatureGroup1() throws InvalidSyntaxException {
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
         manager = new FeatureManager();
@@ -412,15 +415,22 @@ public final class BootstrapperTest {
         final StorageService storage = new DefaultStorage();
         bootstrapper.setStorageService(storage);
 
-        doReturn(group).when(context).getService(reference);
-
         final Map<String, Object> props = createServiceProperties(2, 5, "group1");
         manager.bindFeatureGroup(group, props);
         manager.bindConfigurationListener(bootstrapper);
         manager.setConfigurationAdmin(configurationAdmin);
         manager.activate(context);
-        manager.enableGroup("group1");
 
+        doReturn(new ServiceReference[] { reference }).when(context).getServiceReferences(FeatureGroup.class.getName(),
+                null);
+        doReturn(group).when(context).getService(reference);
+        final List<String> propKeys = Lists.newArrayList("service.id", "service.ranking", "service.pid");
+        doReturn(propKeys.toArray(new String[0])).when(reference).getPropertyKeys();
+        doReturn(5).when(reference).getProperty("service.id");
+        doReturn(2).when(reference).getProperty("service.ranking");
+        doReturn("group1").when(reference).getProperty("service.pid");
+
+        manager.enableGroup("group1");
         assertEquals("group1", storage.get("group1").get());
 
         manager.unbindFeatureGroup(group, props);
@@ -431,7 +441,7 @@ public final class BootstrapperTest {
     }
 
     @Test
-    public void testConfigListenerForFeatureGroup2() {
+    public void testConfigListenerForFeatureGroup2() throws InvalidSyntaxException {
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
         manager = new FeatureManager();
@@ -440,13 +450,21 @@ public final class BootstrapperTest {
         final StorageService storage = new DefaultStorage();
         bootstrapper.setStorageService(storage);
 
-        doReturn(group).when(context).getService(reference);
-
         final Map<String, Object> props = createServiceProperties(2, 5, "group1");
         manager.bindFeatureGroup(group, props);
         manager.bindConfigurationListener(bootstrapper);
         manager.setConfigurationAdmin(configurationAdmin);
         manager.activate(context);
+
+        doReturn(new ServiceReference[] { reference }).when(context).getServiceReferences(FeatureGroup.class.getName(),
+                null);
+        doReturn(group).when(context).getService(reference);
+        final List<String> propKeys = Lists.newArrayList("service.id", "service.ranking", "service.pid");
+        doReturn(propKeys.toArray(new String[0])).when(reference).getPropertyKeys();
+        doReturn(5).when(reference).getProperty("service.id");
+        doReturn(2).when(reference).getProperty("service.ranking");
+        doReturn("group1").when(reference).getProperty("service.pid");
+
         manager.enableGroup("group1");
 
         assertEquals("group1", storage.get("group1").get());

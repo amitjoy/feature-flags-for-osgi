@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -26,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 
@@ -264,13 +266,23 @@ public final class FeatureServiceTest {
     }
 
     @Test
-    public void testIsEnabledWhenFeatureDoesNotBelongToGroupButStrategy() {
+    public void testIsEnabledWhenFeatureDoesNotBelongToGroupButStrategy() throws InvalidSyntaxException {
         final Feature feature = createFeature("feature1", "My Feature 1", true, (String) null, "strategy1");
 
         final ActivationStrategy strategy = createStrategy("strategy1", false, "My Strategy 1");
 
         manager.bindFeature(feature, createServiceProperties(2, 5, "pid1"));
         manager.bindStrategy(strategy, createServiceProperties(2, 5, "pid2"));
+        manager.activate(context);
+
+        doReturn(new ServiceReference[] { reference }).when(context).getServiceReferences(Feature.class.getName(),
+                null);
+        doReturn(feature).when(context).getService(reference);
+        final List<String> propKeys = Lists.newArrayList("service.id", "service.ranking", "service.pid");
+        doReturn(propKeys.toArray(new String[0])).when(reference).getPropertyKeys();
+        doReturn(5).when(reference).getProperty("service.id");
+        doReturn(2).when(reference).getProperty("service.ranking");
+        doReturn("pid1").when(reference).getProperty("service.pid");
 
         assertFalse(manager.isFeatureEnabled("feature1"));
     }
@@ -311,7 +323,8 @@ public final class FeatureServiceTest {
     }
 
     @Test
-    public void testIsEnabledWhenFeatureDoesBelongToGroupButNoStrategyButGroupHasAStrategy() {
+    public void testIsEnabledWhenFeatureDoesBelongToGroupButNoStrategyButGroupHasAStrategy()
+            throws InvalidSyntaxException {
         final Feature feature1 = createFeature("feature1", "My Feature 1", false, "group1", null);
         final Feature feature2 = createFeature("feature2", "My Feature 2", false, "group1", null);
 
@@ -322,6 +335,16 @@ public final class FeatureServiceTest {
         manager.bindFeature(feature2, createServiceProperties(2, 5, "pid2"));
         manager.bindFeatureGroup(group, createServiceProperties(2, 5, "pid3"));
         manager.bindStrategy(strategy, createServiceProperties(2, 5, "pid4"));
+        manager.activate(context);
+
+        doReturn(new ServiceReference[] { reference }).when(context).getServiceReferences(FeatureGroup.class.getName(),
+                null);
+        doReturn(group).when(context).getService(reference);
+        final List<String> propKeys = Lists.newArrayList("service.id", "service.ranking", "service.pid");
+        doReturn(propKeys.toArray(new String[0])).when(reference).getPropertyKeys();
+        doReturn(5).when(reference).getProperty("service.id");
+        doReturn(2).when(reference).getProperty("service.ranking");
+        doReturn("pid3").when(reference).getProperty("service.pid");
 
         assertTrue(manager.isFeatureEnabled("feature1"));
         assertTrue(manager.isFeatureEnabled("feature2"));
@@ -716,7 +739,7 @@ public final class FeatureServiceTest {
     }
 
     @Test
-    public void testConfigListenerForFeature() {
+    public void testConfigListenerForFeature() throws InvalidSyntaxException {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         manager = new FeatureManager();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
@@ -732,7 +755,16 @@ public final class FeatureServiceTest {
         };
         manager.bindConfigurationListener(listener);
         manager.activate(context);
+
+        doReturn(new ServiceReference[] { reference }).when(context).getServiceReferences(Feature.class.getName(),
+                null);
         doReturn(feature).when(context).getService(reference);
+        final List<String> propKeys = Lists.newArrayList("service.id", "service.ranking", "service.pid");
+        doReturn(propKeys.toArray(new String[0])).when(reference).getPropertyKeys();
+        doReturn(5).when(reference).getProperty("service.id");
+        doReturn(2).when(reference).getProperty("service.ranking");
+        doReturn("feature1").when(reference).getProperty("service.pid");
+
         manager.enableFeature("feature1");
         manager.unbindConfigurationListener(listener);
         manager.unsetConfigurationAdmin(configurationAdmin);
@@ -741,7 +773,7 @@ public final class FeatureServiceTest {
     }
 
     @Test
-    public void testConfigListenerForFeatureGroup() {
+    public void testConfigListenerForFeatureGroup() throws InvalidSyntaxException {
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
         manager = new FeatureManager();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
@@ -757,7 +789,16 @@ public final class FeatureServiceTest {
         };
         manager.bindConfigurationListener(listener);
         manager.activate(context);
+
+        doReturn(new ServiceReference[] { reference }).when(context).getServiceReferences(FeatureGroup.class.getName(),
+                null);
         doReturn(group).when(context).getService(reference);
+        final List<String> propKeys = Lists.newArrayList("service.id", "service.ranking", "service.pid");
+        doReturn(propKeys.toArray(new String[0])).when(reference).getPropertyKeys();
+        doReturn(5).when(reference).getProperty("service.id");
+        doReturn(2).when(reference).getProperty("service.ranking");
+        doReturn("group1").when(reference).getProperty("service.pid");
+
         manager.enableGroup("group1");
         manager.unbindConfigurationListener(listener);
         manager.unsetConfigurationAdmin(configurationAdmin);
