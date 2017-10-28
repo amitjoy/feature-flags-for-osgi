@@ -4,11 +4,11 @@ $(document).ready(function() {
     var features = null;
     var param = getParameterByName("name");
     $("#name").alphanum({
-        allow :    '-.',
+        allow : '-.',
         allowSpace : false,
         maxLength : 15
     });
-    
+
     $.ajax({
         type : "GET",
         dataType : "json",
@@ -48,8 +48,8 @@ $(document).ready(function() {
             for (var i = 0; i < features.length; i++) {
                 var j = i;
                 var isEnabled = Boolean(features[i].enabled);
-                var tag = isEnabled ? "is-success" : "is-danger";
-                var enabled = "<span class='tag " + tag + "'>" + isEnabled + "</span>";
+                var tag = isEnabled ? "checked" : "";
+                var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
                 var strategy = features[i].strategy === undefined ? "" : features[i].strategy;
                 var groups = features[i].groups === undefined ? "" : features[i].groups.join();
                 $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + features[i].name + ">" + encodeURIComponent(features[i].name) + "</a></td><td>" + features[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
@@ -70,9 +70,7 @@ $(document).ready(function() {
                 var groups = data.groups;
                 var enabled = Boolean(data.enabled);
                 if (enabled) {
-                    $("#enabledYes").prop("checked", true);
-                } else {
-                    $("#enabledNo").prop("checked", true);
+                    $("#enabled").prop("checked", true);
                 }
                 $("#name").val(name);
                 $("#name").prop("disabled", true);
@@ -140,7 +138,7 @@ function addFeature() {
     var groups = groupsValue === "not_set" ? null : groupsValue;
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
-    var enabled = $("#enabledYes").is(":checked") ? true : false;
+    var enabled = $("#enabled").is(":checked") ? true : false;
     var data = {
         "name" : name,
         "description" : description,
@@ -183,7 +181,7 @@ function updateFeature() {
     var groups = groupsValue === "not_set" ? null : groupsValue;
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
-    var enabled = $("#enabledYes").is(":checked") ? true : false;
+    var enabled = $("#enabled").is(":checked") ? true : false;
     var data = {
         "name" : name,
         "description" : description,

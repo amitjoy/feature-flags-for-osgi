@@ -33,8 +33,8 @@ $(document).ready(function() {
             for (var i = 0; i < groups.length; i++) {
                 var j = i;
                 var isEnabled = Boolean(groups[i].enabled);
-                var tag = isEnabled ? "is-success" : "is-danger";
-                var enabled = "<span class='tag " + tag + "'>" + isEnabled + "</span>";
+                var tag = isEnabled ? "checked" : "";
+                var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
                 var strategy = groups[i].strategy === undefined ? "" : groups[i].strategy;
                 $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(groups[i].name) + ">" + groups[i].name + "</a></td><td>" + groups[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
             }
@@ -52,9 +52,7 @@ $(document).ready(function() {
                 var strategy = data.strategy;
                 var enabled = Boolean(data.enabled);
                 if (enabled) {
-                    $("#enabledYes").prop("checked", true);
-                } else {
-                    $("#enabledNo").prop("checked", true);
+                    $("#enabled").prop("checked", true);
                 }
                 var properties = JSON.stringify(data.properties, undefined, 4);
                 $("#name").val(name);
@@ -121,7 +119,7 @@ function addGroup() {
     var strategy = strategyValue === "not_set" ? null : strategyValue;
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
-    var enabled = $("#enabledYes").is(":checked") ? true : false;
+    var enabled = $("#enabled").is(":checked") ? true : false;
     var data = {
         "name" : name,
         "description" : description,
@@ -160,7 +158,7 @@ function updateGroup() {
     var strategy = strategyValue === "not_set" ? null : strategyValue;
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
-    var enabled = $("#enabledYes").is(":checked") ? true : false;
+    var enabled = $("#enabled").is(":checked") ? true : false;
     var data = {
         "name" : name,
         "description" : description,
