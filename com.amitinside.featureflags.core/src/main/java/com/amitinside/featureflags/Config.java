@@ -7,16 +7,16 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.internal;
+package com.amitinside.featureflags;
 
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
 
-import com.amitinside.featureflags.feature.Feature;
-
 /**
- * Represents configuration elements of a {@link Feature} service
+ * This represents configuration elements to be used for instance properties. Not every instance will
+ * require all these properties. This enum aggregates all the predefined service properties to be used
+ * to represent the primary service instances in Feature Flags.
  */
 public enum Config {
 

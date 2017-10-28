@@ -23,15 +23,11 @@ import java.util.stream.Collectors;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-
 import com.amitinside.featureflags.Constants;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
+import com.amitinside.featureflags.util.ServiceHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -79,30 +75,6 @@ public final class RequestHelper {
             }
         }
         return m;
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static <S, T> Map<String, Object> getServiceProperties(final S actualServiceInstance,
-            final Class<T> serviceClazz) {
-        requireNonNull(actualServiceInstance, "Service Instance cannot be null");
-        requireNonNull(serviceClazz, "Service Class cannot be null");
-        final BundleContext context = FrameworkUtil.getBundle(RequestHelper.class).getBundleContext();
-        final Map<String, Object> props = Maps.newHashMap();
-        try {
-            final ServiceReference[] references = context.getServiceReferences(serviceClazz.getName(), null);
-            for (final ServiceReference reference : references) {
-                final S s = (S) context.getService(reference);
-                if (s == actualServiceInstance) {
-                    for (final String key : reference.getPropertyKeys()) {
-                        props.put(key, reference.getProperty(key));
-                    }
-                    return props;
-                }
-            }
-        } catch (final InvalidSyntaxException e) {
-            // not required
-        }
-        return props;
     }
 
     public static List<String> parseFullUrl(final HttpServletRequest request) {
@@ -274,7 +246,8 @@ public final class RequestHelper {
         final String description = feature.getDescription().orElse(null);
         final List<String> groups = feature.getGroups().collect(Collectors.toList());
         final boolean isEnabled = feature.isEnabled();
-        final Map<String, Object> props = getServiceProperties(feature, Feature.class);
+        final Map<String, Object> props = Maps
+                .newHashMap(ServiceHelper.getServiceProperties(feature, Feature.class, null));
         removeProperties(props);
         return new FeatureData(name, description, strategy, groups, isEnabled, props);
     }
@@ -300,7 +273,8 @@ public final class RequestHelper {
         final String strategy = group.getStrategy().orElse(null);
         final String description = group.getDescription().orElse(null);
         final boolean isEnabled = group.isEnabled();
-        final Map<String, Object> props = getServiceProperties(group, FeatureGroup.class);
+        final Map<String, Object> props = Maps
+                .newHashMap(ServiceHelper.getServiceProperties(group, FeatureGroup.class, null));
         removeProperties(props);
         return new GroupData(name, description, strategy, isEnabled, props);
     }
@@ -308,7 +282,8 @@ public final class RequestHelper {
     public static StrategyData mapToStrategyData(final ActivationStrategy strategy) {
         final String name = strategy.getName();
         final String description = strategy.getDescription().orElse(null);
-        final Map<String, Object> props = getServiceProperties(strategy, ActivationStrategy.class);
+        final Map<String, Object> props = Maps
+                .newHashMap(ServiceHelper.getServiceProperties(strategy, ActivationStrategy.class, null));
         String type = null;
         String key = null;
         String value = null;

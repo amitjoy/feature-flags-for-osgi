@@ -15,7 +15,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.amitinside.featureflags.internal.Config;
+import com.amitinside.featureflags.Config;
 import com.google.common.collect.Maps;
 
 /**

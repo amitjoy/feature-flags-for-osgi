@@ -9,10 +9,10 @@
  *******************************************************************************/
 package com.amitinside.featureflags.internal;
 
+import static com.amitinside.featureflags.Config.*;
 import static com.amitinside.featureflags.ConfigurationEvent.Type.*;
 import static com.amitinside.featureflags.Constants.*;
 import static com.amitinside.featureflags.StrategyFactory.StrategyType.SERVICE_PROPERTY;
-import static com.amitinside.featureflags.internal.Config.*;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.framework.Constants.*;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
@@ -50,6 +50,7 @@ import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
+import com.amitinside.featureflags.util.ServiceHelper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
@@ -582,25 +583,11 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     private Map<String, Object> getFeatureProperties(final Feature feature) {
-        //@formatter:off
-        return allFeatures.values().stream()
-                .sorted()
-                .filter(x -> Objects.equals(x.instance, feature))
-                .findFirst()
-                .map(f -> f.props)
-                .orElse(ImmutableMap.of());
-        //@formatter:on
+        return ServiceHelper.getServiceProperties(feature, Feature.class, null);
     }
 
     private Map<String, Object> getFeatureGroupProperties(final FeatureGroup group) {
-        //@formatter:off
-        return allFeatureGroups.values().stream()
-                .sorted()
-                .filter(x -> Objects.equals(x.instance, group))
-                .findFirst()
-                .map(g -> g.props)
-                .orElse(ImmutableMap.of());
-        //@formatter:on
+        return ServiceHelper.getServiceProperties(group, FeatureGroup.class, null);
     }
 
     private boolean deleteConfiguration(final String name, final String pid) {

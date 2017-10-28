@@ -9,7 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.internal;
 
-import static com.amitinside.featureflags.internal.Config.*;
+import static com.amitinside.featureflags.Config.*;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Map;
@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.amitinside.featureflags.Config;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.amitinside.featureflags.util.ConfigHelper;
 import com.google.common.base.Objects;
