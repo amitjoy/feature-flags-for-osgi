@@ -53,6 +53,7 @@
 	<modules>
 		<module>com.amitinside.featureflags.core</module>
 		<module>com.amitinside.featureflags.web</module>
+		<module>com.amitinside.featureflags.example</module>
 	</modules>
 
 	<dependencies>
