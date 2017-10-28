@@ -60,7 +60,7 @@ public final class SystemPropertyStrategyTest {
     }
 
     @Test
-    public void testPropertiesUnAvailability() {
+    public void testPropertiesUnavailability() {
         strategyProperties = Maps.newHashMap();
         strategyProperties.put("name", "strategy1");
         strategyProperties.put("description", "My Strategy");
@@ -74,6 +74,25 @@ public final class SystemPropertyStrategyTest {
         assertEquals(strategy.getDescription().get(), "My Strategy");
 
         assertFalse(strategy.isEnabled(null, null));
+    }
+
+    @Test
+    public void testPropertiesValueUnavailability() {
+        strategyProperties = Maps.newHashMap();
+        strategyProperties.put("name", "strategy1");
+        strategyProperties.put("description", "My Strategy");
+        strategyProperties.put("property_key", "prop");
+        strategyProperties.put("property_value", "val");
+
+        final SystemPropertyActivationStrategy strategy = new SystemPropertyActivationStrategy();
+        strategy.activate(strategyProperties);
+
+        assertEquals(strategy.getName(), "strategy1");
+        assertEquals(strategy.getDescription().get(), "My Strategy");
+
+        System.setProperty("prop", "val1");
+        assertFalse(strategy.isEnabled(null, null));
+        System.clearProperty("prop");
     }
 
     @Test
