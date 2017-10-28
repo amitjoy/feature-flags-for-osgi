@@ -30,7 +30,13 @@ This requires a small number of dependencies to work correctly:
 
 ### Installation
 
-Just install `com.amitinside.featureflags.core` bundle including all the dependencies it requires.
+This project comprises 3 bundles - 
+
+1. `com.amitinside.featureflags.core` - The core feature flags implementation 
+2. `com.amitinside.featureflags.web` - An web administration to easily manage features, groups and strategies
+3. `com.amitinside.featureflags.example` - An example project that shows how to use core feature flags in codebase
+
+You don't require to install all 3 bundles. To use feature flags in OSGi environment, you could only use the core implementation bundle.
 
 ### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/feature-flags-osgi/issues)
 
