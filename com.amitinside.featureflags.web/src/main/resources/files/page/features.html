@@ -13,6 +13,7 @@
 <script src="../js/jquery-3.2.1.min.js"></script>
 <script src="../js/jquery.alphanum.js"></script>
 <script src="../js/feature.js"></script>
+<script src="../js/commons.js"></script>
 
 <link rel="stylesheet" href="../css/bulma.min.css">
 <link rel="stylesheet" href="../fa/css/font-awesome.min.css">
@@ -33,7 +34,7 @@
 						</span>
 						Home
 					</a>
-					<a class="navbar-item is-tab is-hidden-mobile">About</a>
+					<a id="about" class="navbar-item is-tab is-hidden-mobile">About</a>
 
 					<button class="button navbar-burger" data-target="navMenu">
 						<span></span>
@@ -161,7 +162,15 @@
 					</table>
 				</div>
 			</div>
-
+			<div id="about-modal" class="modal">
+				<div class="modal-background"></div>
+				<div class="modal-content">
+					<p class="image is-4by3">
+						<img src="https://bulma.io/images/placeholders/1280x960.png" alt="">
+					</p>
+				</div>
+				<button id="about-modal-close" class="modal-close is-large" aria-label="close"></button>
+			</div>
 			</main>
 		</div>
 	</div>

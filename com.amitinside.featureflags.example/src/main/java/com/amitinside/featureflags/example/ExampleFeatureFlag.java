@@ -100,7 +100,6 @@ public final class ExampleFeatureFlag extends HttpServlet {
             return;
         }
         resp.setStatus(SC_FORBIDDEN);
-        return;
     }
 
 }

@@ -8,7 +8,7 @@ $(document).ready(function() {
         allowSpace : false,
         maxLength : 15
     });
-
+    
     $.ajax({
         type : "GET",
         dataType : "json",
