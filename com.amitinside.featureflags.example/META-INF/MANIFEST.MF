@@ -9,6 +9,7 @@ Bundle-SCM: https://github.com/amitjoy/feature-flags-osgi
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.amitinside.featureflags;version="[1.0,2.0)",
+ com.amitinside.featureflags.annotation;version="[1.0,2.0)",
  javax.servlet;version="[3.1,4)",
  javax.servlet.http;version="[3.1,4)",
  org.osgi.framework;version="[1.5,2)",

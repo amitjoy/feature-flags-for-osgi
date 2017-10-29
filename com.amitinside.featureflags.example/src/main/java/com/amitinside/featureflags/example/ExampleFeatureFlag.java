@@ -28,12 +28,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.annotation.Feature;
 
 @Component(name = "ExampleFeatureFlag", immediate = true)
 public final class ExampleFeatureFlag extends HttpServlet {
 
     private static final long serialVersionUID = 6674752488720831279L;
     private static final String ALIAS = "/exampleflag";
+
+    @Feature
     private static final String FEATURE_ID = "feature.example";
 
     /** Logger Instance */
