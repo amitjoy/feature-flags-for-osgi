@@ -167,7 +167,7 @@ valid strategy has been associated to a feature group, the strategy will be used
 
 The following flowchart shows the control flow for the determination of feature enablement:
 
-![feature-flags](https://user-images.githubusercontent.com/13380182/31776356-9862ac2e-b4eb-11e7-89f5-fad75d49eb53.png)
+![feature-flags](https://user-images.githubusercontent.com/13380182/32149859-65ab9eda-bd0b-11e7-9d63-c332c676f4d5.jpg)
 
 **Strategies Included**:
 
