@@ -137,10 +137,14 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 5. In your DS Component, use `FeatureService` to check if the feature is enabled
 
 ```java
+
+@Feature
+private static final String MY_FEATURE = "feature2";
+
 private FeatureService featureService;
 
 public void myMethod() {
-   if (featureService.isFeatureEnabled("feature2")) {
+   if (featureService.isFeatureEnabled(MY_FEATURE)) {
          // do this
    } else {
          // do something else
