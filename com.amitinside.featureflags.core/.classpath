@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="src/test/resources"/>
 	<classpathentry kind="lib" path="testlibs/junit-4.12.jar"/>
 	<classpathentry kind="lib" path="testlibs/mockito-core-2.10.0.jar"/>
+	<classpathentry kind="lib" path="testlibs/compile-testing-0.12.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
