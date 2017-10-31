@@ -11,6 +11,7 @@ package com.amitinside.featureflags.util;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
@@ -18,6 +19,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -47,11 +49,13 @@ public final class ServiceHelper {
         requireNonNull(context, "Bundle Context cannot be null");
         requireNonNull(actualServiceInstance, "Service Instance cannot be null");
         requireNonNull(serviceClazz, "Service Class cannot be null");
+        final List<ServiceReference> refs = Lists.newArrayList();
         final Map<String, Object> props = Maps.newHashMap();
         try {
             final ServiceReference[] references = context.getServiceReferences(serviceClazz.getName(), filter);
             for (final ServiceReference reference : references) {
                 final S s = (S) context.getService(reference);
+                refs.add(reference);
                 if (s == actualServiceInstance) {
                     for (final String key : reference.getPropertyKeys()) {
                         props.put(key, reference.getProperty(key));
@@ -59,8 +63,10 @@ public final class ServiceHelper {
                     return props;
                 }
             }
-        } catch (final InvalidSyntaxException e) {
+        } catch (final InvalidSyntaxException | IllegalStateException e) {
             // not required
+        } finally {
+            refs.forEach(context::ungetService);
         }
         return ImmutableMap.copyOf(props);
     }
