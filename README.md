@@ -18,13 +18,18 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/retriable.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-osgi/)
 
+## Requirements
+
+1. Java 8+
+2. OSGi R4+
+
 ### Dependencies
 
 The project does also use few open source libraries that are listed below.
 
-1. SLF4J 1.7.2 (MIT)
-2. Google Guava 15 (Apache 2.0)
-3. GSON 2.2.5 (Apache 2.0)
+1. SLF4J 1.7.2+ (MIT)
+2. Google Guava 15+ (Apache 2.0)
+3. GSON 2.2.5+ (Apache 2.0)
 
 As Test Dependencies, it uses the following test libraries:
 
