@@ -120,7 +120,7 @@ function addFeature() {
     var strategyValue = $("#strategy").val();
     var strategy = strategyValue === "not_set" ? null : strategyValue;
     var groupsValue = $("#groups").val();
-    var groups = groupsValue === "not_set" ? null : groupsValue;
+    var groups = groupsValue[0] === "not_set" ? null : groupsValue;
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
     var enabled = $("#enabled").is(":checked") ? true : false;
@@ -163,7 +163,7 @@ function updateFeature() {
     var strategyValue = $("#strategy").val();
     var strategy = strategyValue === "not_set" ? null : strategyValue;
     var groupsValue = $("#groups").val();
-    var groups = groupsValue === "not_set" ? null : groupsValue;
+    var groups = groupsValue[0] === "not_set" ? null : groupsValue;
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
     var enabled = $("#enabled").is(":checked") ? true : false;
