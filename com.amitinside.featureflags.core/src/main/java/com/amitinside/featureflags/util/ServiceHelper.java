@@ -42,7 +42,8 @@ public final class ServiceHelper {
      * @param filter The filter expression or {@code null} for all services.
      * @return the service properties or empty {@link Map} instance (immutable view)
      *
-     * @throws NullPointerException if {@code actualServiceInstance} or {@code serviceClazz} is {@code null}
+     * @throws NullPointerException if {@code context} or {@code actualServiceInstance} or
+     *             {@code serviceClazz} is {@code null}
      */
     public static <S, T> Map<String, Object> getServiceProperties(final BundleContext context,
             final S actualServiceInstance, final Class<T> serviceClazz, final String filter) {
