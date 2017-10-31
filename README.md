@@ -20,13 +20,17 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 ### Dependencies
 
-This requires a small number of dependencies to work correctly:
+The project does also use few open source libraries that are listed below.
 
-* Java 8+
-* OSGi R4+
-* SLF4J 1.7.2+
-* Google Guava 15+
-* GSON 2.2.5+
+1. SLF4J 1.7.2 (MIT)
+2. Google Guava 15 (Apache 2.0)
+3. GSON 2.2.5 (Apache 2.0)
+
+As Test Dependencies, it uses the following test libraries:
+
+1. JUnit 4.12 (EPL 1.0)
+2. Google Compile Testing 0.12 (Apache 2.0)
+3. Mockito Core 2.10 (MIT)
 
 ### Installation
 
@@ -133,10 +137,14 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 5. In your DS Component, use `FeatureService` to check if the feature is enabled
 
 ```java
+
+@Feature
+private static final String MY_FEATURE = "feature2";
+
 private FeatureService featureService;
 
 public void myMethod() {
-   if (featureService.isFeatureEnabled("feature2")) {
+   if (featureService.isFeatureEnabled(MY_FEATURE)) {
          // do this
    } else {
          // do something else
