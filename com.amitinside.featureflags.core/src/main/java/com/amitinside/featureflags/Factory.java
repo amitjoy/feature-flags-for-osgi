@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableMap;
  *                                                           .withEnabled(false)
  *                                                           .build());
  *                                                           
- * final Factory featureFactory = Factory.make("group1", c -> c.withDescription("My Group 1")
+ * final Factory featureFactory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
  *                                                             .withStrategy("strategy1")
  *                                                             .withGroups(Lists.newArrayList("group1"))
  *                                                             .withProperties(props)

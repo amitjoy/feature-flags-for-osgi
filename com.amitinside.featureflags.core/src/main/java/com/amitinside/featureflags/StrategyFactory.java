@@ -25,7 +25,7 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
  *
  * <pre>
  * final StrategyFactory factory = StrategyFactory.make("SystemStrategy", StrategyType.SERVICE_PROPERTY, 
- *                                                              c -> c.withDescription("My Group 1")
+ *                                                              c -> c.withDescription("My Strategy 1")
  *                                                                    .withKey("propKey")
  *                                                                    .withValue("propValue")
  *                                                                    .build());
