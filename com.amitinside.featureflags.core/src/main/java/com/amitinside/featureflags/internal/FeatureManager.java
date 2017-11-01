@@ -42,9 +42,9 @@ import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
-import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.Strategizable;
+import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.StrategyFactory;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
@@ -281,22 +281,46 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     @Override
     public boolean removeFeature(final String name) {
         requireNonNull(name, "Feature name cannot be null");
-        final String pid = getFeaturePID(name);
-        return deleteConfiguration(name, pid);
+        //@formatter:off
+        allFeatures.values().stream()
+                            .sorted()
+                            .filter(x -> x.instance.getName().equalsIgnoreCase(name))
+                            .map(f -> f.props)
+                            .map(m -> m.get(SERVICE_PID))
+                            .map(String.class::cast)
+                            .forEach(p -> deleteConfiguration(name, p));
+        //@formatter:on
+        return true;
     }
 
     @Override
     public boolean removeGroup(final String name) {
         requireNonNull(name, "Feature Group name cannot be null");
-        final String pid = getGroupPID(name);
-        return deleteConfiguration(name, pid);
+        //@formatter:off
+        allFeatureGroups.values().stream()
+                                 .sorted()
+                                 .filter(x -> x.instance.getName().equalsIgnoreCase(name))
+                                 .map(f -> f.props)
+                                 .map(m -> m.get(SERVICE_PID))
+                                 .map(String.class::cast)
+                                 .forEach(p -> deleteConfiguration(name, p));
+        //@formatter:on
+        return true;
     }
 
     @Override
     public boolean removePropertyBasedStrategy(final String name) {
         requireNonNull(name, "Strategy name cannot be null");
-        final String pid = getStrategyPID(name);
-        return deleteConfiguration(name, pid);
+        //@formatter:off
+        allStrategies.values().stream()
+                              .sorted()
+                              .filter(x -> x.instance.getName().equalsIgnoreCase(name))
+                              .map(f -> f.props)
+                              .map(m -> m.get(SERVICE_PID))
+                              .map(String.class::cast)
+                              .forEach(p -> deleteConfiguration(name, p));
+        //@formatter:on
+        return true;
     }
 
     /**
