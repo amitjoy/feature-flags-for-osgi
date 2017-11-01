@@ -11,13 +11,13 @@ package com.amitinside.featureflags.internal;
 
 import org.junit.Test;
 
-import com.amitinside.featureflags.Factory;
+import com.amitinside.featureflags.StrategizableFactory;
 
 public final class FactoryTest {
 
     @Test(expected = NullPointerException.class)
     public void testNullFunction() {
-        Factory.make("dummy", null);
+        StrategizableFactory.make("dummy", null);
     }
 
 }

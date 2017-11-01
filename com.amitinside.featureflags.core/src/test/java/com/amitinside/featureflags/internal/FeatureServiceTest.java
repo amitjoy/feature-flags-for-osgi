@@ -33,7 +33,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
-import com.amitinside.featureflags.Factory;
+import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.StrategyFactory;
 import com.amitinside.featureflags.StrategyFactory.StrategyType;
@@ -532,7 +532,7 @@ public final class FeatureServiceTest {
     @Test(expected = NullPointerException.class)
     public void testNullArgumentCreateFeature2() throws IOException {
         //@formatter:off
-        final Factory factory = Factory.make(null, c -> c.withDescription("")
+        final StrategizableFactory factory = StrategizableFactory.make(null, c -> c.withDescription("")
                                                          .withStrategy("")
                                                          .withGroups(Lists.newArrayList())
                                                          .withProperties(Maps.newHashMap())
@@ -550,7 +550,7 @@ public final class FeatureServiceTest {
     @Test(expected = NullPointerException.class)
     public void testNullArgumentUpdateFeature2() throws IOException {
         //@formatter:off
-        final Factory factory = Factory.make(null, c -> c.withDescription("")
+        final StrategizableFactory factory = StrategizableFactory.make(null, c -> c.withDescription("")
                                                          .withStrategy("")
                                                          .withGroups(Lists.newArrayList())
                                                          .withProperties(Maps.newHashMap())
@@ -568,7 +568,7 @@ public final class FeatureServiceTest {
     @Test(expected = NullPointerException.class)
     public void testNullArgumentUpdateFeatureGroup2() throws IOException {
         //@formatter:off
-        final Factory factory = Factory.make(null, c -> c.withDescription("")
+        final StrategizableFactory factory = StrategizableFactory.make(null, c -> c.withDescription("")
                                                          .withStrategy("")
                                                          .withProperties(Maps.newHashMap())
                                                          .withEnabled(false)
@@ -585,7 +585,7 @@ public final class FeatureServiceTest {
     @Test(expected = NullPointerException.class)
     public void testNullArgumentCreateFeatureGroup2() throws IOException {
         //@formatter:off
-        final Factory factory = Factory.make(null, c -> c.withDescription("")
+        final StrategizableFactory factory = StrategizableFactory.make(null, c -> c.withDescription("")
                                                          .withStrategy("")
                                                          .withProperties(Maps.newHashMap())
                                                          .withEnabled(false)
@@ -898,7 +898,7 @@ public final class FeatureServiceTest {
         props.put("p", "test");
 
         //@formatter:off
-        final Factory factory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
+        final StrategizableFactory factory = StrategizableFactory.make("feature1", c -> c.withDescription("My Feature 1")
                                                                .withStrategy("strategy1")
                                                                .withGroups(Lists.newArrayList("group1"))
                                                                .withProperties(props)
@@ -918,7 +918,7 @@ public final class FeatureServiceTest {
         doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_FACTORY_PID);
 
         //@formatter:off
-        final Factory factory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
+        final StrategizableFactory factory = StrategizableFactory.make("feature1", c -> c.withDescription("My Feature 1")
                                                                .withStrategy("strategy1")
                                                                .withGroups(Lists.newArrayList("group1"))
                                                                .withProperties(props)
@@ -940,7 +940,7 @@ public final class FeatureServiceTest {
         props.put("p", "test");
 
         //@formatter:off
-        final Factory factory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
+        final StrategizableFactory factory = StrategizableFactory.make("feature1", c -> c.withDescription("My Feature 1")
                                                                .withStrategy("strategy1")
                                                                .withGroups(Lists.newArrayList("group1"))
                                                                .withProperties(props)
@@ -964,7 +964,7 @@ public final class FeatureServiceTest {
         doThrow(IOException.class).when(configurationAdmin).getConfiguration("myPid");
 
         //@formatter:off
-        final Factory factory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
+        final StrategizableFactory factory = StrategizableFactory.make("feature1", c -> c.withDescription("My Feature 1")
                                                                .withStrategy("strategy1")
                                                                .withGroups(Lists.newArrayList("group1"))
                                                                .withProperties(props)
@@ -988,7 +988,7 @@ public final class FeatureServiceTest {
         doReturn(null).when(configurationAdmin).getConfiguration("myPid");
 
         //@formatter:off
-        final Factory factory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
+        final StrategizableFactory factory = StrategizableFactory.make("feature1", c -> c.withDescription("My Feature 1")
                 .withStrategy("strategy1")
                 .withGroups(Lists.newArrayList("group1"))
                 .withProperties(props)
@@ -1010,7 +1010,7 @@ public final class FeatureServiceTest {
         props.put("p", "test");
 
         //@formatter:off
-        final Factory factory = Factory.make("group1", c -> c.withDescription("My Group 1")
+        final StrategizableFactory factory = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
                                                              .withStrategy("strategy1")
                                                              .withProperties(props)
                                                              .withEnabled(false)
@@ -1029,7 +1029,7 @@ public final class FeatureServiceTest {
         doThrow(IOException.class).when(configurationAdmin).createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
 
         //@formatter:off
-        final Factory factory = Factory.make("group1", c -> c.withDescription("My Group 1")
+        final StrategizableFactory factory = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
                                                              .withStrategy("strategy1")
                                                              .withProperties(props)
                                                              .withEnabled(false)
@@ -1050,7 +1050,7 @@ public final class FeatureServiceTest {
         props.put("p", "test");
 
         //@formatter:off
-        final Factory factory = Factory.make("group1", c -> c.withDescription("My Group 1")
+        final StrategizableFactory factory = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
                                                              .withStrategy("strategy1")
                                                              .withProperties(props)
                                                              .withEnabled(false)
@@ -1073,7 +1073,7 @@ public final class FeatureServiceTest {
         doThrow(IOException.class).when(configurationAdmin).getConfiguration("myPid");
 
         //@formatter:off
-        final Factory factory = Factory.make("group1", c -> c.withDescription("My Group 1")
+        final StrategizableFactory factory = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
                                                              .withStrategy("strategy1")
                                                              .withProperties(props)
                                                              .withEnabled(false)
@@ -1096,7 +1096,7 @@ public final class FeatureServiceTest {
         doReturn(null).when(configurationAdmin).getConfiguration("myPid");
 
         //@formatter:off
-        final Factory factory = Factory.make("group1", c -> c.withDescription("My Group 1")
+        final StrategizableFactory factory = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
                 .withStrategy("strategy1")
                 .withProperties(props)
                 .withEnabled(false)

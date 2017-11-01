@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amitinside.featureflags.Factory;
+import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.web.FeatureFlagsServlet;
@@ -120,7 +120,7 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
             final Map<String, Object> properties = json.getProperties();
             final boolean enabled = json.isEnabled();
             //@formatter:off
-            final Factory factory = Factory.make(json.getName(), c -> c.withDescription(description)
+            final StrategizableFactory factory = StrategizableFactory.make(json.getName(), c -> c.withDescription(description)
                                                                  .withStrategy(strategy)
                                                                  .withGroups(groups)
                                                                  .withProperties(properties)
@@ -179,7 +179,7 @@ public final class FeatureServlet extends HttpServlet implements FeatureFlagsSer
             final Map<String, Object> properties = json.getProperties();
             final boolean enabled = json.isEnabled();
             //@formatter:off
-            final Factory factory = Factory.make(uris.get(1), c -> c.withDescription(description)
+            final StrategizableFactory factory = StrategizableFactory.make(uris.get(1), c -> c.withDescription(description)
                                                                  .withStrategy(strategy)
                                                                  .withGroups(groups)
                                                                  .withProperties(properties)

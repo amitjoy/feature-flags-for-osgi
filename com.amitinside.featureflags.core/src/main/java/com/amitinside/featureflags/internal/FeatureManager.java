@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
-import com.amitinside.featureflags.Factory;
+import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.StrategyFactory;
@@ -173,7 +173,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
-    public Optional<String> createFeature(final Factory featureFactory) {
+    public Optional<String> createFeature(final StrategizableFactory featureFactory) {
         requireNonNull(featureFactory, "Feature factory cannot be null");
         final List<String> groups = featureFactory.getGroups();
         final Map<String, Object> props = extractData(featureFactory);
@@ -189,7 +189,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
-    public Optional<String> createGroup(final Factory groupFactory) {
+    public Optional<String> createGroup(final StrategizableFactory groupFactory) {
         requireNonNull(groupFactory, "Group factory cannot be null");
         final Map<String, Object> props = extractData(groupFactory);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
@@ -220,7 +220,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
-    public boolean updateFeature(final Factory featureFactory) {
+    public boolean updateFeature(final StrategizableFactory featureFactory) {
         requireNonNull(featureFactory, "Feature factory cannot be null");
         final List<String> groups = featureFactory.getGroups();
         final Map<String, Object> props = extractData(featureFactory);
@@ -241,7 +241,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
-    public boolean updateGroup(final Factory groupFactory) {
+    public boolean updateGroup(final StrategizableFactory groupFactory) {
         requireNonNull(groupFactory, "Group factory cannot be null");
         final Map<String, Object> props = extractData(groupFactory);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
@@ -517,7 +517,7 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         return false;
     }
 
-    private Map<String, Object> extractData(final Factory factory) {
+    private Map<String, Object> extractData(final StrategizableFactory factory) {
         final String name = factory.getName();
         final String description = factory.getDescription().orElse(null);
         final String strategy = factory.getStrategy().orElse(null);

@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.ConfigurationEvent;
-import com.amitinside.featureflags.Factory;
+import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.FeatureService;
 import com.amitinside.featureflags.listener.ConfigurationListener;
 import com.amitinside.featureflags.storage.StorageService;
@@ -244,7 +244,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
             return Optional.empty();
         }
         //@formatter:off
-        final Factory factory = Factory.make(name, c -> c.withDescription(feature.getDescription())
+        final StrategizableFactory factory = StrategizableFactory.make(name, c -> c.withDescription(feature.getDescription())
                                                          .withStrategy(feature.getStrategy())
                                                          .withGroups(feature.getGroups())
                                                          .withProperties(feature.getProperties())
@@ -268,7 +268,7 @@ public final class FeatureBootstrapper implements BundleTrackerCustomizer, Confi
             return Optional.empty();
         }
         //@formatter:off
-        final Factory factory = Factory.make(name, c -> c.withDescription(group.getDescription())
+        final StrategizableFactory factory = StrategizableFactory.make(name, c -> c.withDescription(group.getDescription())
                                                         .withStrategy(group.getStrategy())
                                                         .withProperties(group.getProperties())
                                                         .withEnabled(group.isEnabled())

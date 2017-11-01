@@ -22,23 +22,23 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * Factory is used to create configuration factories for {@link Feature} or {@link FeatureGroup}.
+ * {@link StrategizableFactory} is used to create configuration factories for {@link Feature} or {@link FeatureGroup}.
  * This is primarily used by {@link FeatureService} to create {@link Feature} and {@link FeatureGroup}
  * configuration instances.
  *
  * <pre>
- * final Factory groupFactory = Factory.make("group1", c -> c.withDescription("My Group 1")
- *                                                           .withStrategy("strategy1")
- *                                                           .withProperties(props)
- *                                                           .withEnabled(false)
- *                                                           .build());
+ * final StrategizableFactory groupFactory = StrategizableFactory.make("group1", g -> g.withDescription("My Group 1")
+ *                                                               .withStrategy("strategy1")
+ *                                                               .withProperties(props)
+ *                                                               .withEnabled(false)
+ *                                                               .build());
  *                                                           
- * final Factory featureFactory = Factory.make("feature1", c -> c.withDescription("My Feature 1")
- *                                                             .withStrategy("strategy1")
- *                                                             .withGroups(Lists.newArrayList("group1"))
- *                                                             .withProperties(props)
- *                                                             .withEnabled(false)
- *                                                             .build());
+ * final StrategizableFactory featureFactory = StrategizableFactory.make("feature1", f -> f.withDescription("My Feature 1")
+ *                                                                 .withStrategy("strategy1")
+ *                                                                 .withGroups(Lists.newArrayList("group1"))
+ *                                                                 .withProperties(props)
+ *                                                                 .withEnabled(false)
+ *                                                                 .build());
  * </pre>
  *
  * @noimplement This interface is not intended to be implemented by feature providers.
@@ -51,7 +51,7 @@ import com.google.common.collect.ImmutableMap;
  * @ThreadSafe
  * @Immutable
  */
-public class Factory {
+public class StrategizableFactory {
 
     private final String name;
     private final String description;
@@ -68,7 +68,7 @@ public class Factory {
      * @throws NullPointerException NullPointerException if the {@link Builder}
      *             or specified {@code name} is {@code null}
      */
-    private Factory(final Builder builder) {
+    private StrategizableFactory(final Builder builder) {
         requireNonNull(builder, "Builder cannot be null");
         name = requireNonNull(builder.name, "Name cannot be null");
         description = builder.description;
@@ -116,8 +116,8 @@ public class Factory {
         }
 
         @Override
-        public Factory create() {
-            return new Factory(this);
+        public StrategizableFactory create() {
+            return new StrategizableFactory(this);
         }
 
         @Override
@@ -170,13 +170,13 @@ public class Factory {
     }
 
     /**
-     * Creates a {@link Factory} instance
+     * Creates a {@link StrategizableFactory} instance
      *
      * @param name the name of the instance
      * @param configuration the function representing the instance configuration
-     * @return the {@link Factory} instance
+     * @return the {@link StrategizableFactory} instance
      */
-    public static Factory make(final String name,
+    public static StrategizableFactory make(final String name,
             final Function<BuilderWithDescription, FactoryFinalizationStep> configuration) {
         requireNonNull(configuration, "Function cannot be null");
         return configuration.andThen(FactoryFinalizationStep::create).apply(new Builder(name));
@@ -218,7 +218,7 @@ public class Factory {
     }
 
     public static interface FactoryFinalizationStep {
-        public Factory create();
+        public StrategizableFactory create();
     }
 
 }

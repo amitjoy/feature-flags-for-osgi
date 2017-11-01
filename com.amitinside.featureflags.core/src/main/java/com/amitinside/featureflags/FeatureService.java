@@ -119,7 +119,7 @@ public interface FeatureService {
      * @throws NullPointerException if the specified argument {@code featureFactory} is {@code null}
      *             or the factory has been configured with a {@code null} name
      */
-    Optional<String> createFeature(Factory featureFactory);
+    Optional<String> createFeature(StrategizableFactory featureFactory);
 
     /**
      * Creates a group with the provided configuration.
@@ -131,7 +131,7 @@ public interface FeatureService {
      * @throws NullPointerException if the specified argument {@code groupFactory} is {@code null}
      *             or the factory has been configured with a {@code null} name
      */
-    Optional<String> createGroup(Factory groupFactory);
+    Optional<String> createGroup(StrategizableFactory groupFactory);
 
     /**
      * Creates a property based strategy.
@@ -192,7 +192,7 @@ public interface FeatureService {
      * @throws NullPointerException if the specified argument {@code featureFactory} is {@code null}
      *             or the factory has been configured with a {@code null} name
      */
-    boolean updateFeature(Factory featureFactory);
+    boolean updateFeature(StrategizableFactory featureFactory);
 
     /**
      * Updates a group with the provided configuration.
@@ -205,7 +205,7 @@ public interface FeatureService {
      * @throws NullPointerException if the specified argument {@code groupFactory} is {@code null}
      *             or the factory has been configured with a {@code null} name
      */
-    boolean updateGroup(Factory groupFactory);
+    boolean updateGroup(StrategizableFactory groupFactory);
 
     /**
      * Updates a property based strategy.

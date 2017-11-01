@@ -77,7 +77,7 @@ public interface Strategizable {
      *            The type into which the strategizable instance should be converted
      * @return the converted instance of the requested type.
      *
-     * @throws NullPointerException if the speicifed {@code type} is null
+     * @throws NullPointerException if the specified {@code type} is null
      * @throws IllegalArgumentException if the strategizable instance cannot be converted to
      *             the specified type
      */
