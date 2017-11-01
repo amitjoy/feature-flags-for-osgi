@@ -24,11 +24,11 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
  * {@code ServicePropertyActivationStrategy} configuration instances.
  *
  * <pre>
- * final StrategyFactory factory = StrategyFactory.make("SystemStrategy", StrategyType.SERVICE_PROPERTY, 
- *                                                              c -> c.withDescription("My Strategy 1")
- *                                                                    .withKey("propKey")
- *                                                                    .withValue("propValue")
- *                                                                    .build());
+ * final StrategyFactory factory = StrategyFactory.make("MyServiceStrategy", StrategyType.SERVICE_PROPERTY, 
+ *                                                                   s -> s.withDescription("My Strategy 1")
+ *                                                                         .withKey("propKey")
+ *                                                                         .withValue("propValue")
+ *                                                                         .build());
  * </pre>
  *
  * @noimplement This interface is not intended to be implemented by feature providers.
