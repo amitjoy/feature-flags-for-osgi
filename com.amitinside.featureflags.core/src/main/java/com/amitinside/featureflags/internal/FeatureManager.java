@@ -447,9 +447,9 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     private ConfigurationEvent getEvent(final Strategizable instance, final int type) {
         Map<String, Object> properties = ImmutableMap.of();
         if (instance instanceof Feature) {
-            properties = getFeatureProperties((Feature) instance);
+            properties = getFeatureProperties(instance.asInstanceOf(Feature.class));
         } else if (instance instanceof FeatureGroup) {
-            properties = getFeatureGroupProperties((FeatureGroup) instance);
+            properties = getFeatureGroupProperties(instance.asInstanceOf(FeatureGroup.class));
         }
         final Type eventType = type == 1 ? UPDATED : DELETED;
         return new ConfigurationEvent(eventType, instance, properties);

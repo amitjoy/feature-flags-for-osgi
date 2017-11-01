@@ -9,6 +9,8 @@
  *******************************************************************************/
 package com.amitinside.featureflags;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 
 import com.amitinside.featureflags.feature.Feature;
@@ -65,4 +67,26 @@ public interface Strategizable {
      * @return {@code true} if this {@code Strategizable} is enabled in its configuration
      */
     boolean isEnabled();
+
+    /**
+     * Returns strategizable instance as the specified type.
+     *
+     * @param <T>
+     *            the type to represent
+     * @param type
+     *            The type into which the strategizable instance should be converted
+     * @return the converted instance of the requested type.
+     *
+     * @throws NullPointerException if the speicifed {@code type} is null
+     * @throws IllegalArgumentException if the strategizable instance cannot be converted to
+     *             the specified type
+     */
+    default <T extends Strategizable> T asInstanceOf(final Class<T> type) {
+        requireNonNull(type, "Class instance cannot be null");
+        try {
+            return type.cast(this);
+        } catch (final ClassCastException ex) {
+            throw new IllegalArgumentException(String.format("Instance cannot be converted to %s", type.toString()));
+        }
+    }
 }
