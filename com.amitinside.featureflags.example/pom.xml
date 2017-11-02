@@ -23,7 +23,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.amitinside</groupId>
-			<artifactId>com.amitinside.featureflags.core</artifactId>
+			<artifactId>com.amitinside.featureflags.provider</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
