@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.internal;
+package com.amitinside.featureflags.provider;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +18,11 @@ import java.util.stream.Stream;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
+import com.amitinside.featureflags.provider.ConfiguredFeature;
+import com.amitinside.featureflags.provider.ConfiguredFeatureGroup;
+import com.amitinside.featureflags.provider.FeatureManager;
+import com.amitinside.featureflags.provider.ServicePropertyActivationStrategy;
+import com.amitinside.featureflags.provider.SystemPropertyActivationStrategy;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.Maps;
 

@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.internal;
+package com.amitinside.featureflags.provider;
 
 import static org.junit.Assert.*;
 
@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.amitinside.featureflags.provider.SystemPropertyActivationStrategy;
 import com.google.common.collect.Maps;
 
 public final class SystemPropertyStrategyTest {

@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.internal;
+package com.amitinside.featureflags.provider;
 
 import static com.amitinside.featureflags.Config.*;
 import static com.amitinside.featureflags.Constants.FEATURE_FACTORY_PID;

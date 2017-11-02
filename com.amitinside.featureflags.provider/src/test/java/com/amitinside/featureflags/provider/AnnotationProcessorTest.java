@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.internal;
+package com.amitinside.featureflags.provider;
 
 import static org.junit.Assert.*;
 
@@ -17,6 +17,7 @@ import javax.tools.JavaFileObject;
 
 import org.junit.Test;
 
+import com.amitinside.featureflags.provider.FeatureAnnotationProcessor;
 import com.google.common.io.Resources;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;

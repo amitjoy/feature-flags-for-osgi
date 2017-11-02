@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.internal;
+package com.amitinside.featureflags.provider;
 
 import static com.amitinside.featureflags.annotation.ExpirationType.TIMED;
 import static javax.lang.model.SourceVersion.RELEASE_8;

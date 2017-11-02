@@ -7,10 +7,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.internal;
+package com.amitinside.featureflags.provider;
 
 import static com.amitinside.featureflags.Constants.*;
-import static com.amitinside.featureflags.internal.TestHelper.*;
+import static com.amitinside.featureflags.provider.TestHelper.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -40,6 +40,7 @@ import com.amitinside.featureflags.StrategyFactory.StrategyType;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.listener.ConfigurationListener;
+import com.amitinside.featureflags.provider.FeatureManager;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.internal;
+package com.amitinside.featureflags.provider;
 
 import java.io.IOException;
 import java.util.Dictionary;
@@ -25,6 +25,8 @@ import org.osgi.service.cm.ConfigurationListener;
 
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
+import com.amitinside.featureflags.provider.FeatureManager;
+import com.amitinside.featureflags.provider.SystemPropertyActivationStrategy;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

@@ -7,9 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.internal;
+package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.internal.TestHelper.*;
+import static com.amitinside.featureflags.provider.TestHelper.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
