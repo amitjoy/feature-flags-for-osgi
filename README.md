@@ -39,11 +39,13 @@ As Test Dependencies, it uses the following test libraries:
 
 ### Installation
 
-This project comprises 3 bundles - 
+This project comprises 5 bundles - 
 
-1. `com.amitinside.featureflags.core` - The core feature flags implementation 
-2. `com.amitinside.featureflags.web` - An web administration to easily manage features, groups and strategies
-3. `com.amitinside.featureflags.example` - An example project that shows how to use core feature flags in codebase
+1. `com.amitinside.featureflags.api` - The core feature flags API 
+2. `com.amitinside.featureflags.provider` - The core feature flags implementation
+3. `com.amitinside.featureflags.rest` - REST Service to manage features, groups and strategies
+4. `com.amitinside.featureflags.console` - A web console to easily manage features, groups and strategies
+5. `com.amitinside.featureflags.example` - An example project that shows how to use core feature flags in codebase
 
 You don't require to install all 3 bundles. To use feature flags in OSGi environment, you could only use the core implementation bundle.
 
@@ -53,14 +55,9 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 #### Project Import
 
-**Import as Eclipse Project**
-
-1. Add `SLF4J`, `Google Guava` and `GSON` to your Eclipse IDE Installation's Target Platform
-2. Import this project as Existing Project (`File -> Import -> General -> Existing Project into Workspace`)
-
 **Import as Maven Project**
 
-1. You can also import the project as Existing Maven Project (`File -> Import -> Maven -> Existing Maven Projects`)
+Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> Existing Maven Projects`)
 
 #### Building from Source
 
