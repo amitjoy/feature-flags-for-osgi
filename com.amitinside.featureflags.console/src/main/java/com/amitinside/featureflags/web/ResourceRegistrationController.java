@@ -18,8 +18,8 @@ import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(name = "FeatureFlagsServletsController", immediate = true)
-public final class FeatureFlagsServletsController {
+@Component(name = "ResourceRegistrationController", immediate = true)
+public final class ResourceRegistrationController {
 
     private static final String ALIAS = "/featureflags";
 
