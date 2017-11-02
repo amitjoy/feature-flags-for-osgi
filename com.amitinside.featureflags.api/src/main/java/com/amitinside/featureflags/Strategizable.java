@@ -13,6 +13,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
 
+import org.osgi.annotation.versioning.ConsumerType;
+
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
@@ -33,6 +35,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  *
  * @ThreadSafe
  */
+@ConsumerType
 public interface Strategizable {
 
     /**

@@ -31,7 +31,6 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.util.ServiceHelper;
 import com.google.common.collect.Lists;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
 @RunWith(MockitoJUnitRunner.class)
 public final class ServiceHelperTest {
 

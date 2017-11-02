@@ -158,7 +158,6 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
     }
 
     @Override
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void configurationEvent(final org.osgi.service.cm.ConfigurationEvent event) {
         final ServiceReference reference = event.getReference();
         try {

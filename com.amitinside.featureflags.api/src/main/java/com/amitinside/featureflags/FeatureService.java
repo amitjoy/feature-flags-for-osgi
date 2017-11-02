@@ -12,6 +12,8 @@ package com.amitinside.featureflags;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
@@ -30,6 +32,7 @@ import com.google.common.base.Strings;
  *
  * @ThreadSafe
  */
+@ProviderType
 public interface FeatureService {
 
     /**
