@@ -101,6 +101,7 @@ public final class ConfiguredFeature implements Feature {
         return Optional.ofNullable(groups).map(Arrays::stream).orElse(Stream.empty());
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String toString() {
         //@formatter:off
