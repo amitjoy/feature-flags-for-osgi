@@ -1,8 +1,0 @@
-com.amitinside.featureflags
-com.amitinside.featureflags.annotation
-com.amitinside.featureflags.feature
-com.amitinside.featureflags.feature.group
-com.amitinside.featureflags.listener
-com.amitinside.featureflags.storage
-com.amitinside.featureflags.strategy
-com.amitinside.featureflags.util

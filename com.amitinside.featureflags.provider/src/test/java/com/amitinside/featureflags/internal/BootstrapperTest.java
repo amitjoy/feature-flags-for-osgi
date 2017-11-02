@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Resources;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings("unchecked")
 @RunWith(MockitoJUnitRunner.class)
 public final class BootstrapperTest {
 

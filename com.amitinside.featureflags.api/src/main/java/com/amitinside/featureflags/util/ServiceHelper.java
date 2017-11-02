@@ -25,7 +25,7 @@ import com.google.common.collect.Maps;
 /**
  * Service Helper Class
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings("unchecked")
 public final class ServiceHelper {
 
     /** Constructor */

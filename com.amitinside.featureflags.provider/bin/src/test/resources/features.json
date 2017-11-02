@@ -1,0 +1,23 @@
+{
+	"features": [
+		{
+			"name": "my.feature",
+			"description": "My Feature",
+			"enabled": false,
+			"groups": ["MyFeatureGroup1", "MyFeatureGroup2"]
+		}
+	],
+	"groups": [
+		{
+			"name": "MyFeatureGroup1",
+			"description": "My Favorite Group",
+			"enabled": true,
+			"strategy": "MyStrategy2"
+		},
+		{
+			"name": "MyFeatureGroup2",
+			"description": "I don't like this Group",
+			"enabled": false
+		}
+	]
+}
