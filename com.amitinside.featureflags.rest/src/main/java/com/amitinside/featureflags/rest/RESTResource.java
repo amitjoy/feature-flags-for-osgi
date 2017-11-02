@@ -10,7 +10,6 @@
 package com.amitinside.featureflags.rest;
 
 import static com.amitinside.featureflags.StrategyFactory.StrategyType.*;
-import static com.google.common.base.Preconditions.checkArgument;
 import static javax.servlet.http.HttpServletResponse.*;
 
 import java.io.BufferedReader;
@@ -52,46 +51,66 @@ public final class RESTResource implements REST {
     private final Gson gson = new Gson();
 
     public String getFeatures(final RESTRequest req) {
+        final HttpServletResponse resp = req._response();
         //@formatter:off
         final List<FeatureData> data = featureService.getFeatures()
                                             .map(RequestHelper::mapToFeatureData)
                                             .collect(Collectors.toList());
         //@formatter:on
         final String json = gson.toJson(new DataHolder<>(data));
-        checkArgument(json == null || json.equalsIgnoreCase("null"));
+        if (json == null || json.equalsIgnoreCase("null")) {
+            resp.setStatus(SC_NO_CONTENT);
+            return "";
+        }
+        resp.setContentType("application/json");
         return json;
     }
 
     public String getFeature(final RESTRequest req, final String name) {
+        final HttpServletResponse resp = req._response();
         final Optional<Feature> feature = featureService.getFeature(name);
         //@formatter:off
         final FeatureData data = feature.map(RequestHelper::mapToFeatureData)
                                         .orElse(null);
         //@formatter:on
         final String json = gson.toJson(data);
-        checkArgument(json == null || json.equalsIgnoreCase("null"));
+        if (json == null || json.equalsIgnoreCase("null")) {
+            resp.setStatus(SC_NO_CONTENT);
+            return "";
+        }
+        resp.setContentType("application/json");
         return json;
     }
 
     public String getFeaturesByGroup(final RESTRequest req, final String name) {
+        final HttpServletResponse resp = req._response();
         //@formatter:off
         final List<FeatureData> data = featureService.getFeaturesByGroup(name)
                                             .map(RequestHelper::mapToFeatureData)
                                             .collect(Collectors.toList());
         //@formatter:on
         final String json = gson.toJson(new DataHolder<>(data));
-        checkArgument(json == null || json.equalsIgnoreCase("null"));
+        if (json == null || json.equalsIgnoreCase("null")) {
+            resp.setStatus(SC_NO_CONTENT);
+            return "";
+        }
+        resp.setContentType("application/json");
         return json;
     }
 
     public String getFeaturesByStrategy(final RESTRequest req, final String name) {
+        final HttpServletResponse resp = req._response();
         //@formatter:off
         final List<FeatureData> data = featureService.getFeaturesByStrategy(name)
                                             .map(RequestHelper::mapToFeatureData)
                                             .collect(Collectors.toList());
         //@formatter:on
         final String json = gson.toJson(new DataHolder<>(data));
-        checkArgument(json == null || json.equalsIgnoreCase("null"));
+        if (json == null || json.equalsIgnoreCase("null")) {
+            resp.setStatus(SC_NO_CONTENT);
+            return "";
+        }
+        resp.setContentType("application/json");
         return json;
     }
 
@@ -198,35 +217,50 @@ public final class RESTResource implements REST {
     }
 
     public String getGroups(final RESTRequest req) {
+        final HttpServletResponse resp = req._response();
         //@formatter:off
         final List<GroupData> data = featureService.getGroups()
                                         .map(RequestHelper::mapToGroupData)
                                         .collect(Collectors.toList());
         //@formatter:on
         final String json = gson.toJson(new DataHolder<>(data));
-        checkArgument(json == null || json.equalsIgnoreCase("null"));
+        if (json == null || json.equalsIgnoreCase("null")) {
+            resp.setStatus(SC_NO_CONTENT);
+            return "";
+        }
+        resp.setContentType("application/json");
         return json;
     }
 
     public String getGroup(final RESTRequest req, final String name) {
+        final HttpServletResponse resp = req._response();
         //@formatter:off
         final GroupData data = featureService.getGroup(name)
                                     .map(RequestHelper::mapToGroupData)
                                     .orElse(null);
         //@formatter:on
         final String json = gson.toJson(data);
-        checkArgument(json == null || json.equalsIgnoreCase("null"));
+        if (json == null || json.equalsIgnoreCase("null")) {
+            resp.setStatus(SC_NO_CONTENT);
+            return "";
+        }
+        resp.setContentType("application/json");
         return json;
     }
 
     public String getGroupsByStrategy(final RESTRequest req, final String name) {
+        final HttpServletResponse resp = req._response();
         //@formatter:off
         final List<GroupData> data = featureService.getGroupsByStrategy(name)
                                             .map(RequestHelper::mapToGroupData)
                                             .collect(Collectors.toList());
         //@formatter:on
         final String json = gson.toJson(new DataHolder<>(data));
-        checkArgument(json == null || json.equalsIgnoreCase("null"));
+        if (json == null || json.equalsIgnoreCase("null")) {
+            resp.setStatus(SC_NO_CONTENT);
+            return "";
+        }
+        resp.setContentType("application/json");
         return json;
     }
 
@@ -329,28 +363,38 @@ public final class RESTResource implements REST {
     }
 
     public String getStrategies(final RESTRequest req) {
+        final HttpServletResponse resp = req._response();
         //@formatter:off
         final List<StrategyData> data = featureService.getStrategies()
                                                 .map(RequestHelper::mapToStrategyData)
                                                 .collect(Collectors.toList());
         //@formatter:on
         final String json = gson.toJson(new DataHolder<>(data));
-        checkArgument(json == null || json.equalsIgnoreCase("null"));
+        if (json == null || json.equalsIgnoreCase("null")) {
+            resp.setStatus(SC_NO_CONTENT);
+            return "";
+        }
+        resp.setContentType("application/json");
         return json;
     }
 
     public String getStrategy(final RESTRequest req, final String name) {
+        final HttpServletResponse resp = req._response();
         //@formatter:off
         final StrategyData data = featureService.getStrategy(name)
                                             .map(RequestHelper::mapToStrategyData)
                                             .orElse(null);
         //@formatter:on
         final String json = gson.toJson(data);
-        checkArgument(json == null || json.equalsIgnoreCase("null"));
+        if (json == null || json.equalsIgnoreCase("null")) {
+            resp.setStatus(SC_NO_CONTENT);
+            return "";
+        }
+        resp.setContentType("application/json");
         return json;
     }
 
-    public void postStrategy(final RESTRequest req) {
+    public void postStrategy(final RESTRequest req, final String name) {
         final HttpServletResponse resp = req._response();
         String jsonData = null;
         try (final BufferedReader reader = req._request().getReader()) {
@@ -369,7 +413,6 @@ public final class RESTResource implements REST {
             return;
         }
         final StrategyType type = json.getType().equalsIgnoreCase("system") ? SYSTEM_PROPERTY : SERVICE_PROPERTY;
-        final String name = json.getName();
         final String desc = json.getDescription();
         final String key = json.getKey();
         final String value = json.getValue();
