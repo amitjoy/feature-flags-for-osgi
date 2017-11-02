@@ -870,7 +870,7 @@ public final class FeatureServiceTest {
         final Map<String, Object> props3 = createServiceProperties(3, 5, "myPid");
         final Map<String, Object> props4 = createServiceProperties(3, 6, "myPid");
 
-        final Class clazz = Class.forName("com.amitinside.featureflags.internal.FeatureManager$Description");
+        final Class clazz = Class.forName("com.amitinside.featureflags.provider.FeatureManager$Description");
         final Constructor constructor = clazz.getConstructor(Object.class, Map.class);
         constructor.setAccessible(true);
         final Object instance1 = constructor.newInstance(feature1, props1);
