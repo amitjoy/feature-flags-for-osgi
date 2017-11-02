@@ -19,16 +19,21 @@ import java.util.regex.Pattern;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
+import com.amitinside.featureflags.provider.ServicePropertyActivationStrategy.ServicePropertyStrategyConfig;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 
 /**
  * This strategy is responsible for checking configured property key and value in the
  * {@link Feature} or {@link FeatureGroup}'s OSGi service property.
  */
+@Designate(ocd = ServicePropertyStrategyConfig.class, factory = true)
 @Component(name = "ConfiguredServicePropertyStrategy", immediate = true, configurationPolicy = REQUIRE, configurationPid = STRATEGY_SERVICE_PROPERTY_PID, service = ActivationStrategy.class)
 public final class ServicePropertyActivationStrategy extends AbstractPropertyActivationStrategy {
 
@@ -60,6 +65,22 @@ public final class ServicePropertyActivationStrategy extends AbstractPropertyAct
             }
         }
         return false;
+    }
+
+    @ObjectClassDefinition(id = STRATEGY_SERVICE_PROPERTY_PID, name = "Service Property Activation Strategy", description = "Allows for the definition of statically configured service property strategy which are defined and enabled through OSGi configuration")
+    @interface ServicePropertyStrategyConfig {
+
+        @AttributeDefinition(description = "Short friendly name of this strategy")
+        String name() default "MyStrategy";
+
+        @AttributeDefinition(description = "Description of this strategy")
+        String description() default "MyStrategyDescription";
+
+        @AttributeDefinition(description = "Property Key to check in the associated feature or feature group's service properties")
+        String property_key() default "";
+
+        @AttributeDefinition(description = "Property Value to check in the associated feature or feature group's service properties")
+        String property_value() default "";
     }
 
 }

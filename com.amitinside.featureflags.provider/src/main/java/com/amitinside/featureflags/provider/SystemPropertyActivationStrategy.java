@@ -19,8 +19,12 @@ import java.util.regex.Pattern;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import com.amitinside.featureflags.Strategizable;
+import com.amitinside.featureflags.provider.SystemPropertyActivationStrategy.SystemPropertyStrategyConfig;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.Maps;
 
@@ -28,6 +32,7 @@ import com.google.common.collect.Maps;
  * This strategy is responsible for checking configured property key and value in the
  * system configured properties.
  */
+@Designate(ocd = SystemPropertyStrategyConfig.class, factory = true)
 @Component(name = "ConfiguredSystemPropertyStrategy", immediate = true, configurationPolicy = REQUIRE, configurationPid = STRATEGY_SYSTEM_PROPERTY_PID, service = ActivationStrategy.class)
 public final class SystemPropertyActivationStrategy extends AbstractPropertyActivationStrategy {
 
@@ -60,6 +65,22 @@ public final class SystemPropertyActivationStrategy extends AbstractPropertyActi
             }
         }
         return false;
+    }
+
+    @ObjectClassDefinition(id = STRATEGY_SYSTEM_PROPERTY_PID, name = "System Property Activation Strategy", description = "Allows for the definition of statically configured system property strategy which are defined and enabled through OSGi configuration")
+    @interface SystemPropertyStrategyConfig {
+
+        @AttributeDefinition(description = "Short friendly name of this strategy")
+        String name() default "MyStrategy";
+
+        @AttributeDefinition(description = "Description of this strategy")
+        String description() default "MyStrategyDescription";
+
+        @AttributeDefinition(name = "property_key", description = "Property Key to check in the system properties")
+        String propertyKey() default "";
+
+        @AttributeDefinition(name = "property_value", description = "Property Value to check in the system properties")
+        String propertyValue() default "";
     }
 
 }

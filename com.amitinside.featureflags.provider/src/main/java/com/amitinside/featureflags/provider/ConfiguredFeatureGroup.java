@@ -22,13 +22,18 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import com.amitinside.featureflags.Config;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
+import com.amitinside.featureflags.provider.ConfiguredFeatureGroup.FeatureGroupConfig;
 import com.amitinside.featureflags.util.ConfigHelper;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
+@Designate(ocd = FeatureGroupConfig.class, factory = true)
 @Component(name = "ConfiguredFeatureGroup", immediate = true, configurationPolicy = REQUIRE, configurationPid = FEATURE_GROUP_FACTORY_PID)
 public final class ConfiguredFeatureGroup implements FeatureGroup {
 
@@ -101,6 +106,22 @@ public final class ConfiguredFeatureGroup implements FeatureGroup {
                         .add("Strategy", strategy)
                         .add("Enabled", isEnabled).toString();
         //@formatter:on
+    }
+
+    @ObjectClassDefinition(id = FEATURE_GROUP_FACTORY_PID, name = "Feature Group", description = "Allows for the definition of statically configured feature groups which are defined and enabled through OSGi configuration")
+    @interface FeatureGroupConfig {
+
+        @AttributeDefinition(description = "Short friendly name of this feature group")
+        String name() default "MyFeatureGroup";
+
+        @AttributeDefinition(description = "Description of this feature group")
+        String description() default "MyFeatureGroupDescription";
+
+        @AttributeDefinition(description = "Boolean flag indicating whether this feature group is enabled or not by this configuration")
+        boolean enabled() default false;
+
+        @AttributeDefinition(description = "Strategy ID of this feature group to check if the feature group is enabled or not by this configuration")
+        String strategy() default "";
     }
 
 }

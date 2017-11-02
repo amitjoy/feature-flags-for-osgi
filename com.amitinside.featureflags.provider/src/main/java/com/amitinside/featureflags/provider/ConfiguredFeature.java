@@ -24,13 +24,18 @@ import java.util.stream.Stream;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import com.amitinside.featureflags.Config;
 import com.amitinside.featureflags.feature.Feature;
+import com.amitinside.featureflags.provider.ConfiguredFeature.FeatureConfig;
 import com.amitinside.featureflags.util.ConfigHelper;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
+@Designate(ocd = FeatureConfig.class, factory = true)
 @Component(name = "ConfiguredFeature", immediate = true, configurationPolicy = REQUIRE, configurationPid = FEATURE_FACTORY_PID)
 public final class ConfiguredFeature implements Feature {
 
@@ -112,6 +117,25 @@ public final class ConfiguredFeature implements Feature {
                         .add("Groups", Arrays.toString(groups))
                         .add("Enabled", isEnabled).toString();
         //@formatter:on
+    }
+
+    @ObjectClassDefinition(id = FEATURE_FACTORY_PID, name = "Feature", description = "Allows for the definition of statically configured features which are defined and enabled through OSGi configuration")
+    @interface FeatureConfig {
+
+        @AttributeDefinition(description = "Short friendly name of this feature")
+        String name() default "MyFeature";
+
+        @AttributeDefinition(description = "Description of this feature")
+        String description() default "MyFeatureDescription";
+
+        @AttributeDefinition(description = "Boolean flag indicating whether this feature is enabled or not by this configuration")
+        boolean enabled() default false;
+
+        @AttributeDefinition(description = "Strategy ID of this feature to check if the feature is enabled or not by this configuration")
+        String strategy() default "";
+
+        @AttributeDefinition(description = "Group IDs of this feature to check if the feature belongs to any group(s)")
+        String[] groups() default {};
     }
 
 }
