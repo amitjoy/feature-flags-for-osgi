@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-License: https://www.eclipse.org/legal/epl-v10.html
 Bundle-Copyright: Copyright (c) 2017 Amit Kumar Mondal
 Bundle-SCM: https://github.com/amitjoy/feature-flags-osgi
+Bundle-Icon: logo.png
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.amitinside.featureflags;version="[1.0,1.1)",
