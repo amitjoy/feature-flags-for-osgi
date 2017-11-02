@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Feature Flags REST Services
+Bundle-SymbolicName: com.amitinside.featureflags.rest;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-License: https://www.eclipse.org/legal/epl-v10.html
+Bundle-Copyright: Copyright (c) 2017 Amit Kumar Mondal
+Bundle-SCM: https://github.com/amitjoy/feature-flags-osgi
+Bundle-Icon: logo.png
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Import-Package: com.amitinside.featureflags;version="[1.0,2.0)",
+ com.amitinside.featureflags.feature;version="[1.0,2.0)",
+ com.amitinside.featureflags.feature.group;version="[1.0,2.0)",
+ com.amitinside.featureflags.strategy;version="[1.0,2.0)",
+ com.amitinside.featureflags.util;version="[1.0,2.0)",
+ com.google.common.base;version="15.0",
+ com.google.common.collect;version="15.0",
+ javax.servlet;version="[3.1,4)",
+ javax.servlet.http;version="[3.1,4)",
+ org.osgi.dto;version="[1.0,2)",
+ org.osgi.framework;version="[1.5,2)",
+ org.osgi.service.component.annotations;version="[1.2,2)";resolution:=optional,
+ org.osgi.service.http;version="[1.2,2)",
+ org.slf4j;version="[1.7,2)",
+ osgi.enroute.rest.api;version="[1.1,1.2)"
