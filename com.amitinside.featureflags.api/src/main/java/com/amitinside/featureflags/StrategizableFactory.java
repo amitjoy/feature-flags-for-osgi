@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.google.common.collect.ImmutableList;
@@ -51,6 +53,7 @@ import com.google.common.collect.ImmutableMap;
  * @ThreadSafe
  * @Immutable
  */
+@ProviderType
 public class StrategizableFactory {
 
     private final String name;
