@@ -21,7 +21,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 ## Requirements
 
 1. Java 8+
-2. OSGi R4+
+2. OSGi R6+
 
 ### Dependencies
 
@@ -29,7 +29,7 @@ The project does also use few open source libraries that are listed below.
 
 1. SLF4J 1.7.2+ (MIT)
 2. Google Guava 15+ (Apache 2.0)
-3. GSON 2.2.5+ (Apache 2.0)
+3. GSON 2.2.5+ (Apache 2.0) 
 
 As Test Dependencies, it uses the following test libraries:
 
@@ -63,12 +63,12 @@ Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> 
 
 1. Run `mvn clean install -Dgpg.skip` in the project folder
 
-#### Web Administration
+#### Web Console
 
 1. Checkout this project
 2. Build using `mvn clean install -Dgpg.skip`
 3. Run packaged Apache Felix OSGi framework. See [How-To](https://github.com/amitjoy/feature-flags-osgi/wiki/Feature-Flags-Web-Administration)
-4. Install `com.amitinside.featureflags.core` and `com.amitinside.featureflags.web`
+4. Install all the bundles to your OSGi runtime
 5. Open browser and access `http://localhost:8080/featureflags/page/index.html`
 
 ### License
@@ -77,66 +77,9 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 
 ### Usage
 
-1. Create a `features.json` in your bundle's root directory
-2. The features can be specified in `features.json` in the following way
+1. You can use `FeatureService#createFeature(...)`, `FeatureService#createGroup(...)` and `FeatureService#createPropertyBasedStrategy(...)` to create features, groups and property based strategies.
 
-```json
-{
-  "features":[
-     {
-        "name":"feature1",
-        "description":"My Feature 1",
-        "enabled":false,
-        "groups":["MyFeatureGroup1"]
-     },
-     {
-        "name":"feature2",
-        "description":"My Feature 2",
-        "strategy":"MyStrategy1"
-     },
-     {
-        "name":"feature3",
-        "description":"My Feature 3",
-        "enabled":false,
-        "groups":["MyFeatureGroup1", "MyFeatureGroup2"]
-     },
-     {
-        "name":"feature4",
-        "description":"My Feature 4",
-        "enabled":false,
-        "strategy":"MyStrategy2",
-        "properties":{
-           "p1":1,
-           "p2":"test1",
-           "p3":"test2"
-        }
-     }
-  ],
-  "groups":[
-     {
-        "name":"MyFeatureGroup1",
-        "description":"My Favorite Group",
-        "enabled":true,
-        "strategy":"MyStrategy2"
-     },
-     {
-        "name":"MyFeatureGroup2",
-        "description":"I don't like this Group",
-        "enabled":false,
-        "properties":{
-           "p4":1,
-           "p5":"test1",
-           "p6":"test2"
-        }
-     }
-  ]
-}
-```
-3. This will create `Feature` service instance(s) that will be configured with OSGi configuration whose factory PID is `com.amitinside.featureflags.feature`. You can add extra properties to your feature as shown in the last feature example. These properties will be added as your feature's service properties. You can also create feature groups by specifying groups in the JSON resource. If you specify groups in JSON resource, `FeatureGroup` service instance(s) will be created and configured with this provided configuration whose factory PID will be `com.amitinside.featureflags.feature.group`. Likewise, you can add extra properties to your group as shown in the example. These properties will be added to your group's service properties.
-
-4. Instead of providing `features.json`, you can also use `FeatureService#createFeature(...)` and `FeatureService#createGroup(...)` to create features and feature groups.
-
-5. In your DS Component, use `FeatureService` to check if the feature is enabled
+2. In your DS Component, use `FeatureService` to check if the feature is enabled
 
 ```java
 
@@ -162,7 +105,7 @@ void unsetFeatureService(final FeatureService featureService) {
    this.featureService = null;
 }
 ```
-6. Instead of providing `features.json`, you can also implement `Feature` interface and expose it as an OSGi service
+6. You can also implement `Feature` interface and expose it as an OSGi service
 7. The strategy must be provided by implementing `ActivationStrategy` interface and exposing as an OSGi service
 8. You can also provide a feature group by implementing `FeatureGroup` interface and exposing as an OSGi service
 
