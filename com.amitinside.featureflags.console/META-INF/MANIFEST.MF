@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Feature Flags Web Administration
-Bundle-SymbolicName: com.amitinside.featureflags.web;singleton:=true
+Bundle-Name: Feature Flags Web Console
+Bundle-SymbolicName: com.amitinside.featureflags.console;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-License: https://www.eclipse.org/legal/epl-v10.html
 Bundle-Copyright: Copyright (c) 2017 Amit Kumar Mondal
