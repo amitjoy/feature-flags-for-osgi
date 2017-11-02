@@ -29,7 +29,6 @@ The project does also use few open source libraries that are listed below.
 
 1. SLF4J 1.7.2+ (MIT)
 2. Google Guava 15+ (Apache 2.0)
-3. GSON 2.2.5+ (Apache 2.0) 
 
 As Test Dependencies, it uses the following test libraries:
 
