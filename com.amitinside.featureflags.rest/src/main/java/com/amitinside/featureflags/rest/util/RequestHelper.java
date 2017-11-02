@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.dto.DTO;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
@@ -33,6 +34,8 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.amitinside.featureflags.util.ServiceHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import osgi.enroute.rest.api.RESTRequest;
 
 public final class RequestHelper {
 
@@ -109,140 +112,47 @@ public final class RequestHelper {
     /**
      * Class used to represent Strategy JSON data
      */
-    public static final class StrategyData {
-        private String name;
-        private String description;
-        private String type;
-        private String key;
-        private String value;
-
-        public StrategyData() {
-            // required for GSON
-        }
-
-        public StrategyData(final String name, final String description, final String type, final String key,
-                final String value) {
-            this.name = name;
-            this.description = description;
-            this.type = type;
-            this.key = key;
-            this.value = value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public String getType() {
-            return type;
-        }
-
+    public static final class StrategyData extends DTO {
+        public String name;
+        public String description;
+        public String type;
+        public String key;
+        public String value;
     }
 
     /**
      * Class used to represent Group JSON data
      */
-    public static final class GroupData {
-        private String name;
-        private String description;
-        private String strategy;
-        private boolean enabled;
-        private Map<String, Object> properties;
-
-        public GroupData() {
-            // required for GSON
-        }
-
-        public GroupData(final String name, final String description, final String strategy, final boolean enabled,
-                final Map<String, Object> properties) {
-            this.name = name;
-            this.description = description;
-            this.strategy = strategy;
-            this.enabled = enabled;
-            this.properties = properties;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getStrategy() {
-            return strategy;
-        }
-
-        public Map<String, Object> getProperties() {
-            return properties;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
+    public static final class GroupData extends DTO {
+        public String name;
+        public String description;
+        public String strategy;
+        public boolean enabled;
+        public Map<String, Object> properties;
     }
 
     /**
      * Class used to represent Feature Group JSON data
      */
-    public static final class FeatureData {
-        private String name;
-        private String description;
-        private String strategy;
-        private List<String> groups;
-        private boolean enabled;
-        private Map<String, Object> properties;
+    public static final class FeatureData extends DTO {
+        public String name;
+        public String description;
+        public String strategy;
+        public List<String> groups;
+        public boolean enabled;
+        public Map<String, Object> properties;
+    }
 
-        public FeatureData() {
-            // required for GSON
-        }
+    public interface FeatureRequest extends RESTRequest {
+        FeatureData _body();
+    }
 
-        public FeatureData(final String name, final String description, final String strategy,
-                final List<String> groups, final boolean enabled, final Map<String, Object> properties) {
-            this.name = name;
-            this.description = description;
-            this.strategy = strategy;
-            this.groups = groups;
-            this.enabled = enabled;
-            this.properties = properties;
-        }
+    public interface GroupRequest extends RESTRequest {
+        GroupData _body();
+    }
 
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getStrategy() {
-            return strategy;
-        }
-
-        public List<String> getGroups() {
-            return groups;
-        }
-
-        public Map<String, Object> getProperties() {
-            return properties;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
+    public interface StrategyRequest extends RESTRequest {
+        StrategyData _body();
     }
 
     public static FeatureData mapToFeatureData(final Feature feature) {
@@ -254,7 +164,14 @@ public final class RequestHelper {
         final Map<String, Object> props = Maps
                 .newHashMap(ServiceHelper.getServiceProperties(context, feature, Feature.class, null));
         removeProperties(props);
-        return new FeatureData(name, description, strategy, groups, isEnabled, props);
+        final FeatureData data = new FeatureData();
+        data.name = name;
+        data.description = description;
+        data.strategy = strategy;
+        data.groups = groups;
+        data.enabled = isEnabled;
+        data.properties = props;
+        return data;
     }
 
     private static void removeProperties(final Map<String, Object> props) {
@@ -281,7 +198,13 @@ public final class RequestHelper {
         final Map<String, Object> props = Maps
                 .newHashMap(ServiceHelper.getServiceProperties(context, group, FeatureGroup.class, null));
         removeProperties(props);
-        return new GroupData(name, description, strategy, isEnabled, props);
+        final GroupData data = new GroupData();
+        data.name = name;
+        data.description = description;
+        data.strategy = strategy;
+        data.enabled = isEnabled;
+        data.properties = props;
+        return data;
     }
 
     public static StrategyData mapToStrategyData(final ActivationStrategy strategy) {
@@ -302,6 +225,12 @@ public final class RequestHelper {
             key = (String) props.get("property_key");
             value = (String) props.get("property_value");
         }
-        return new StrategyData(name, description, type, key, value);
+        final StrategyData data = new StrategyData();
+        data.name = name;
+        data.description = description;
+        data.type = type;
+        data.key = key;
+        data.value = value;
+        return data;
     }
 }

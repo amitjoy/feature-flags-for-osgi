@@ -12,9 +12,9 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "/groups",
+        url : "/rest/groups",
         success : function(data) {
-            var groups = data.groups;
+            var groups = JSON.parse(data).elements;
             for (var i = 0; i < groups.length; i++) {
                 $("#groups").append($("<option>", {
                     value : groups[i].name,
@@ -27,9 +27,9 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "/strategies",
+        url : "/rest/strategies",
         success : function(data) {
-            var strategies = data.strategies;
+            var strategies = JSON.parse(data).elements;
             for (var i = 0; i < strategies.length; i++) {
                 $("#strategy").append($("<option>", {
                     value : strategies[i].name,
@@ -42,9 +42,9 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "/features",
+        url : "/rest/features",
         success : function(data) {
-            features = data.features;
+            features = JSON.parse(data).elements;
             for (var i = 0; i < features.length; i++) {
                 var j = i;
                 var isEnabled = Boolean(features[i].enabled);
@@ -61,7 +61,7 @@ $(document).ready(function() {
         $.ajax({
             type : "GET",
             dataType : "json",
-            url : "/features/" + param,
+            url : "/rest/features/" + param,
             success : function(data) {
                 var name = data.name;
                 var description = data.description;
@@ -102,7 +102,7 @@ function removeFeature() {
     if (param != null) {
         $.ajax({
             type : "DELETE",
-            url : "/features/" + param,
+            url : "/rest/features/" + param,
             success : function(data) {
                 $("#feature-deleted").show();
                 window.setTimeout(function() {
@@ -142,7 +142,7 @@ function addFeature() {
     $.ajax({
         type : "POST",
         data : JSON.stringify(data),
-        url : "/features",
+        url : "/rest/features",
         success : function(data) {
             $("#feature-added").show();
             $("#error-message").hide();
@@ -166,7 +166,7 @@ function updateFeature() {
     var groups = groupsValue[0] === "not_set" ? null : groupsValue;
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
-    var enabled = $("#enabled").is(":checked") ? true : false;
+    var enabled = $("#enabled").is(":checked") ? true : false;z
     var data = {
         "name" : name,
         "description" : description,
@@ -180,7 +180,7 @@ function updateFeature() {
     $.ajax({
         type : "PUT",
         data : JSON.stringify(data),
-        url : "/features/" + name,
+        url : "/rest/features/" + name,
         success : function(data) {
             $("#feature-updated").show();
             $("#error-message").hide();

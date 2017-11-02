@@ -12,9 +12,9 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "/strategies",
+        url : "/rest/strategies",
         success : function(data) {
-            var strategies = data.strategies;
+            var strategies = JSON.parse(data).elements;
             for (var i = 0; i < strategies.length; i++) {
                 $("#strategy").append($("<option>", {
                     value : strategies[i].name,
@@ -27,9 +27,9 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "/groups",
+        url : "/rest/groups",
         success : function(data) {
-            groups = data.groups;
+            groups = JSON.parse(data).elements;
             for (var i = 0; i < groups.length; i++) {
                 var j = i;
                 var isEnabled = Boolean(groups[i].enabled);
@@ -45,7 +45,7 @@ $(document).ready(function() {
         $.ajax({
             type : "GET",
             dataType : "json",
-            url : "/groups/" + param,
+            url : "/rest/groups/" + param,
             success : function(data) {
                 var name = data.name;
                 var description = data.description;
@@ -85,7 +85,7 @@ function removeGroup() {
     if (param != null) {
         $.ajax({
             type : "DELETE",
-            url : "/groups/" + param,
+            url : "/rest/groups/" + param,
             success : function(data) {
                 $("#group-deleted").show();
                 window.setTimeout(function() {
@@ -121,7 +121,7 @@ function addGroup() {
     $.ajax({
         type : "POST",
         data : JSON.stringify(data),
-        url : "/groups",
+        url : "/rest/groups",
         success : function(data) {
             $("#group-added").show();
             $("#error-message").hide();
@@ -156,7 +156,7 @@ function updateGroup() {
     $.ajax({
         type : "PUT",
         data : JSON.stringify(data),
-        url : "/groups/" + name,
+        url : "/rest/groups/" + name,
         success : function(data) {
             $("#group-updated").show();
             $("#error-message").hide();

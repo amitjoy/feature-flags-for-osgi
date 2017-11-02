@@ -22,9 +22,9 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "/strategies",
+        url : "/strategy",
         success : function(data) {
-            strategies = data.strategies;
+            strategies = JSON.parse(data).elements;
             for (var i = 0; i < strategies.length; i++) {
                 var j = i;
                 $("#strategies-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_strategy.html?name=" + encodeURIComponent(strategies[i].name) + ">" + strategies[i].name + "</a></td><td>" + strategies[i].description + "</td><td>" + strategies[i].type + "</td><td>" + strategies[i].key + "</td><td>" + strategies[i].value + "</td></tr>");
@@ -36,7 +36,7 @@ $(document).ready(function() {
         $.ajax({
             type : "GET",
             dataType : "json",
-            url : "/strategies/" + param,
+            url : "/rest/strategies/" + param,
             success : function(data) {
                 var name = data.name;
                 var description = data.description;
@@ -69,7 +69,7 @@ function removeStrategy() {
     if (param != null) {
         $.ajax({
             type : "DELETE",
-            url : "/strategies/" + param,
+            url : "/rest/strategies/" + param,
             success : function(data) {
                 $("#strategy-deleted").show();
                 window.setTimeout(function() {
@@ -103,7 +103,7 @@ function addStrategy() {
             "key" : key,
             "value" : value
         }),
-        url : "/strategies",
+        url : "/rest/strategies",
         success : function(data) {
             $("#strategy-added").show();
             $("#error-message").hide();
@@ -140,7 +140,7 @@ function updateStrategy() {
             "key" : key,
             "value" : value
         }),
-        url : "/strategies/" + name,
+        url : "/rest/strategies/" + name,
         success : function(data) {
             $("#strategy-updated").show();
             $("#error-message").hide();
