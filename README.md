@@ -16,7 +16,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Code Coverage** [![codecov](https://codecov.io/gh/amitjoy/feature-flags-osgi/branch/master/graph/badge.svg)](https://codecov.io/gh/amitjoy/feature-flags-osgi)
 
-**Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/retriable.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-osgi/)
+**Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/retriable.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-for-osgi/)
 
 ## Requirements
 
