@@ -14,11 +14,10 @@ $(document).ready(function() {
         dataType : "json",
         url : "/rest/strategies",
         success : function(data) {
-            var strategies = JSON.parse(data).elements;
-            for (var i = 0; i < strategies.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 $("#strategy").append($("<option>", {
-                    value : strategies[i].name,
-                    text : strategies[i].name
+                    value : data[i].name,
+                    text : data[i].name
                 }));
             }
         }
@@ -29,14 +28,13 @@ $(document).ready(function() {
         dataType : "json",
         url : "/rest/groups",
         success : function(data) {
-            groups = JSON.parse(data).elements;
-            for (var i = 0; i < groups.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 var j = i;
-                var isEnabled = Boolean(groups[i].enabled);
+                var isEnabled = Boolean(data[i].enabled);
                 var tag = isEnabled ? "checked" : "";
                 var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
-                var strategy = groups[i].strategy === undefined ? "" : groups[i].strategy;
-                $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(groups[i].name) + ">" + groups[i].name + "</a></td><td>" + groups[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
+                var strategy = data[i].strategy === undefined ? "" : data[i].strategy;
+                $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
             }
         }
     });
@@ -122,6 +120,7 @@ function addGroup() {
         type : "POST",
         data : JSON.stringify(data),
         url : "/rest/groups",
+        contentType: "application/json",
         success : function(data) {
             $("#group-added").show();
             $("#error-message").hide();
@@ -157,6 +156,7 @@ function updateGroup() {
         type : "PUT",
         data : JSON.stringify(data),
         url : "/rest/groups/" + name,
+        contentType: "application/json",
         success : function(data) {
             $("#group-updated").show();
             $("#error-message").hide();

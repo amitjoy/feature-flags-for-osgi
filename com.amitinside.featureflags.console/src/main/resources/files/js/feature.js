@@ -14,11 +14,10 @@ $(document).ready(function() {
         dataType : "json",
         url : "/rest/groups",
         success : function(data) {
-            var groups = JSON.parse(data).elements;
-            for (var i = 0; i < groups.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 $("#groups").append($("<option>", {
-                    value : groups[i].name,
-                    text : groups[i].name
+                    value : data[i].name,
+                    text : data[i].name
                 }));
             }
         }
@@ -29,11 +28,10 @@ $(document).ready(function() {
         dataType : "json",
         url : "/rest/strategies",
         success : function(data) {
-            var strategies = JSON.parse(data).elements;
-            for (var i = 0; i < strategies.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 $("#strategy").append($("<option>", {
-                    value : strategies[i].name,
-                    text : strategies[i].name
+                    value : data[i].name,
+                    text : data[i].name
                 }));
             }
         }
@@ -44,15 +42,15 @@ $(document).ready(function() {
         dataType : "json",
         url : "/rest/features",
         success : function(data) {
-            features = JSON.parse(data).elements;
-            for (var i = 0; i < features.length; i++) {
+            features = data;
+            for (var i = 0; i < data.length; i++) {
                 var j = i;
-                var isEnabled = Boolean(features[i].enabled);
+                var isEnabled = Boolean(data[i].enabled);
                 var tag = isEnabled ? "checked" : "";
                 var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
-                var strategy = features[i].strategy === undefined ? "" : features[i].strategy;
-                var groups = features[i].groups === undefined ? "" : features[i].groups.join();
-                $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + features[i].name + ">" + encodeURIComponent(features[i].name) + "</a></td><td>" + features[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
+                var strategy = data[i].strategy === undefined ? "" : data[i].strategy;
+                var groups = data[i].groups === undefined ? "" : data[i].groups.join();
+                $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
             }
         }
     });
@@ -143,6 +141,7 @@ function addFeature() {
         type : "POST",
         data : JSON.stringify(data),
         url : "/rest/features",
+        contentType: "application/json",
         success : function(data) {
             $("#feature-added").show();
             $("#error-message").hide();
@@ -166,7 +165,7 @@ function updateFeature() {
     var groups = groupsValue[0] === "not_set" ? null : groupsValue;
     var propertiesValue = $("#properties").val();
     var properties = propertiesValue === "" ? null : propertiesValue;
-    var enabled = $("#enabled").is(":checked") ? true : false;z
+    var enabled = $("#enabled").is(":checked") ? true : false;
     var data = {
         "name" : name,
         "description" : description,
@@ -181,6 +180,7 @@ function updateFeature() {
         type : "PUT",
         data : JSON.stringify(data),
         url : "/rest/features/" + name,
+        contentType: "application/json",
         success : function(data) {
             $("#feature-updated").show();
             $("#error-message").hide();

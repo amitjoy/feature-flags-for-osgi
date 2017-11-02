@@ -112,7 +112,7 @@ public final class RequestHelper {
     /**
      * Class used to represent Strategy JSON data
      */
-    public static final class StrategyData extends DTO {
+    public static class StrategyData extends DTO {
         public String name;
         public String description;
         public String type;
@@ -123,7 +123,7 @@ public final class RequestHelper {
     /**
      * Class used to represent Group JSON data
      */
-    public static final class GroupData extends DTO {
+    public static class GroupData extends DTO {
         public String name;
         public String description;
         public String strategy;

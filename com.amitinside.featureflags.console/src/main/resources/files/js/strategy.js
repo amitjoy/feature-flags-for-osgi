@@ -22,12 +22,11 @@ $(document).ready(function() {
     $.ajax({
         type : "GET",
         dataType : "json",
-        url : "/strategy",
+        url : "/rest/strategies",
         success : function(data) {
-            strategies = JSON.parse(data).elements;
-            for (var i = 0; i < strategies.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 var j = i;
-                $("#strategies-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_strategy.html?name=" + encodeURIComponent(strategies[i].name) + ">" + strategies[i].name + "</a></td><td>" + strategies[i].description + "</td><td>" + strategies[i].type + "</td><td>" + strategies[i].key + "</td><td>" + strategies[i].value + "</td></tr>");
+                $("#strategies-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_strategy.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td>" + data[i].type + "</td><td>" + data[i].key + "</td><td>" + data[i].value + "</td></tr>");
             }
         }
     });
@@ -93,17 +92,19 @@ function addStrategy() {
         $("#error-message").show();
         return false;
     }
+    var data = JSON.stringify({
+        "name" : name,
+        "description" : description,
+        "type" : type,
+        "key" : key,
+        "value" : value
+    });
 
     $.ajax({
         type : "POST",
-        data : JSON.stringify({
-            "name" : name,
-            "description" : description,
-            "type" : type,
-            "key" : key,
-            "value" : value
-        }),
+        data : data,
         url : "/rest/strategies",
+        contentType: "application/json",
         success : function(data) {
             $("#strategy-added").show();
             $("#error-message").hide();
@@ -130,17 +131,20 @@ function updateStrategy() {
         $("#error-message").show();
         return false;
     }
+    
+    var data = JSON.stringify({
+        "name" : name,
+        "description" : description,
+        "type" : type,
+        "key" : key,
+        "value" : value
+    });
 
     $.ajax({
         type : "PUT",
-        data : JSON.stringify({
-            "name" : name,
-            "description" : description,
-            "type" : type,
-            "key" : key,
-            "value" : value
-        }),
-        url : "/rest/strategies/" + name,
+        data : data,
+        url : "http://localhost:8080/rest/strategies/" + name,
+        contentType: "application/json",
         success : function(data) {
             $("#strategy-updated").show();
             $("#error-message").hide();

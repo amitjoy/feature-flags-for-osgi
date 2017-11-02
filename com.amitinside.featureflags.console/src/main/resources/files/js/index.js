@@ -4,7 +4,7 @@ $(document).ready(function() {
         dataType : "json",
         url : "/rest/strategies",
         success : function(data) {
-            var count = data.elements.length;
+            var count = data.length;
             $("#noOfStrategies").html(count);
         }
     });
@@ -13,7 +13,7 @@ $(document).ready(function() {
         dataType : "json",
         url : "/rest/features",
         success : function(data) {
-            var count = data.elements.length;
+            var count = data.length;
             $("#noOfFeatures").html(count);
         }
     });
@@ -22,7 +22,7 @@ $(document).ready(function() {
         dataType : "json",
         url : "/rest/groups",
         success : function(data) {
-            var count = data.elements.length;
+            var count = data.length;
             $("#noOfGroups").html(count);
         }
     });
