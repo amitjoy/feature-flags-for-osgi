@@ -12,7 +12,7 @@ Bundle-ActivationPolicy: lazy
 Import-Package: com.google.common.base;version="15.0",
  com.google.common.collect;version="15.0",
  org.osgi.framework;version="[1.5,2)"
-Export-Package: com.amitinside.featureflags,
+Export-Package: com.amitinside.featureflags;version="1.0",
  com.amitinside.featureflags.annotation;version="1.0",
  com.amitinside.featureflags.feature;version="1.0",
  com.amitinside.featureflags.feature.group;version="1.0",
