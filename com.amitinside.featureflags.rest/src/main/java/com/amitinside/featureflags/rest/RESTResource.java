@@ -112,14 +112,6 @@ public final class RESTResource implements REST {
         }
     }
 
-    public void putFeatures(final RESTRequest req, final String name, final boolean flag) {
-        if (flag) {
-            featureService.enableFeature(name);
-        } else {
-            featureService.disableFeature(name);
-        }
-    }
-
     public void putFeatures(final FeatureRequest req) {
         final HttpServletResponse resp = req._response();
         final FeatureData json = req._body();
@@ -203,14 +195,6 @@ public final class RESTResource implements REST {
             }
         } else {
             resp.setStatus(SC_NO_CONTENT);
-        }
-    }
-
-    public void putGroups(final RESTRequest req, final String name, final boolean flag) {
-        if (flag) {
-            featureService.enableGroup(name);
-        } else {
-            featureService.disableGroup(name);
         }
     }
 

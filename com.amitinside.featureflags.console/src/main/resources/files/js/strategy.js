@@ -143,7 +143,7 @@ function updateStrategy() {
     $.ajax({
         type : "PUT",
         data : data,
-        url : "http://localhost:8080/rest/strategies/" + name,
+        url : "/rest/strategies",
         contentType: "application/json",
         success : function(data) {
             $("#strategy-updated").show();

@@ -33,7 +33,7 @@ $(document).ready(function() {
                 var isEnabled = Boolean(data[i].enabled);
                 var tag = isEnabled ? "checked" : "";
                 var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
-                var strategy = data[i].strategy === undefined ? "" : data[i].strategy;
+                var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
                 $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
             }
         }
@@ -155,7 +155,7 @@ function updateGroup() {
     $.ajax({
         type : "PUT",
         data : JSON.stringify(data),
-        url : "/rest/groups/" + name,
+        url : "/rest/groups",
         contentType: "application/json",
         success : function(data) {
             $("#group-updated").show();

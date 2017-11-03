@@ -48,8 +48,8 @@ $(document).ready(function() {
                 var isEnabled = Boolean(data[i].enabled);
                 var tag = isEnabled ? "checked" : "";
                 var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
-                var strategy = data[i].strategy === undefined ? "" : data[i].strategy;
-                var groups = data[i].groups === undefined ? "" : data[i].groups.join();
+                var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
+                var groups = (data[i].groups === undefined) || (data[i].groups === null) ? "" : data[i].groups.join();
                 $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
             }
         }
@@ -141,7 +141,7 @@ function addFeature() {
         type : "POST",
         data : JSON.stringify(data),
         url : "/rest/features",
-        contentType: "application/json",
+        contentType : "application/json",
         success : function(data) {
             $("#feature-added").show();
             $("#error-message").hide();
@@ -179,8 +179,8 @@ function updateFeature() {
     $.ajax({
         type : "PUT",
         data : JSON.stringify(data),
-        url : "/rest/features/" + name,
-        contentType: "application/json",
+        url : "/rest/features",
+        contentType : "application/json",
         success : function(data) {
             $("#feature-updated").show();
             $("#error-message").hide();
