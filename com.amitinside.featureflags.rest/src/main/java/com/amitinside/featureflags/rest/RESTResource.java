@@ -141,7 +141,6 @@ public final class RESTResource implements REST {
             resp.setStatus(SC_OK);
         } else {
             resp.setStatus(SC_NOT_MODIFIED);
-            return;
         }
     }
 
@@ -284,7 +283,6 @@ public final class RESTResource implements REST {
             } catch (final IOException e) {
                 logger.error("{}", e.getMessage(), e);
                 resp.setStatus(SC_INTERNAL_SERVER_ERROR);
-                return;
             }
         } else {
             resp.setStatus(SC_NO_CONTENT);
@@ -319,7 +317,6 @@ public final class RESTResource implements REST {
             resp.setStatus(SC_OK);
         } else {
             resp.setStatus(SC_NO_CONTENT);
-            return;
         }
     }
 
