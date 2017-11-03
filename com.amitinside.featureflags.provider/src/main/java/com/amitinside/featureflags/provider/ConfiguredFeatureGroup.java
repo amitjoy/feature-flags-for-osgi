@@ -96,7 +96,6 @@ public final class ConfiguredFeatureGroup implements FeatureGroup {
         return isEnabled;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public String toString() {
         //@formatter:off

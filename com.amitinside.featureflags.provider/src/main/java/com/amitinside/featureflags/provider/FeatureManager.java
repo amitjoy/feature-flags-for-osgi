@@ -688,7 +688,6 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
             return Objects.hashCode(serviceId);
         }
 
-        @SuppressWarnings("deprecation")
         @Override
         public String toString() {
             //@formatter:off

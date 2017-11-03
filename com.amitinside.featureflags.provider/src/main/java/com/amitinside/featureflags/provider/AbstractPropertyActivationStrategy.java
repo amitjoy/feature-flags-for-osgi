@@ -81,7 +81,6 @@ public abstract class AbstractPropertyActivationStrategy implements ActivationSt
         return Optional.ofNullable(propertyValue);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public String toString() {
         //@formatter:off
