@@ -76,11 +76,11 @@ public final class ServicePropertyActivationStrategy extends AbstractPropertyAct
         @AttributeDefinition(description = "Description of this strategy")
         String description() default "MyStrategyDescription";
 
-        @AttributeDefinition(description = "Property Key to check in the associated feature or feature group's service properties")
-        String property_key() default "";
+        @AttributeDefinition(name = "property_key", description = "Property Key to check in the associated feature or feature group's service properties")
+        String propertyKey() default "";
 
-        @AttributeDefinition(description = "Property Value to check in the associated feature or feature group's service properties")
-        String property_value() default "";
+        @AttributeDefinition(name = "property_value", description = "Property Value to check in the associated feature or feature group's service properties")
+        String propertyValue() default "";
     }
 
 }
