@@ -9,9 +9,6 @@ branches:
   only:
     - master
       
--before_install:
-    - "cd com.amitinside.featureflags.provider"
-
 install: mvn install -Dgpg.skip
 
 after_success:
