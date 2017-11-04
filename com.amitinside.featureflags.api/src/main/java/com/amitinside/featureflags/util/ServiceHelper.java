@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -57,7 +58,7 @@ public final class ServiceHelper {
             for (final ServiceReference reference : references) {
                 final S s = (S) context.getService(reference);
                 refs.add(reference);
-                if (s == actualServiceInstance) {
+                if (Objects.equals(s, actualServiceInstance)) {
                     for (final String key : reference.getPropertyKeys()) {
                         props.put(key, reference.getProperty(key));
                     }
