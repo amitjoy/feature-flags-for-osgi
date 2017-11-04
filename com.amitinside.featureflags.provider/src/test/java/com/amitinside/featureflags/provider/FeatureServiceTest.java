@@ -33,14 +33,13 @@ import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
-import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.Strategizable;
+import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.StrategyFactory;
 import com.amitinside.featureflags.StrategyFactory.StrategyType;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.listener.ConfigurationListener;
-import com.amitinside.featureflags.provider.FeatureManager;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -740,7 +739,7 @@ public final class FeatureServiceTest {
     }
 
     @Test
-    public void testConfigListenerForFeature() throws InvalidSyntaxException {
+    public void testConfigListenerForFeatureWhenConfigUpdated() throws InvalidSyntaxException {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
         manager = new FeatureManager();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
@@ -771,6 +770,40 @@ public final class FeatureServiceTest {
         manager.unsetConfigurationAdmin(configurationAdmin);
 
         assertTrue(manager.getFeature("feature1").get().isEnabled());
+    }
+
+    @Test
+    public void testConfigListenerForFeatureWhenConfigDeleted() throws InvalidSyntaxException {
+        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
+        manager = new FeatureManager();
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+        configurationAdmin.addListener(manager);
+
+        manager.bindFeature(feature, createServiceProperties(2, 5, "feature1"));
+        manager.setConfigurationAdmin(configurationAdmin);
+        final ConfigurationListener listener = new ConfigurationListener() {
+            @Override
+            public void accept(final ConfigurationEvent event) {
+                assertEquals(event.getType(), Type.DELETED);
+            }
+        };
+        manager.bindConfigurationListener(listener);
+        manager.activate(context);
+
+        doReturn(new ServiceReference[] { reference }).when(context).getServiceReferences(Feature.class.getName(),
+                null);
+        doReturn(feature).when(context).getService(reference);
+        final List<String> propKeys = Lists.newArrayList("service.id", "service.ranking", "service.pid");
+        doReturn(propKeys.toArray(new String[0])).when(reference).getPropertyKeys();
+        doReturn(5).when(reference).getProperty("service.id");
+        doReturn(2).when(reference).getProperty("service.ranking");
+        doReturn("feature1").when(reference).getProperty("service.pid");
+
+        manager.removeFeature("feature1");
+        manager.unbindConfigurationListener(listener);
+        manager.unsetConfigurationAdmin(configurationAdmin);
+
+        assertFalse(manager.getFeature("feature1").get().isEnabled());
     }
 
     @Test
