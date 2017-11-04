@@ -14,7 +14,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Static Code Analysis** [![Codacy Badge](https://api.codacy.com/project/badge/Grade/90918f9f84b64b14ac9ea1ed7f8ac041)](https://www.codacy.com/app/admin_62/feature-flags-for-osgi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=amitjoy/feature-flags-osgi&amp;utm_campaign=Badge_Grade)
 
-**Code Coverage** [![codecov](https://codecov.io/gh/amitjoy/feature-flags-for-osgi/branch/master/graph/badge.svg)](https://codecov.io/gh/amitjoy/feature-flags-for-osgi)
+**Code Coverage** [![codecov](https://codecov.io/gh/amitjoy/feature-flags-for-osgi/branch/master/graph/badge.svg)](https://codecov.io/gh/amitjoy/feature-flags-for-osgi) [![Coverage Status](https://coveralls.io/repos/github/amitjoy/feature-flags-for-osgi/badge.svg?branch=master)](https://coveralls.io/github/amitjoy/feature-flags-for-osgi?branch=master)
 
 **Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/retriable.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-for-osgi/)
 
