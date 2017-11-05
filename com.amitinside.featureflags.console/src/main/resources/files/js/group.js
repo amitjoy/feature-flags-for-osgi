@@ -4,7 +4,7 @@ $(document).ready(function() {
     var groups = null;
     var param = getParameterByName("name");
     $("#name").alphanum({
-        allow :    '-.',
+        allow : '-.',
         allowSpace : false,
         maxLength : 20
     });
@@ -23,21 +23,41 @@ $(document).ready(function() {
         }
     });
 
-    $.ajax({
-        type : "GET",
-        dataType : "json",
-        url : "/rest/groups",
-        success : function(data) {
-            for (var i = 0; i < data.length; i++) {
-                var j = i;
-                var isEnabled = Boolean(data[i].enabled);
-                var tag = isEnabled ? "checked" : "";
-                var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
-                var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
-                $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
+    var strategyParam = getParameterByName("strategy");
+    if (strategyParam != null) {
+        $.ajax({
+            type : "GET",
+            dataType : "json",
+            url : "/rest/groupsByStrategy/" + strategyParam,
+            success : function(data) {
+                $("#title").html("All Registered Groups by Strategy " + strategyParam);
+                for (var i = 0; i < data.length; i++) {
+                    var j = i;
+                    var isEnabled = Boolean(data[i].enabled);
+                    var tag = isEnabled ? "checked" : "";
+                    var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
+                    var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
+                    $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
+                }
             }
-        }
-    });
+        });
+    } else {
+        $.ajax({
+            type : "GET",
+            dataType : "json",
+            url : "/rest/groups",
+            success : function(data) {
+                for (var i = 0; i < data.length; i++) {
+                    var j = i;
+                    var isEnabled = Boolean(data[i].enabled);
+                    var tag = isEnabled ? "checked" : "";
+                    var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
+                    var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
+                    $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
+                }
+            }
+        });
+    }
 
     if (param != null) {
         $.ajax({
@@ -120,7 +140,7 @@ function addGroup() {
         type : "POST",
         data : JSON.stringify(data),
         url : "/rest/groups",
-        contentType: "application/json",
+        contentType : "application/json",
         success : function(data) {
             $("#group-added").show();
             $("#error-message").hide();
@@ -156,7 +176,7 @@ function updateGroup() {
         type : "PUT",
         data : JSON.stringify(data),
         url : "/rest/groups",
-        contentType: "application/json",
+        contentType : "application/json",
         success : function(data) {
             $("#group-updated").show();
             $("#error-message").hide();

@@ -37,23 +37,69 @@ $(document).ready(function() {
         }
     });
 
-    $.ajax({
-        type : "GET",
-        dataType : "json",
-        url : "/rest/features",
-        success : function(data) {
-            features = data;
-            for (var i = 0; i < data.length; i++) {
-                var j = i;
-                var isEnabled = Boolean(data[i].enabled);
-                var tag = isEnabled ? "checked" : "";
-                var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
-                var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
-                var groups = (data[i].groups === undefined) || (data[i].groups === null) ? "" : data[i].groups.join();
-                $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
+    var strategyParam = getParameterByName("strategy");
+    var groupParam = getParameterByName("group");
+    if (strategyParam != null && groupParam != null) {
+        console.log("Startegy and Group Query Parameters cannot be set at the same time");
+        return false;
+    }
+    if (strategyParam != null) {
+        $.ajax({
+            type : "GET",
+            dataType : "json",
+            url : "/rest/featuresByStrategy/" + strategyParam,
+            success : function(data) {
+                $("#title").html("All Registered Features by Strategy " + strategyParam);
+                features = data;
+                for (var i = 0; i < data.length; i++) {
+                    var j = i;
+                    var isEnabled = Boolean(data[i].enabled);
+                    var tag = isEnabled ? "checked" : "";
+                    var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
+                    var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
+                    var groups = (data[i].groups === undefined) || (data[i].groups === null) ? "" : data[i].groups.join();
+                    $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
+                }
             }
-        }
-    });
+        });
+    } else if (groupParam != null) {
+        $.ajax({
+            type : "GET",
+            dataType : "json",
+            url : "/rest/featuresByGroup/" + groupParam,
+            success : function(data) {
+                $("#title").html("All Registered Features by Group " + groupParam);
+                features = data;
+                for (var i = 0; i < data.length; i++) {
+                    var j = i;
+                    var isEnabled = Boolean(data[i].enabled);
+                    var tag = isEnabled ? "checked" : "";
+                    var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
+                    var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
+                    var groups = (data[i].groups === undefined) || (data[i].groups === null) ? "" : data[i].groups.join();
+                    $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
+                }
+            }
+        });
+    } else {
+        $.ajax({
+            type : "GET",
+            dataType : "json",
+            url : "/rest/features",
+            success : function(data) {
+                features = data;
+                for (var i = 0; i < data.length; i++) {
+                    var j = i;
+                    var isEnabled = Boolean(data[i].enabled);
+                    var tag = isEnabled ? "checked" : "";
+                    var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
+                    var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
+                    var groups = (data[i].groups === undefined) || (data[i].groups === null) ? "" : data[i].groups.join();
+                    $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
+                }
+            }
+        });
+    }
 
     if (param != null) {
         $.ajax({
