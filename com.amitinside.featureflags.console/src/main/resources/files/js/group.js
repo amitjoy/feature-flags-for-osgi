@@ -37,7 +37,7 @@ $(document).ready(function() {
                     var tag = isEnabled ? "checked" : "";
                     var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
                     var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
-                    $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
+                    $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td><a href=groups.html?strategy=" + strategy + ">" + strategy + "</a></td><td>" + enabled + "</td></tr>");
                 }
             }
         });
@@ -53,7 +53,7 @@ $(document).ready(function() {
                     var tag = isEnabled ? "checked" : "";
                     var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
                     var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
-                    $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + enabled + "</td></tr>");
+                    $("#groups-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_group.html?name=" + encodeURIComponent(data[i].name) + ">" + data[i].name + "</a></td><td>" + data[i].description + "</td><td><a href=groups.html?strategy=" + strategy + ">" + strategy + "</a></td><td>" + enabled + "</td></tr>");
                 }
             }
         });

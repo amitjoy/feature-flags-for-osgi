@@ -58,7 +58,7 @@ $(document).ready(function() {
                     var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
                     var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
                     var groups = (data[i].groups === undefined) || (data[i].groups === null) ? "" : data[i].groups.join();
-                    $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
+                    $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td><a href=features.html?strategy=" + strategy + ">" + strategy + "</a></td><td>" + getGroupsURL(groups) + "</td><td>" + enabled + "</td></tr>");
                 }
             }
         });
@@ -77,7 +77,7 @@ $(document).ready(function() {
                     var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
                     var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
                     var groups = (data[i].groups === undefined) || (data[i].groups === null) ? "" : data[i].groups.join();
-                    $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
+                    $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td><a href=features.html?strategy=" + strategy + ">" + strategy + "</a></td><td>" + getGroupsURL(groups) + "</td><td>" + enabled + "</td></tr>");
                 }
             }
         });
@@ -95,7 +95,7 @@ $(document).ready(function() {
                     var enabled = "<label class='switch'><input type='checkbox' " + tag + " disabled> <span class='slider'></span></label>";
                     var strategy = (data[i].strategy === undefined) || (data[i].strategy === null) ? "" : data[i].strategy;
                     var groups = (data[i].groups === undefined) || (data[i].groups === null) ? "" : data[i].groups.join();
-                    $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td>" + strategy + "</td><td>" + groups + "</td><td>" + enabled + "</td></tr>");
+                    $("#features-table tr:last").after("<tr><th>" + ++j + "</th><td><a href=add_feature.html?name=" + data[i].name + ">" + encodeURIComponent(data[i].name) + "</a></td><td>" + data[i].description + "</td><td><a href=features.html?strategy=" + strategy + ">" + strategy + "</a></td><td>" + getGroupsURL(groups) + "</td><td>" + enabled + "</td></tr>");
                 }
             }
         });
@@ -239,4 +239,14 @@ function updateFeature() {
             $("#error-message").show();
         }
     });
+}
+
+function getGroupsURL(stringToSplit) {
+    var arr = stringToSplit.split(",");
+    var url = "";
+    for (var i = 0; i < arr.length; i++) {
+        url += "<a href=features.html?group=" + arr[i] + ">" + arr[i] + "</a>";
+        url += " ";
+    }
+    return url;
 }
