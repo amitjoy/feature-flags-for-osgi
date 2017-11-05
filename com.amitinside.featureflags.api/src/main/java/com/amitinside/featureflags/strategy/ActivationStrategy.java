@@ -20,19 +20,17 @@ import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 
 /**
- * This interface represents a custom strategy for deciding whether
- * a {@link Strategizable} instance will be active or not.
+ * This interface represents a custom strategy for deciding whether a {@link Strategizable}
+ * instance will be active or not.
  * <p>
- * Currently {@link Feature} and {@link FeatureGroup} instances are
- * {@link Strategizable}.
+ * Currently {@link Feature} and {@link FeatureGroup} instances are {@link Strategizable}.
  * </p>
  * <p>
- * Strategy names {@link #getName()} should be globally unique (case-insensitive).
- * If multiple strategies have the same name, the strategy with the highest service
- * ranking is accessible through the {@link FeatureService} service while those with
- * lower service rankings are ignored. If service rankings are equal, sort by service
- * ID in descending order. That is, services with lower service IDs will be accessible
- * whereas those with higher service IDs are ignored.
+ * Strategy names {@link #getName()} should be globally unique (case-insensitive). If multiple
+ * strategies have the same name, the strategy with the highest service ranking is accessible
+ * through the {@link FeatureService} service while those with lower service rankings are ignored.
+ * If service rankings are equal, sort by service ID in descending order. That is, services with
+ * lower service IDs will be accessible whereas those with higher service IDs are ignored.
  * </p>
  *
  * This interface is intended to be implemented by feature providers.

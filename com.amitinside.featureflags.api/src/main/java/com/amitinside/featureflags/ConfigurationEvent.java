@@ -17,6 +17,7 @@ import org.osgi.annotation.versioning.ProviderType;
 
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * A Configuration Event.
@@ -60,7 +61,8 @@ public class ConfigurationEvent {
 
     /**
      * Constructs a {@code ConfigurationEvent} object from the given
-     * <code>ServiceReference</code> object, event type, and pids.
+     * event type, {@link Strategizable} instance and associated service
+     * properties
      *
      * @param type The event type. See {@link #getType}.
      * @param reference The {@link Strategizable} reference.
@@ -96,12 +98,12 @@ public class ConfigurationEvent {
     }
 
     /**
-     * Returns the associated {@link Strategizable} instance's service properties
+     * Returns the associated {@link Strategizable} instance's service properties (immutable view)
      *
      * @return service properties
      */
     public Map<String, Object> getProperties() {
-        return properties;
+        return ImmutableMap.copyOf(properties);
     }
 
     public enum Type {

@@ -10,9 +10,7 @@
 package com.amitinside.featureflags;
 
 /**
- * Constants used with the {@link FeatureService} service.
- *
- * @Immutable
+ * Constants required for feature flags.
  */
 public final class Constants {
 
