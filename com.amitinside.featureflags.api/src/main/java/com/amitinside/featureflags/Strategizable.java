@@ -20,11 +20,9 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 
 /**
- * A class implements the {@code Strategizable} interface to
- * indicate that the instances of the class can be used to
- * provide strategic information for its enablement. Strategic
- * information can be provided by implementing {@link ActivationStrategy}
- * interface.
+ * A class implements the {@code Strategizable} interface to indicate that the instances of
+ * the class can be used to provide strategic information for its enablement. Strategic
+ * information can be provided by implementing {@link Strategy} interface.
  *
  * @noimplement This interface is not intended to be implemented by feature providers.
  * @noextend This interface is not intended to be extended by feature providers.

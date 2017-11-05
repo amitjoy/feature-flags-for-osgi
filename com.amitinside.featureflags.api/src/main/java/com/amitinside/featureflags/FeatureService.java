@@ -20,8 +20,9 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.base.Strings;
 
 /**
- * The {@link FeatureService} service is the applications access point to the Feature
- * Flag functionality. It can be used to query the available features.
+ * The {@link FeatureService} service is the applications access point to the feature
+ * flags functionality. It can be used to query the available features, groups and
+ * strategies. It is also used to manage these instances easily.
  *
  * @noimplement This interface is not intended to be implemented by feature providers.
  * @noextend This interface is not intended to be extended by feature providers.

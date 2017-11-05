@@ -2,13 +2,9 @@
 
 ## Why? [![start with what and why](https://img.shields.io/badge/start%20with-why%3F-brightgreen.svg?style=flat)](http://featureflags.io/feature-flags/)
 
-This is an implementation of the Feature Toggles pattern (also known as Feature Flags) for OSGi. Feature Toggles are widespread agile development practices in the context of continuous deployment and delivery. The basic idea is to associate a toggle with each new feature you are working on. This allows you to enable or disable these features at application runtime, even for individual users.
+This is an implementation of the Feature Toggles pattern (also known as Feature Flags) for OSGi Service Platform. Feature Flags (also known as Feature Toggles and Feature Controls) is a software development practice that facilitates the easy enablement and disablement of deployed functionalities. Besides, feature flags ease the management of the feature's entire lifecycle. These allow you to manage components and compartmentalize risk. We can also roll out the features to a specific group of users or exclude the group from accessing it, perform A/B test and much more. It’s also way to test how your features perform in the real world and not just in an artificial test environment. Therefore, feature toggle is a widespread agile development practice in the context of continuous deployment and delivery.
 
-------------------------------------------------
-
-“A feature toggle, (also feature switch, feature flag, feature flipper, conditional feature, etc.) is a technique in software development that attempts to provide an alternative to maintaining multiple source-code branches (known as feature branches).  Continuous release and continuous deployment provide developers with rapid feedback about their coding. This requires the integration of their code changes as early as possible. Feature branches introduce a bypass to this process. Feature toggles bring developers back to the track, but the execution paths of their features are still “dead” if a toggle is “off”. But the effort is low to enable the new execution paths just by setting a toggle to on.”
-
--------------------------------------------------
+----------------------------------------------------------------
 
 **Continuous Integration** ![Build Status](https://travis-ci.org/amitjoy/feature-flags-for-osgi.svg?branch=master)
 
@@ -18,11 +14,15 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/retriable.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-for-osgi/)
 
-## Requirements
+----------------------------------------------------------------
+
+### Requirements
 
 1. Java 8+
 2. OSGi R4+ (For Core API and Implementation)
 3. OSGi R6+ (For REST Services and Web Console)
+
+----------------------------------------------------------------
 
 ### Dependencies
 
@@ -50,6 +50,8 @@ The bundle comprising REST services requires:
 1. OSGi enRoute REST Provider (Implementation of proposed OSGi REST Specification)
 2. OSGi enRoute DTOs (Implementation of proposed OSGi DTO Service) 
 
+----------------------------------------------------------------
+
 ### Installation
 
 1. `com.amitinside.featureflags.api`
@@ -60,9 +62,13 @@ The bundle comprising REST services requires:
 
 You don't need to install all five bundles. To use feature flags in OSGi environment, you could only use the API and provider bundles.
 
+----------------------------------------------------------------
+
 ### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/feature-flags-osgi/issues)
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/feature-flags-osgi/blob/master/CONTRIBUTING.md)
+
+----------------------------------------------------------------
 
 #### Project Import
 
@@ -70,9 +76,13 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> Existing Maven Projects`)
 
+----------------------------------------------------------------
+
 #### Building from Source
 
 1. Run `mvn clean install -Dgpg.skip` in the project folder
+
+----------------------------------------------------------------
 
 #### Web Console
 
@@ -82,9 +92,13 @@ Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> 
 4. Install all the bundles to your OSGi runtime
 5. Open browser and access `http://localhost:8080/featureflags/page/index.html`
 
+----------------------------------------------------------------
+
 ### License
 
 This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/license-EPL-blue.svg)](http://www.eclipse.org/legal/epl-v10.html)
+
+----------------------------------------------------------------
 
 ### Usage
 
@@ -133,11 +147,13 @@ The following flowchart shows the control flow for the determination of feature 
 
 ![feature-flags](https://user-images.githubusercontent.com/13380182/32149859-65ab9eda-bd0b-11e7-9d63-c332c676f4d5.jpg)
 
+----------------------------------------------------------------
+
 **Strategies Included**:
 
 1. **Service Property Activation Strategy**: This strategy is responsible for checking configured property key and value in the feature or feature group's OSGi service property.
 2. **System Property Activation Strategy**: Likewise this strategy checks for specified property key and value in the system configured properties.
 
-**Motivation of Feature Group**: Feature groups are primarily used to enable or disable multiple related features all-together. That's why enablement of any feature group is directly applied to the belonging features. Not all features should belong to feature group and hence a feature can optionally specify the feature group to which it belongs. Please note that use feature groups only if you have multiple features to group and whose enablements and disablements would happen together. If you do have various features whose enablements and disablements are not at all related, **do not specify any feature group** for those features. For more information, have a look at the flowchart as mentioned earlier.
-
 ----------------------------------------------------------------
+
+**Motivation of Feature Group**: Feature groups are primarily used to enable or disable multiple related features all-together. That's why enablement of any feature group is directly applied to the belonging features. Not all features should belong to feature group and hence a feature can optionally specify the feature group to which it belongs. Please note that use feature groups only if you have multiple features to group and whose enablements and disablements would happen together. If you do have various features whose enablements and disablements are not at all related, **do not specify any feature group** for those features. For more information, have a look at the flowchart as mentioned earlier.
