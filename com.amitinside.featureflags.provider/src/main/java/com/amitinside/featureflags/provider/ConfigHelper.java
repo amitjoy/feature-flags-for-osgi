@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.util;
+package com.amitinside.featureflags.provider;
 
 import static java.util.Objects.requireNonNull;
 
@@ -15,7 +15,6 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.amitinside.featureflags.Config;
 import com.google.common.collect.Maps;
 
 /**

@@ -9,7 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.Config.*;
+import static com.amitinside.featureflags.provider.Config.*;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Constructor;
@@ -19,8 +19,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.amitinside.featureflags.Config;
-import com.amitinside.featureflags.util.ConfigHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 

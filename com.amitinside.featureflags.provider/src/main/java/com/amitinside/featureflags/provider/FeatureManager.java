@@ -9,10 +9,10 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.Config.*;
 import static com.amitinside.featureflags.ConfigurationEvent.Type.*;
 import static com.amitinside.featureflags.Constants.*;
 import static com.amitinside.featureflags.StrategyFactory.StrategyType.SERVICE_PROPERTY;
+import static com.amitinside.featureflags.provider.Config.*;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.framework.Constants.*;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;

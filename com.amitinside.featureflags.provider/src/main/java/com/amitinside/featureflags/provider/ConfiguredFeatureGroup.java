@@ -9,8 +9,8 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.Config.*;
 import static com.amitinside.featureflags.Constants.FEATURE_GROUP_FACTORY_PID;
+import static com.amitinside.featureflags.provider.Config.*;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE;
 
@@ -26,10 +26,8 @@ import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
-import com.amitinside.featureflags.Config;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.provider.ConfiguredFeatureGroup.FeatureGroupConfig;
-import com.amitinside.featureflags.util.ConfigHelper;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
