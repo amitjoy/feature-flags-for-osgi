@@ -32,7 +32,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  * @ThreadSafe
  */
 @ConsumerType
-public interface Strategizable {
+public interface Strategizable extends Configurable {
 
     /**
      * The name of the strategizable.
