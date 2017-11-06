@@ -28,6 +28,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.provider.ConfiguredFeatureGroup.FeatureGroupConfig;
+import com.amitinside.featureflags.provider.util.ConfigHelper;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 

@@ -30,6 +30,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.provider.ConfiguredFeature.FeatureConfig;
+import com.amitinside.featureflags.provider.util.ConfigHelper;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 

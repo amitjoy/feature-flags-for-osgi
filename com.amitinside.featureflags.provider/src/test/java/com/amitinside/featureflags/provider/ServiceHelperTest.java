@@ -28,7 +28,7 @@ import org.osgi.framework.ServiceReference;
 
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
-import com.amitinside.featureflags.util.ServiceHelper;
+import com.amitinside.featureflags.provider.util.ServiceHelper;
 import com.google.common.collect.Lists;
 
 @RunWith(MockitoJUnitRunner.class)

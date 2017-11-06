@@ -21,7 +21,6 @@ import com.amitinside.featureflags.Constants;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
-import com.amitinside.featureflags.util.ServiceHelper;
 import com.google.common.collect.Maps;
 
 import osgi.enroute.rest.api.RESTRequest;

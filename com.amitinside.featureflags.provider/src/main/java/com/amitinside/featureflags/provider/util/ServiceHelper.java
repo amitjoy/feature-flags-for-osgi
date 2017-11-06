@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.util;
+package com.amitinside.featureflags.provider.util;
 
 import static java.util.Objects.requireNonNull;
 
