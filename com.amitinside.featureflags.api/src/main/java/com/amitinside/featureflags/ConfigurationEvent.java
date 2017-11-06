@@ -17,6 +17,7 @@ import org.osgi.annotation.versioning.ProviderType;
 
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
+import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -34,7 +35,8 @@ import com.google.common.collect.ImmutableMap;
  *
  * @see Feature
  * @see FeatureGroup
- * @see Strategizable
+ * @see ActivationStrategy
+ * @see Configurable
  *
  * @ThreadSafe
  * @Immutable
@@ -52,7 +54,7 @@ public class ConfigurationEvent {
     /**
      * The service instance which created this event.
      */
-    private final Strategizable service;
+    private final Configurable service;
 
     /**
      * The service properties of the associated {@link Strategizable} instance
@@ -61,15 +63,15 @@ public class ConfigurationEvent {
 
     /**
      * Constructs a {@code ConfigurationEvent} object from the given
-     * event type, {@link Strategizable} instance and associated service
+     * event type, {@link Configurable} instance and associated service
      * properties
      *
      * @param type The event type. See {@link #getType}.
-     * @param reference The {@link Strategizable} reference.
-     * @param properties The service properties of the associated {@link Strategizable}
+     * @param reference The {@link Configurable} reference.
+     * @param properties The service properties of the associated {@link Configurable}
      * @throws NullPointerException if any of the specified arguments is {@code null}
      */
-    public ConfigurationEvent(final Type type, final Strategizable reference, final Map<String, Object> properties) {
+    public ConfigurationEvent(final Type type, final Configurable reference, final Map<String, Object> properties) {
         requireNonNull(type, "Event type cannot be null");
         requireNonNull(reference, "Event associated instance cannot be null");
         requireNonNull(properties, "Service properties cannot be null");
@@ -89,11 +91,11 @@ public class ConfigurationEvent {
     }
 
     /**
-     * Returns the associated {@link Strategizable} instance
+     * Returns the associated {@link Configurable} instance
      *
-     * @return associated {@link Strategizable} instance
+     * @return associated {@link Configurable} instance
      */
-    public Strategizable getReference() {
+    public Configurable getReference() {
         return service;
     }
 
