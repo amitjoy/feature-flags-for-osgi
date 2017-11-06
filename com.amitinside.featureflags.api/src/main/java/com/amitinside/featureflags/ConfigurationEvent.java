@@ -25,9 +25,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * <p>
  * {@code ConfigurationEvent} objects are delivered to all registered
- * {@code ConfigurationListener} service objects. ConfigurationEvents
- * must be asynchronously delivered in chronological order with respect to each
- * listener.
+ * {@code ConfigurationListener} service objects.
  * </p>
  *
  * @noimplement This interface is not intended to be implemented by feature providers.
