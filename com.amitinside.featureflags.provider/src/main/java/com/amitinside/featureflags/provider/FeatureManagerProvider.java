@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import com.amitinside.featureflags.Configurable;
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
-import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.StrategyFactory;
 import com.amitinside.featureflags.feature.Feature;
@@ -60,11 +60,11 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
 /**
- * This service implements the {@link FeatureService}. It keeps track of all
+ * This service implements the {@link FeatureManager}. It keeps track of all
  * {@link Feature}, {@link FeatureGroup} and {@link ActivationStrategy} services.
  */
 @Component(name = "FeatureManager", immediate = true)
-public class FeatureManager implements FeatureService, org.osgi.service.cm.ConfigurationListener {
+public class FeatureManagerProvider implements FeatureManager, org.osgi.service.cm.ConfigurationListener {
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());

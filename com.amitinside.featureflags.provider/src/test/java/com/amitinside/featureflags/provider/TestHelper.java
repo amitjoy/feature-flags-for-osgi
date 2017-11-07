@@ -20,7 +20,7 @@ import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.provider.ConfiguredFeature;
 import com.amitinside.featureflags.provider.ConfiguredFeatureGroup;
-import com.amitinside.featureflags.provider.FeatureManager;
+import com.amitinside.featureflags.provider.FeatureManagerProvider;
 import com.amitinside.featureflags.provider.ServicePropertyActivationStrategy;
 import com.amitinside.featureflags.provider.SystemPropertyActivationStrategy;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
@@ -210,7 +210,7 @@ public final class TestHelper {
         return properties;
     }
 
-    public static class MyFeatureCustomManager extends FeatureManager {
+    public static class MyFeatureCustomManager extends FeatureManagerProvider {
         @Override
         protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
             Feature newFeature;
@@ -227,11 +227,11 @@ public final class TestHelper {
         }
     }
 
-    public static FeatureManager createFeatureManagerWithCM() {
+    public static FeatureManagerProvider createFeatureManagerWithCM() {
         return new MyFeatureCustomManager();
     }
 
-    public static class MyFeatureGroupCustomManager extends FeatureManager {
+    public static class MyFeatureGroupCustomManager extends FeatureManagerProvider {
         @Override
         protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
             FeatureGroup newFeatureGroup;
@@ -247,7 +247,7 @@ public final class TestHelper {
         }
     }
 
-    public static FeatureManager createFeatureGroupManagerWithCM() {
+    public static FeatureManagerProvider createFeatureGroupManagerWithCM() {
         return new MyFeatureGroupCustomManager();
     }
 }

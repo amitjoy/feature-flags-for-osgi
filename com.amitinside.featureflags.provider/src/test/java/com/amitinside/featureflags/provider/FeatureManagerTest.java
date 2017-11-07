@@ -47,9 +47,9 @@ import com.google.common.collect.Maps;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @RunWith(MockitoJUnitRunner.class)
-public final class FeatureServiceTest {
+public final class FeatureManagerTest {
 
-    private FeatureManager manager;
+    private FeatureManagerProvider manager;
 
     @Mock
     private BundleContext context;
@@ -704,7 +704,7 @@ public final class FeatureServiceTest {
     @Test
     public void testConfigAdmin() {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
-        manager = new FeatureManager();
+        manager = new FeatureManagerProvider();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
         manager.bindFeature(feature, createServiceProperties(2, 5, "feature1"));
@@ -718,7 +718,7 @@ public final class FeatureServiceTest {
     @Test
     public void testConfigAdminWhenPIDEmpty() {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
-        manager = new FeatureManager();
+        manager = new FeatureManagerProvider();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
         manager.bindFeature(feature, createServiceProperties(2, 5, ""));
@@ -730,7 +730,7 @@ public final class FeatureServiceTest {
     @Test
     public void testConfigAdminWhenPIDEmpty2() {
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
-        manager = new FeatureManager();
+        manager = new FeatureManagerProvider();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
 
         manager.bindFeatureGroup(group, createServiceProperties(2, 5, ""));
@@ -742,7 +742,7 @@ public final class FeatureServiceTest {
     @Test
     public void testConfigListenerForFeatureWhenConfigUpdated() throws InvalidSyntaxException {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
-        manager = new FeatureManager();
+        manager = new FeatureManagerProvider();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
         configurationAdmin.addListener(manager);
 
@@ -776,7 +776,7 @@ public final class FeatureServiceTest {
     @Test
     public void testConfigListenerForFeatureWhenConfigDeleted() throws InvalidSyntaxException {
         final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
-        manager = new FeatureManager();
+        manager = new FeatureManagerProvider();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
         configurationAdmin.addListener(manager);
 
@@ -810,7 +810,7 @@ public final class FeatureServiceTest {
     @Test
     public void testConfigListenerForFeatureGroup() throws InvalidSyntaxException {
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
-        manager = new FeatureManager();
+        manager = new FeatureManagerProvider();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
         configurationAdmin.addListener(manager);
 
@@ -844,7 +844,7 @@ public final class FeatureServiceTest {
     @Test
     public void testConfigListenerForStrategy() throws InvalidSyntaxException {
         final ActivationStrategy strategy = createActivationStrategyCustom("strategy1", "My Strategy 1", false);
-        manager = new FeatureManager();
+        manager = new FeatureManagerProvider();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, strategy);
         configurationAdmin.addListener(manager);
 
@@ -886,7 +886,7 @@ public final class FeatureServiceTest {
 
     @Test
     public void testGetEventMethodForStrategizableButNotFeatureOrFeatureGroup() {
-        manager = new FeatureManager();
+        manager = new FeatureManagerProvider();
         try {
             final Method method = manager.getClass().getDeclaredMethod("getEvent", Configurable.class, int.class);
             method.setAccessible(true);
@@ -906,7 +906,7 @@ public final class FeatureServiceTest {
     @Test
     public void testConfigListenerForFeatureGroupWithIOException() throws IOException {
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
-        manager = new FeatureManager();
+        manager = new FeatureManagerProvider();
 
         manager.bindFeatureGroup(group, createServiceProperties(2, 5, "group1"));
         manager.setConfigurationAdmin(configurationAdmin);
@@ -940,7 +940,7 @@ public final class FeatureServiceTest {
         final Map<String, Object> props3 = createServiceProperties(3, 5, "myPid");
         final Map<String, Object> props4 = createServiceProperties(3, 6, "myPid");
 
-        final Class clazz = Class.forName("com.amitinside.featureflags.provider.FeatureManager$Description");
+        final Class clazz = Class.forName("com.amitinside.featureflags.provider.FeatureManagerProvider$Description");
         final Constructor constructor = clazz.getConstructor(Object.class, Map.class);
         constructor.setAccessible(true);
         final Object instance1 = constructor.newInstance(feature1, props1);

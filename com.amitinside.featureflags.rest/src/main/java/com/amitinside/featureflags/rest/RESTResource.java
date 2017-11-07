@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.StrategyFactory;
 import com.amitinside.featureflags.StrategyFactory.StrategyType;
@@ -48,7 +48,7 @@ public final class RESTResource implements REST {
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private FeatureService featureService;
+    private FeatureManager featureService;
 
     public List<FeatureData> getFeatures(final RESTRequest req) {
         //@formatter:off
@@ -305,17 +305,17 @@ public final class RESTResource implements REST {
     }
 
     /**
-     * {@link FeatureService} service binding callback
+     * {@link FeatureManager} service binding callback
      */
     @Reference
-    protected void setFeatureService(final FeatureService featureService) {
+    protected void setFeatureService(final FeatureManager featureService) {
         this.featureService = featureService;
     }
 
     /**
-     * {@link FeatureService} service unbinding callback
+     * {@link FeatureManager} service unbinding callback
      */
-    protected void unsetFeatureService(final FeatureService featureService) {
+    protected void unsetFeatureService(final FeatureManager featureService) {
         this.featureService = null;
     }
 

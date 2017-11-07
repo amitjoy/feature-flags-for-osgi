@@ -25,7 +25,7 @@ import org.osgi.service.cm.ConfigurationListener;
 
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
-import com.amitinside.featureflags.provider.FeatureManager;
+import com.amitinside.featureflags.provider.FeatureManagerProvider;
 import com.amitinside.featureflags.provider.SystemPropertyActivationStrategy;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.Lists;
@@ -34,12 +34,12 @@ import com.google.common.collect.Maps;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public final class ConfigurationAdminMock implements ConfigurationAdmin {
 
-    private final FeatureManager manager;
+    private final FeatureManagerProvider manager;
     private final ServiceReference reference;
     private final List<ConfigurationListener> listeners = Lists.newCopyOnWriteArrayList();
     private final Object instance;
 
-    public ConfigurationAdminMock(final FeatureManager manager, final ServiceReference reference,
+    public ConfigurationAdminMock(final FeatureManagerProvider manager, final ServiceReference reference,
             final Object instance) {
         this.manager = manager;
         this.reference = reference;
@@ -82,11 +82,11 @@ public final class ConfigurationAdminMock implements ConfigurationAdmin {
     public final class ConfigurationMock implements Configuration {
 
         private final String name;
-        private final FeatureManager manager;
+        private final FeatureManagerProvider manager;
         private final ServiceReference reference;
         private final Object instance;
 
-        public ConfigurationMock(final String name, final FeatureManager manager, final ServiceReference reference,
+        public ConfigurationMock(final String name, final FeatureManagerProvider manager, final ServiceReference reference,
                 final Object instance) {
             this.name = name;
             this.manager = manager;

@@ -20,7 +20,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.base.Strings;
 
 /**
- * The {@link FeatureService} service is the applications access point to the feature
+ * The {@link FeatureManager} service is the applications access point to the feature
  * flags functionality. It can be used to query the available features, groups and
  * strategies. It is also used to manage these instances easily.
  *
@@ -34,7 +34,7 @@ import com.google.common.base.Strings;
  * @ThreadSafe
  */
 @ProviderType
-public interface FeatureService {
+public interface FeatureManager {
 
     /**
      * Retrieve all (known) {@link Feature}s.

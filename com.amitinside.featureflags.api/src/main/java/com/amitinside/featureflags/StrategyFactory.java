@@ -22,7 +22,7 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
 /**
  * StrategyFactory is used to create configuration factories for {@code SystemPropertyActivationStrategy}
  * and {@code ServicePropertyActivationStrategy}.
- * This is primarily used by {@link FeatureService} to create {@code SystemPropertyActivationStrategy} and
+ * This is primarily used by {@link FeatureManager} to create {@code SystemPropertyActivationStrategy} and
  * {@code ServicePropertyActivationStrategy} configuration instances.
  *
  * <pre>

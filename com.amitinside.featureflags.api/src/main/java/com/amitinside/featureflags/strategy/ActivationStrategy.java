@@ -15,7 +15,7 @@ import java.util.Optional;
 import org.osgi.annotation.versioning.ConsumerType;
 
 import com.amitinside.featureflags.Configurable;
-import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
@@ -29,7 +29,7 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
  * <p>
  * Strategy names {@link #getName()} should be globally unique (case-insensitive). If multiple
  * strategies have the same name, the strategy with the highest service ranking is accessible
- * through the {@link FeatureService} service while those with lower service rankings are ignored.
+ * through the {@link FeatureManager} service while those with lower service rankings are ignored.
  * If service rankings are equal, sort by service ID in descending order. That is, services with
  * lower service IDs will be accessible whereas those with higher service IDs are ignored.
  * </p>
@@ -38,7 +38,7 @@ import com.amitinside.featureflags.feature.group.FeatureGroup;
  *
  * @see Feature
  * @see FeatureGroup
- * @see FeatureService
+ * @see FeatureManager
  *
  * @ThreadSafe
  */

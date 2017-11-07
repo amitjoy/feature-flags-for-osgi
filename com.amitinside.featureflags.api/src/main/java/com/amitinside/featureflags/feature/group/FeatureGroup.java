@@ -11,7 +11,7 @@ package com.amitinside.featureflags.feature.group;
 
 import org.osgi.annotation.versioning.ConsumerType;
 
-import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
@@ -22,7 +22,7 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  * <p>
  * Feature Group names {@link #getName()} should be globally unique (case-insensitive).
  * If multiple feature groups have the same name, the feature group with the highest
- * service ranking is accessible through the {@link FeatureService} service while those
+ * service ranking is accessible through the {@link FeatureManager} service while those
  * with lower service rankings are ignored. If service rankings are equal, sort by service
  * ID in descending order. That is, services with lower service IDs will be accessible
  * whereas those with higher service IDs are ignored.
@@ -32,13 +32,13 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
  * enabled. Hence, no associated strategy would be effective on belonging {@link Feature}s.
  * </p>
  * <p>
- * To check enablement of any feature group, use {@link FeatureService#isGroupEnabled(String)}.
+ * To check enablement of any feature group, use {@link FeatureManager#isGroupEnabled(String)}.
  * </p>
  *
  * This interface is intended to be implemented by feature providers.
  *
  * @see Feature
- * @see FeatureService
+ * @see FeatureManager
  * @see ActivationStrategy
  *
  * @ThreadSafe

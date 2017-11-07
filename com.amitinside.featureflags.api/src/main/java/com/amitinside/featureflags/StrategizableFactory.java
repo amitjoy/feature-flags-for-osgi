@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link StrategizableFactory} is used to create configuration factories for {@link Feature} or {@link FeatureGroup}.
- * This is primarily used by {@link FeatureService} to create {@link Feature} and {@link FeatureGroup}
+ * This is primarily used by {@link FeatureManager} to create {@link Feature} and {@link FeatureGroup}
  * configuration instances.
  *
  * <pre>

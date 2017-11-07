@@ -27,7 +27,7 @@ import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amitinside.featureflags.FeatureService;
+import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.annotation.Feature;
 
 @Component(name = "ExampleFeatureFlag", immediate = true)
@@ -43,7 +43,7 @@ public final class ExampleFeatureFlag extends HttpServlet {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private HttpService httpService;
-    private FeatureService featureService;
+    private FeatureManager featureManager;
 
     /**
      * Component activation callback
@@ -81,24 +81,24 @@ public final class ExampleFeatureFlag extends HttpServlet {
     }
 
     /**
-     * {@link FeatureService} service binding callback
+     * {@link FeatureManager} service binding callback
      */
     @Reference
-    protected void setFeatureService(final FeatureService featureService) {
-        this.featureService = featureService;
+    protected void setFeatureManager(final FeatureManager featureManager) {
+        this.featureManager = featureManager;
     }
 
     /**
-     * {@link FeatureService} service unbinding callback
+     * {@link FeatureManager} service unbinding callback
      */
-    protected void unsetFeatureService(final FeatureService featureService) {
-        this.featureService = null;
+    protected void unsetFeatureManager(final FeatureManager featureManager) {
+        this.featureManager = null;
     }
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
-        if (featureService.isFeatureEnabled(FEATURE_ID)) {
+        if (featureManager.isFeatureEnabled(FEATURE_ID)) {
             resp.setStatus(SC_OK);
             return;
         }
