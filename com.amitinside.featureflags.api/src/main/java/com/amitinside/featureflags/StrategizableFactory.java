@@ -178,6 +178,7 @@ public class StrategizableFactory {
      * @param name the name of the instance
      * @param configuration the function representing the instance configuration
      * @return the {@link StrategizableFactory} instance
+     * @throws NullPointerException if any of the specified arguments is {@code null}
      */
     public static StrategizableFactory make(final String name,
             final Function<BuilderWithDescription, FactoryFinalizationStep> configuration) {
