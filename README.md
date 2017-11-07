@@ -102,19 +102,19 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 
 ### Usage
 
-1. You can use `FeatureService#createFeature(...)`, `FeatureService#createGroup(...)` and `FeatureService#createPropertyBasedStrategy(...)` to create features, groups and property based strategies.
+1. You can use `FeatureManager#createFeature(...)`, `FeatureManager#createGroup(...)` and `FeatureManager#createPropertyBasedStrategy(...)` to create features, groups and property based strategies.
 
 2. In your DS Component, use `FeatureService` to check if the feature is enabled
 
 ```java
 
 @Feature
-private static final String MY_FEATURE = "feature2";
+private static final String MY_FEATURE = "Myfeature";
 
-private FeatureService featureService;
+private FeatureManager featureManager;
 
 public void myMethod() {
-   if (featureService.isFeatureEnabled(MY_FEATURE)) {
+   if (featureManager.isFeatureEnabled(MY_FEATURE)) {
          // do this
    } else {
          // do something else
@@ -122,12 +122,12 @@ public void myMethod() {
 }
 
 @Reference
-void setFeatureService(final FeatureService featureService) {
-   this.featureService = featureService;
+void setFeatureManager(final FeatureManager featureManager) {
+   this.featureManager = featureManager;
 }
     
-void unsetFeatureService(final FeatureService featureService) {
-   this.featureService = null;
+void unsetFeatureManager(final FeatureManager featureManager) {
+   this.featureManager = null;
 }
 ```
 6. You can also implement `Feature` interface and expose it as an OSGi service
