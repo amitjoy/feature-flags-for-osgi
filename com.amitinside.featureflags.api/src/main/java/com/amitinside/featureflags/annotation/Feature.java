@@ -19,7 +19,8 @@ import java.lang.annotation.Target;
 /**
  * This annotation is primarily used to annotate field that contains the feature identifier to be used
  * in the source code. This is introduced to ease the effort to clean up obsolete features. The packaged
- * annotation processor would be used to show warning messages if any such feature is expired.
+ * annotation processor would be used to show warning messages during source build time if any such feature
+ * is expired.
  *
  * @see ExpirationType
  */
