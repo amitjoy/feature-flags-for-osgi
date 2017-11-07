@@ -153,6 +153,7 @@ public class StrategyFactory {
      * @param type the type of the strategy
      * @param configuration the function representing the instance configuration
      * @return the {@link StrategyFactory} instance
+     * @throws NullPointerException if any of the specified arguments is {@code null}
      */
     public static StrategyFactory make(final String name, final StrategyType type,
             final Function<BuilderWithDescription, FactoryFinalizationStep> configuration) {
