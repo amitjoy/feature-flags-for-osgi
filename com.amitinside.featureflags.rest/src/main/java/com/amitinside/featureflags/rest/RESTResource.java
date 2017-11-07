@@ -68,7 +68,9 @@ public final class RESTResource implements REST {
 
     public List<FeatureData> getFeaturesByGroup(final RESTRequest req, final String name) {
         //@formatter:off
-        return featureService.getFeaturesByGroup(name)
+        return featureService.getFeatures()
+                             .filter(f -> f.getGroups()
+                                           .anyMatch(g -> g.equalsIgnoreCase(name)))
                              .map(RequestHelper::mapToFeatureData)
                              .collect(Collectors.toList());
         //@formatter:on
@@ -76,7 +78,8 @@ public final class RESTResource implements REST {
 
     public List<FeatureData> getFeaturesByStrategy(final RESTRequest req, final String name) {
         //@formatter:off
-        return featureService.getFeaturesByStrategy(name)
+        return featureService.getFeatures()
+                             .filter(f -> f.getStrategy().orElse("").equalsIgnoreCase(name))
                              .map(RequestHelper::mapToFeatureData)
                              .collect(Collectors.toList());
         //@formatter:on
@@ -163,7 +166,8 @@ public final class RESTResource implements REST {
 
     public List<GroupData> getGroupsByStrategy(final RESTRequest req, final String name) {
         //@formatter:off
-        return featureService.getGroupsByStrategy(name)
+        return featureService.getGroups()
+                             .filter(f -> f.getStrategy().orElse("").equalsIgnoreCase(name))
                              .map(RequestHelper::mapToGroupData)
                              .collect(Collectors.toList());
         //@formatter:on

@@ -17,7 +17,6 @@ import org.osgi.annotation.versioning.ProviderType;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
-import com.google.common.base.Strings;
 
 /**
  * The {@link FeatureManager} service is the applications access point to the feature
@@ -282,44 +281,5 @@ public interface FeatureManager {
      * @throws NullPointerException if the specified argument {@code name} is {@code null}
      */
     boolean isGroupEnabled(String name);
-
-    /*
-     * ========================================================
-     * Default Utility Methods (Not required to be implemented)
-     * ========================================================
-     */
-
-    /**
-     * Retrieve all (known) {@link Feature}s associated with the specified group
-     *
-     * @param name the group name
-     * @return The known {@link Feature}s
-     */
-    default Stream<Feature> getFeaturesByGroup(final String name) {
-        return Strings.isNullOrEmpty(name) ? Stream.empty()
-                : getFeatures().filter(f -> f.getGroups().anyMatch(g -> g.equalsIgnoreCase(name)));
-    }
-
-    /**
-     * Retrieve all (known) {@link Feature}s associated with the specified strategy
-     *
-     * @param name the strategy name
-     * @return The known {@link Feature}s
-     */
-    default Stream<Feature> getFeaturesByStrategy(final String name) {
-        return Strings.isNullOrEmpty(name) ? Stream.empty()
-                : getFeatures().filter(f -> f.getStrategy().orElse("").equalsIgnoreCase(name));
-    }
-
-    /**
-     * Retrieve all (known) {@link FeatureGroup}s associated with the specified strategy
-     *
-     * @param name the strategy name
-     * @return The known {@link FeatureGroup}s
-     */
-    default Stream<FeatureGroup> getGroupsByStrategy(final String name) {
-        return Strings.isNullOrEmpty(name) ? Stream.empty()
-                : getGroups().filter(f -> f.getStrategy().orElse("").equalsIgnoreCase(name));
-    }
 
 }

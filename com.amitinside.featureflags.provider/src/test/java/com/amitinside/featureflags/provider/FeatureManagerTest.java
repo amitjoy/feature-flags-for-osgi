@@ -155,44 +155,6 @@ public final class FeatureManagerTest {
     }
 
     @Test
-    public void testGetFeaturesByStrategy() {
-        final Feature feature1 = createFeature("feature1", "My Feature 1", true, "group1", "strategy1");
-        final Feature feature2 = createFeature("feature2", "My Feature 2", true, "group1", "strategy1");
-        final Feature feature3 = createFeature("feature3", "My Feature 3", true, "group2", "strategy3");
-
-        manager.bindFeature(feature1, createServiceProperties(2, 5, "pid1"));
-        manager.bindFeature(feature2, createServiceProperties(3, 5, "pid2"));
-        manager.bindFeature(feature3, createServiceProperties(4, 5, "pid3"));
-
-        final ActivationStrategy strategy1 = createStrategy("strategy1", true, "My Strategy 1");
-        manager.bindStrategy(strategy1, createServiceProperties(2, 5, "pid4"));
-
-        assertEquals(manager.getFeaturesByStrategy("strategy1").count(), 2);
-
-        assertEquals(manager.getFeaturesByStrategy("").count(), 0);
-        assertEquals(manager.getFeaturesByStrategy(null).count(), 0);
-    }
-
-    @Test
-    public void testGetGroupsByStrategy() {
-        final FeatureGroup group1 = createFeatureGroup("group1", "My Group 1", true, "strategy1");
-        final FeatureGroup group2 = createFeatureGroup("group2", "My Group 2", true, "strategy2");
-        final FeatureGroup group3 = createFeatureGroup("group3", "My Group 3", true, "strategy1");
-
-        manager.bindFeatureGroup(group1, createServiceProperties(2, 5, "pid1"));
-        manager.bindFeatureGroup(group2, createServiceProperties(3, 6, "pid2"));
-        manager.bindFeatureGroup(group3, createServiceProperties(4, 6, "pid3"));
-
-        final ActivationStrategy strategy1 = createStrategy("strategy1", true, "My Strategy 1");
-        manager.bindStrategy(strategy1, createServiceProperties(2, 5, "pid4"));
-
-        assertEquals(manager.getGroupsByStrategy("strategy1").count(), 2);
-
-        assertEquals(manager.getGroupsByStrategy("").count(), 0);
-        assertEquals(manager.getGroupsByStrategy(null).count(), 0);
-    }
-
-    @Test
     public void testIsEnabledWhenFeatureInstanceNotPresent() {
         assertFalse(manager.isFeatureEnabled("feature1"));
     }
@@ -388,25 +350,6 @@ public final class FeatureManagerTest {
         manager.bindFeatureGroup(group2, createServiceProperties(3, 5, "pid4"));
 
         assertTrue(manager.isFeatureEnabled("feature1"));
-    }
-
-    @Test
-    public void testGetFeaturesByGroup() {
-        final Feature feature1 = createFeature("feature1", "My Feature 1", true, "group1", "strategy1");
-        final Feature feature2 = createFeature("feature2", "My Feature 2", true, "group1", "strategy2");
-        final Feature feature3 = createFeature("feature3", "My Feature 3", true, "group2", "strategy3");
-
-        manager.bindFeature(feature1, createServiceProperties(2, 5, "pid1"));
-        manager.bindFeature(feature2, createServiceProperties(3, 5, "pid2"));
-        manager.bindFeature(feature3, createServiceProperties(4, 5, "pid3"));
-
-        final FeatureGroup group1 = createFeatureGroup("group1", "My Group 1", true, "strategy1");
-        manager.bindFeatureGroup(group1, createServiceProperties(2, 5, "pid4"));
-
-        assertEquals(manager.getFeaturesByGroup("group1").count(), 2);
-
-        assertEquals(manager.getFeaturesByGroup("").count(), 0);
-        assertEquals(manager.getFeaturesByGroup(null).count(), 0);
     }
 
     @Test
@@ -617,21 +560,6 @@ public final class FeatureManagerTest {
     @Test(expected = NullPointerException.class)
     public void testNullArgumentRemoveFeatureGroup() throws IOException {
         manager.removeGroup(null);
-    }
-
-    @Test
-    public void testNullArgumentGetFeaturesByGroup() {
-        assertEquals(manager.getFeaturesByGroup(null).count(), 0);
-    }
-
-    @Test
-    public void testNullArgumentGetFeaturesByStrategy() {
-        assertEquals(manager.getFeaturesByStrategy(null).count(), 0);
-    }
-
-    @Test
-    public void testNullArgumentGetGroupsByStrategy() {
-        assertEquals(manager.getGroupsByStrategy(null).count(), 0);
     }
 
     @Test
