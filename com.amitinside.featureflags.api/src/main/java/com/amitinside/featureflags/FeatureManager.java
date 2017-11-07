@@ -140,14 +140,14 @@ public interface FeatureManager {
     /**
      * Creates a property based strategy.
      *
-     * @param factory The factory to be used to create the property based strategy. (cannot be {@code null})
+     * @param strategyFactory The factory to be used to create the property based strategy. (cannot be {@code null})
      * @return configuration PID as created wrapped in {@link Optional} or empty {@link Optional}
      *         instance if strategy does not get created due to failure
      *
      * @throws NullPointerException if the specified argument {@code factory} is {@code null}
      *             or the factory has been configured with a {@code null} name
      */
-    Optional<String> createPropertyBasedStrategy(StrategyFactory factory);
+    Optional<String> createPropertyBasedStrategy(StrategyFactory strategyFactory);
 
     /**
      * Removes a feature.
