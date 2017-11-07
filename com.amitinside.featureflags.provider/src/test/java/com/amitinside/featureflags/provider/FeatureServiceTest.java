@@ -31,6 +31,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import com.amitinside.featureflags.Configurable;
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
 import com.amitinside.featureflags.Strategizable;
@@ -841,6 +842,42 @@ public final class FeatureServiceTest {
     }
 
     @Test
+    public void testConfigListenerForStrategy() throws InvalidSyntaxException {
+        final ActivationStrategy strategy = createActivationStrategyCustom("strategy1", "My Strategy 1", false);
+        manager = new FeatureManager();
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, strategy);
+        configurationAdmin.addListener(manager);
+
+        final Map<String, Object> props = createServiceProperties(3, 5, "pid1");
+        manager.bindStrategy(strategy, props);
+        manager.setConfigurationAdmin(configurationAdmin);
+        final ConfigurationListener listener = new ConfigurationListener() {
+            @Override
+            public void accept(final ConfigurationEvent event) {
+                assertEquals(event.getType(), Type.DELETED);
+            }
+        };
+        manager.bindConfigurationListener(listener);
+        manager.activate(context);
+
+        doReturn(new ServiceReference[] { reference }).when(context)
+                .getServiceReferences(ActivationStrategy.class.getName(), null);
+        doReturn(strategy).when(context).getService(reference);
+        final List<String> propKeys = Lists.newArrayList("service.id", "service.ranking", "service.pid");
+        doReturn(propKeys.toArray(new String[0])).when(reference).getPropertyKeys();
+        doReturn(5).when(reference).getProperty("service.id");
+        doReturn(3).when(reference).getProperty("service.ranking");
+        doReturn("strategy1").when(reference).getProperty("service.pid");
+
+        manager.removePropertyBasedStrategy("strategy1");
+        manager.unbindConfigurationListener(listener);
+        manager.unsetConfigurationAdmin(configurationAdmin);
+        manager.unbindStrategy(strategy, props);
+
+        assertFalse(manager.getStrategy("strategy1").isPresent());
+    }
+
+    @Test
     public void testConfigurationEventMethod() {
         manager.activate(context);
         manager.configurationEvent(event);
@@ -851,7 +888,7 @@ public final class FeatureServiceTest {
     public void testGetEventMethodForStrategizableButNotFeatureOrFeatureGroup() {
         manager = new FeatureManager();
         try {
-            final Method method = manager.getClass().getDeclaredMethod("getEvent", Strategizable.class, int.class);
+            final Method method = manager.getClass().getDeclaredMethod("getEvent", Configurable.class, int.class);
             method.setAccessible(true);
             final ConfigurationEvent event = (ConfigurationEvent) method.invoke(manager, strategizable, 1);
             assertTrue(event.getProperties().isEmpty());

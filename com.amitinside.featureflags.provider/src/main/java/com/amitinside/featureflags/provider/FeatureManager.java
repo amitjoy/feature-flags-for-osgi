@@ -40,10 +40,10 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.amitinside.featureflags.Configurable;
 import com.amitinside.featureflags.ConfigurationEvent;
 import com.amitinside.featureflags.ConfigurationEvent.Type;
 import com.amitinside.featureflags.FeatureService;
-import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.StrategizableFactory;
 import com.amitinside.featureflags.StrategyFactory;
 import com.amitinside.featureflags.feature.Feature;
@@ -162,8 +162,8 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         final ServiceReference reference = event.getReference();
         try {
             final Object service = context.getService(reference);
-            if (service instanceof Strategizable) {
-                final Strategizable instance = (Strategizable) service;
+            if (service instanceof Configurable) {
+                final Configurable instance = (Configurable) service;
                 listeners.forEach(l -> l.accept(getEvent(instance, event.getType())));
             }
         } finally {
@@ -467,12 +467,14 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
         calculateActiveInstances(allInstances, activeInstances);
     }
 
-    private ConfigurationEvent getEvent(final Strategizable instance, final int type) {
+    private ConfigurationEvent getEvent(final Configurable instance, final int type) {
         Map<String, Object> properties = ImmutableMap.of();
         if (instance instanceof Feature) {
             properties = getFeatureProperties((Feature) instance);
         } else if (instance instanceof FeatureGroup) {
             properties = getFeatureGroupProperties((FeatureGroup) instance);
+        } else if (instance instanceof ActivationStrategy) {
+            properties = getStrategyProperties((ActivationStrategy) instance);
         }
         final Type eventType = type == 1 ? UPDATED : DELETED;
         return new ConfigurationEvent(eventType, instance, properties);
@@ -611,6 +613,10 @@ public class FeatureManager implements FeatureService, org.osgi.service.cm.Confi
 
     private Map<String, Object> getFeatureGroupProperties(final FeatureGroup group) {
         return ServiceHelper.getServiceProperties(context, group, FeatureGroup.class, null);
+    }
+
+    private Map<String, Object> getStrategyProperties(final ActivationStrategy strategy) {
+        return ServiceHelper.getServiceProperties(context, strategy, ActivationStrategy.class, null);
     }
 
     private boolean deleteConfiguration(final String name, final String pid) {
