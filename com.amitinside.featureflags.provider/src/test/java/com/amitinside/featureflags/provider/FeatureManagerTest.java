@@ -897,8 +897,6 @@ public final class FeatureManagerTest {
         manager.bindConfigurationListener(listener);
         manager.activate(context);
 
-        doThrow(IOException.class).when(configurationAdmin).getConfiguration("group1", "?");
-
         //@formatter:off
         final StrategizableFactory factory = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
                                                          .withStrategy("strategy1")
