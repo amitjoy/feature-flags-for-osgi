@@ -18,11 +18,6 @@ import java.util.stream.Stream;
 import com.amitinside.featureflags.Strategizable;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
-import com.amitinside.featureflags.provider.ConfiguredFeature;
-import com.amitinside.featureflags.provider.ConfiguredFeatureGroup;
-import com.amitinside.featureflags.provider.FeatureManagerProvider;
-import com.amitinside.featureflags.provider.ServicePropertyActivationStrategy;
-import com.amitinside.featureflags.provider.SystemPropertyActivationStrategy;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
 import com.google.common.collect.Maps;
 
@@ -210,44 +205,4 @@ public final class TestHelper {
         return properties;
     }
 
-    public static class MyFeatureCustomManager extends FeatureManagerProvider {
-        @Override
-        protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
-            Feature newFeature;
-            for (final Feature f : getFeatures().collect(Collectors.toList())) {
-                if (name.equalsIgnoreCase(name)) {
-                    newFeature = TestHelper.createFeature(f.getName(), f.getDescription().get(), status,
-                            f.getGroups().findAny().orElse(null), f.getStrategy().orElse(null));
-                    final Map<String, Object> props = createServiceProperties(2, 5, "pid1");
-                    unbindFeature(f, props);
-                    bindFeature(newFeature, props);
-                }
-            }
-            return true;
-        }
-    }
-
-    public static FeatureManagerProvider createFeatureManagerWithCM() {
-        return new MyFeatureCustomManager();
-    }
-
-    public static class MyFeatureGroupCustomManager extends FeatureManagerProvider {
-        @Override
-        protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
-            FeatureGroup newFeatureGroup;
-            for (final FeatureGroup g : getGroups().collect(Collectors.toList())) {
-                if (name.equalsIgnoreCase(name)) {
-                    newFeatureGroup = createFeatureGroup(g.getName(), g.getDescription().get(), status,
-                            g.getStrategy().orElse(null));
-                    unbindFeatureGroup(g, createServiceProperties(2, 5, "pid1"));
-                    bindFeatureGroup(newFeatureGroup, createServiceProperties(2, 5, "pid1"));
-                }
-            }
-            return true;
-        }
-    }
-
-    public static FeatureManagerProvider createFeatureGroupManagerWithCM() {
-        return new MyFeatureGroupCustomManager();
-    }
 }

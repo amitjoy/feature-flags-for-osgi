@@ -64,7 +64,7 @@ public final class FeatureManagerTest {
 
     @Before
     public void init() {
-        manager = createFeatureManagerWithCM();
+        manager = new FeatureManagerProvider();
     }
 
     @Test
@@ -331,7 +331,7 @@ public final class FeatureManagerTest {
 
     @Test
     public void testIsEnabledByTogglingFeatureGroup() {
-        manager = createFeatureGroupManagerWithCM();
+        manager = new FeatureManagerProvider();
         final Feature feature1 = createFeature("feature1", "My Feature 1", true, "group1", null);
         final Feature feature2 = createFeature("feature2", "My Feature 2", true, "group1", null);
 
@@ -376,7 +376,7 @@ public final class FeatureManagerTest {
 
     @Test
     public void testIsEnabledWhenFeaturesSpecifiesMultpleFeatures() {
-        manager = createFeatureGroupManagerWithCM();
+        manager = new FeatureManagerProvider();
         final Feature feature = createFeature("feature1", "My Feature 1", false, Lists.newArrayList("group1", "group2"),
                 null);
 

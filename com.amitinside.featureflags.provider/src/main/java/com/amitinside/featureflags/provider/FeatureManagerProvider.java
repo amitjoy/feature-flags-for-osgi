@@ -64,7 +64,7 @@ import com.google.common.collect.TreeMultimap;
  * {@link Feature}, {@link FeatureGroup} and {@link ActivationStrategy} services.
  */
 @Component(name = "FeatureManager", immediate = true)
-public class FeatureManagerProvider implements FeatureManager, org.osgi.service.cm.ConfigurationListener {
+public final class FeatureManagerProvider implements FeatureManager, org.osgi.service.cm.ConfigurationListener {
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -493,19 +493,6 @@ public class FeatureManagerProvider implements FeatureManager, org.osgi.service.
                 .map(String.class::cast)
                 .orElse("");
         //@formatter:on
-    }
-
-    protected boolean checkAndUpdateConfiguration(final String name, final String pid, final boolean status) {
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(pid, "?");
-            final Map<String, Object> newProps = Maps.newHashMap();
-            newProps.put(ENABLED.value(), status);
-            configuration.update(new Hashtable<>(newProps));
-            return true;
-        } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", name, e);
-        }
-        return false;
     }
 
     private Map<String, Object> extractData(final StrategizableFactory factory) {
