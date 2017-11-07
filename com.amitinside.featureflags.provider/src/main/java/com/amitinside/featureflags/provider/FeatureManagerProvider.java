@@ -134,30 +134,6 @@ public class FeatureManagerProvider implements FeatureManager, org.osgi.service.
     }
 
     @Override
-    public boolean enableFeature(final String featureName) {
-        requireNonNull(featureName, "Feature name cannot be null");
-        return toggleFeature(featureName, true);
-    }
-
-    @Override
-    public boolean disableFeature(final String featureName) {
-        requireNonNull(featureName, "Feature name cannot be null");
-        return toggleFeature(featureName, false);
-    }
-
-    @Override
-    public boolean enableGroup(final String groupName) {
-        requireNonNull(groupName, "Feature Group name cannot be null");
-        return toggleFeatureGroup(groupName, true);
-    }
-
-    @Override
-    public boolean disableGroup(final String groupName) {
-        requireNonNull(groupName, "Feature Group name cannot be null");
-        return toggleFeatureGroup(groupName, false);
-    }
-
-    @Override
     public void configurationEvent(final org.osgi.service.cm.ConfigurationEvent event) {
         final ServiceReference reference = event.getReference();
         try {
@@ -478,16 +454,6 @@ public class FeatureManagerProvider implements FeatureManager, org.osgi.service.
         }
         final Type eventType = type == 1 ? UPDATED : DELETED;
         return new ConfigurationEvent(eventType, instance, properties);
-    }
-
-    private boolean toggleFeature(final String featureName, final boolean status) {
-        final String pid = getFeaturePID(featureName);
-        return pid.isEmpty() ? false : checkAndUpdateConfiguration(featureName, pid, status);
-    }
-
-    private boolean toggleFeatureGroup(final String groupName, final boolean status) {
-        final String pid = getGroupPID(groupName);
-        return pid.isEmpty() ? false : checkAndUpdateConfiguration(groupName, pid, status);
     }
 
     private String getFeaturePID(final String featureName) {

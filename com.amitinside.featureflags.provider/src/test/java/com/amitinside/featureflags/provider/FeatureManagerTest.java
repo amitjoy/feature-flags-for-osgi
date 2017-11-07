@@ -193,48 +193,6 @@ public final class FeatureManagerTest {
     }
 
     @Test
-    public void testEnableFeature() {
-        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
-
-        manager.bindFeature(feature, createServiceProperties(2, 5, "pid1"));
-        manager.enableFeature("feature1");
-
-        assertTrue(manager.getFeature("feature1").get().isEnabled());
-    }
-
-    @Test
-    public void testDisableFeature() {
-        final Feature feature = createFeature("feature1", "My Feature 1", true, "group1", "strategy1");
-
-        manager.bindFeature(feature, createServiceProperties(2, 5, "pid1"));
-        manager.disableFeature("feature1");
-
-        assertFalse(manager.getFeature("feature1").get().isEnabled());
-    }
-
-    @Test
-    public void testEnableFeatureGroup() {
-        manager = createFeatureGroupManagerWithCM();
-        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
-
-        manager.bindFeatureGroup(group, createServiceProperties(2, 5, "pid1"));
-        manager.enableGroup("group1");
-
-        assertTrue(manager.getGroup("group1").get().isEnabled());
-    }
-
-    @Test
-    public void testDisableFeatureGroup() {
-        manager = createFeatureGroupManagerWithCM();
-        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", true, "strategy1");
-
-        manager.bindFeatureGroup(group, createServiceProperties(2, 5, "pid1"));
-        manager.disableGroup("group1");
-
-        assertFalse(manager.getGroup("group1").get().isEnabled());
-    }
-
-    @Test
     public void testIsEnabledWhenFeatureInstanceNotPresent() {
         assertFalse(manager.isFeatureEnabled("feature1"));
     }
@@ -247,22 +205,42 @@ public final class FeatureManagerTest {
     @Test
     public void testIsEnabledWhenFeatureDoesNotBelongToGroup() {
         final Feature feature = createFeature("feature1", "My Feature 1", true, (String) null, null);
-
-        manager.bindFeature(feature, createServiceProperties(2, 5, "pid1"));
-
+        final Map<String, Object> props = createServiceProperties(2, 5, "pid1");
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+        manager.bindFeature(feature, props);
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
         assertTrue(manager.isFeatureEnabled("feature1"));
-        manager.disableFeature("feature1");
+        //@formatter:off
+        final StrategizableFactory factory = StrategizableFactory.make("feature1", c -> c.withDescription("My Feature 1")
+                                                         .withStrategy(null)
+                                                         .withGroups(null)
+                                                         .withProperties(props)
+                                                         .withEnabled(false)
+                                                         .build());
+        //@formatter:on
+        manager.updateFeature(factory);
         assertFalse(manager.isFeatureEnabled("feature1"));
     }
 
     @Test
     public void testIsEnabledWhenFeatureDoesNotBelongToGroupAndStrategyNotPresent() {
         final Feature feature = createFeature("feature1", "My Feature 1", true, (String) null, "strategy");
-
-        manager.bindFeature(feature, createServiceProperties(2, 5, "pid1"));
-
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
+        final Map<String, Object> props = createServiceProperties(2, 5, "pid1");
+        manager.bindFeature(feature, props);
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.activate(context);
         assertTrue(manager.isFeatureEnabled("feature1"));
-        manager.disableFeature("feature1");
+        //@formatter:off
+        final StrategizableFactory factory = StrategizableFactory.make("feature1", c -> c.withDescription("My Feature 1")
+                                                         .withStrategy("strategy")
+                                                         .withGroups(Lists.newArrayList())
+                                                         .withProperties(props)
+                                                         .withEnabled(false)
+                                                         .build());
+        //@formatter:on
+        manager.updateFeature(factory);
         assertFalse(manager.isFeatureEnabled("feature1"));
     }
 
@@ -358,21 +336,38 @@ public final class FeatureManagerTest {
         final Feature feature2 = createFeature("feature2", "My Feature 2", true, "group1", null);
 
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, null);
+        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
 
         manager.bindFeature(feature1, createServiceProperties(2, 5, "pid1"));
         manager.bindFeature(feature2, createServiceProperties(2, 5, "pid2"));
-        manager.bindFeatureGroup(group, createServiceProperties(2, 5, "pid3"));
+        manager.setConfigurationAdmin(configurationAdmin);
+        final Map<String, Object> props = createServiceProperties(2, 5, "pid3");
+        manager.bindFeatureGroup(group, props);
 
         assertFalse(manager.isFeatureEnabled("feature1"));
         assertFalse(manager.isFeatureEnabled("feature2"));
 
-        manager.enableGroup("group1");
+        //@formatter:off
+        final StrategizableFactory factory1 = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
+                                                         .withStrategy(null)
+                                                         .withProperties(props)
+                                                         .withEnabled(true)
+                                                         .build());
+        //@formatter:on
+        manager.updateFeature(factory1);
 
         assertTrue(manager.isFeatureEnabled("feature1"));
         assertTrue(manager.isFeatureEnabled("feature2"));
         assertTrue(manager.isGroupEnabled("group1"));
 
-        manager.disableGroup("group1");
+        //@formatter:off
+        final StrategizableFactory factory2 = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
+                                                         .withStrategy(null)
+                                                         .withProperties(props)
+                                                         .withEnabled(false)
+                                                         .build());
+        //@formatter:on
+        manager.updateFeature(factory2);
 
         assertFalse(manager.isFeatureEnabled("feature1"));
         assertFalse(manager.isFeatureEnabled("feature2"));
@@ -503,26 +498,6 @@ public final class FeatureManagerTest {
     @Test(expected = NullPointerException.class)
     public void testNullArgumentIsGroupEnabled() {
         manager.isGroupEnabled(null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNullArgumentEnableFeature() {
-        manager.enableFeature(null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNullArgumentDisableFeature() {
-        manager.disableFeature(null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNullArgumentEnableGroup() {
-        manager.enableGroup(null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNullArgumentDisableGroup() {
-        manager.disableGroup(null);
     }
 
     @Test(expected = NullPointerException.class)
@@ -707,36 +682,21 @@ public final class FeatureManagerTest {
         manager = new FeatureManagerProvider();
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
 
-        manager.bindFeature(feature, createServiceProperties(2, 5, "feature1"));
+        final Map<String, Object> props = createServiceProperties(2, 5, "feature1");
+        manager.bindFeature(feature, props);
         manager.setConfigurationAdmin(configurationAdmin);
-        manager.enableFeature("feature1");
+        //@formatter:off
+        final StrategizableFactory factory = StrategizableFactory.make("feature1", c -> c.withDescription("My Feature 1")
+                                                         .withStrategy("strategy")
+                                                         .withGroups(Lists.newArrayList("group1"))
+                                                         .withProperties(props)
+                                                         .withEnabled(true)
+                                                         .build());
+        //@formatter:on
+        manager.updateFeature(factory);
         manager.unsetConfigurationAdmin(configurationAdmin);
 
         assertTrue(manager.getFeature("feature1").get().isEnabled());
-    }
-
-    @Test
-    public void testConfigAdminWhenPIDEmpty() {
-        final Feature feature = createFeature("feature1", "My Feature 1", false, "group1", "strategy1");
-        manager = new FeatureManagerProvider();
-        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
-
-        manager.bindFeature(feature, createServiceProperties(2, 5, ""));
-        manager.setConfigurationAdmin(configurationAdmin);
-        assertFalse(manager.enableFeature("feature1"));
-        manager.unsetConfigurationAdmin(configurationAdmin);
-    }
-
-    @Test
-    public void testConfigAdminWhenPIDEmpty2() {
-        final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
-        manager = new FeatureManagerProvider();
-        final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
-
-        manager.bindFeatureGroup(group, createServiceProperties(2, 5, ""));
-        manager.setConfigurationAdmin(configurationAdmin);
-        assertFalse(manager.enableGroup("group1"));
-        manager.unsetConfigurationAdmin(configurationAdmin);
     }
 
     @Test
@@ -746,7 +706,8 @@ public final class FeatureManagerTest {
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, feature);
         configurationAdmin.addListener(manager);
 
-        manager.bindFeature(feature, createServiceProperties(2, 5, "feature1"));
+        final Map<String, Object> props = createServiceProperties(2, 5, "feature1");
+        manager.bindFeature(feature, props);
         manager.setConfigurationAdmin(configurationAdmin);
         final ConfigurationListener listener = new ConfigurationListener() {
             @Override
@@ -766,7 +727,15 @@ public final class FeatureManagerTest {
         doReturn(2).when(reference).getProperty("service.ranking");
         doReturn("feature1").when(reference).getProperty("service.pid");
 
-        manager.enableFeature("feature1");
+        //@formatter:off
+        final StrategizableFactory factory = StrategizableFactory.make("feature1", c -> c.withDescription("My Feature 1")
+                                                         .withStrategy("strategy")
+                                                         .withGroups(Lists.newArrayList("group1"))
+                                                         .withProperties(props)
+                                                         .withEnabled(true)
+                                                         .build());
+        //@formatter:on
+        manager.updateFeature(factory);
         manager.unbindConfigurationListener(listener);
         manager.unsetConfigurationAdmin(configurationAdmin);
 
@@ -814,7 +783,8 @@ public final class FeatureManagerTest {
         final ConfigurationAdminMock configurationAdmin = new ConfigurationAdminMock(manager, reference, group);
         configurationAdmin.addListener(manager);
 
-        manager.bindFeatureGroup(group, createServiceProperties(2, 5, "group1"));
+        final Map<String, Object> props = createServiceProperties(2, 5, "group1");
+        manager.bindFeatureGroup(group, props);
         manager.setConfigurationAdmin(configurationAdmin);
         final ConfigurationListener listener = new ConfigurationListener() {
             @Override
@@ -834,7 +804,14 @@ public final class FeatureManagerTest {
         doReturn(2).when(reference).getProperty("service.ranking");
         doReturn("group1").when(reference).getProperty("service.pid");
 
-        manager.enableGroup("group1");
+        //@formatter:off
+        final StrategizableFactory factory = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
+                                                         .withStrategy("strategy1")
+                                                         .withProperties(props)
+                                                         .withEnabled(true)
+                                                         .build());
+        //@formatter:on
+        manager.updateFeature(factory);
         manager.unbindConfigurationListener(listener);
         manager.unsetConfigurationAdmin(configurationAdmin);
 
@@ -908,7 +885,8 @@ public final class FeatureManagerTest {
         final FeatureGroup group = createFeatureGroup("group1", "My Group 1", false, "strategy1");
         manager = new FeatureManagerProvider();
 
-        manager.bindFeatureGroup(group, createServiceProperties(2, 5, "group1"));
+        final Map<String, Object> props = createServiceProperties(2, 5, "group1");
+        manager.bindFeatureGroup(group, props);
         manager.setConfigurationAdmin(configurationAdmin);
         final ConfigurationListener listener = new ConfigurationListener() {
             @Override
@@ -921,7 +899,14 @@ public final class FeatureManagerTest {
 
         doThrow(IOException.class).when(configurationAdmin).getConfiguration("group1", "?");
 
-        manager.enableGroup("group1");
+        //@formatter:off
+        final StrategizableFactory factory = StrategizableFactory.make("group1", c -> c.withDescription("My Group 1")
+                                                         .withStrategy("strategy1")
+                                                         .withProperties(props)
+                                                         .withEnabled(true)
+                                                         .build());
+        //@formatter:on
+        manager.updateFeature(factory);
         manager.unbindConfigurationListener(listener);
         manager.unsetConfigurationAdmin(configurationAdmin);
 
