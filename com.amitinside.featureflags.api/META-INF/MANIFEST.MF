@@ -9,9 +9,7 @@ Bundle-SCM: https://github.com/amitjoy/feature-flags-osgi
 Bundle-Icon: logo.png
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Import-Package: com.google.common.base;version="15.0",
- com.google.common.collect;version="15.0",
- org.osgi.framework;version="[1.5,2)"
+Import-Package: org.osgi.framework;version="[1.5,2)"
 Export-Package: com.amitinside.featureflags;version="1.0",
  com.amitinside.featureflags.annotation;version="1.0",
  com.amitinside.featureflags.feature;version="1.0",

@@ -11,6 +11,7 @@ package com.amitinside.featureflags;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -18,7 +19,6 @@ import org.osgi.annotation.versioning.ProviderType;
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
 import com.amitinside.featureflags.strategy.ActivationStrategy;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * A Configuration Event.
@@ -103,7 +103,7 @@ public class ConfigurationEvent {
      * @return service properties
      */
     public Map<String, Object> getProperties() {
-        return ImmutableMap.copyOf(properties);
+        return Collections.unmodifiableMap(properties);
     }
 
     public enum Type {
