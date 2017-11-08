@@ -11,6 +11,7 @@ package com.amitinside.featureflags;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,8 +21,6 @@ import org.osgi.annotation.versioning.ProviderType;
 
 import com.amitinside.featureflags.feature.Feature;
 import com.amitinside.featureflags.feature.group.FeatureGroup;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link StrategizableFactory} is used to create configuration factories for {@link Feature} or {@link FeatureGroup}.
@@ -169,7 +168,7 @@ public class StrategizableFactory {
      * return a list of group names or an empty list
      */
     public List<String> getGroups() {
-        return groups == null ? ImmutableList.of() : ImmutableList.copyOf(groups);
+        return groups == null ? Collections.emptyList() : Collections.unmodifiableList(groups);
     }
 
     /**
@@ -192,7 +191,7 @@ public class StrategizableFactory {
      * return the specified service properties or an empty map
      */
     public Map<String, Object> getProperties() {
-        return properties == null ? ImmutableMap.of() : ImmutableMap.copyOf(properties);
+        return properties == null ? Collections.emptyMap() : Collections.unmodifiableMap(properties);
     }
 
     public static interface BuilderWithDescription {
