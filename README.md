@@ -19,20 +19,18 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 ### Requirements
 
 1. Java 8+
-2. OSGi R4+ (For Core API and Implementation)
-3. OSGi R6+ (For REST Services and Web Console)
+2. OSGi R6+
 
 ----------------------------------------------------------------
 
 ### Dependencies
 
-This project comprises five bundles - 
+This project comprises four bundles - 
 
 1. `com.amitinside.featureflags.api` - The core feature flags API
 2. `com.amitinside.featureflags.provider` - The core feature flags implementation
-3. `com.amitinside.featureflags.rest` - REST Services to manage features, groups and strategies
-4. `com.amitinside.featureflags.console` - Web console to manage features, groups and strategies
-5. `com.amitinside.featureflags.example` - Example project showing how to use core feature flags in codebase
+3. `com.amitinside.featureflags.rest` - REST Services to manage features
+4. `com.amitinside.featureflags.example` - Example project showing how to use core feature flags in codebase
 
 The core implementation bundle does require few open source libraries that are listed below.
 
@@ -42,7 +40,6 @@ The core implementation bundle does require few open source libraries that are l
 As Test Dependencies, it uses the following test libraries:
 
 1. JUnit 4.12 (EPL 1.0)
-2. Google Compile Testing 0.12 (Apache 2.0)
 3. Mockito Core 2.10 (MIT)
 
 The bundle comprising REST services requires:
@@ -57,10 +54,9 @@ The bundle comprising REST services requires:
 1. `com.amitinside.featureflags.api`
 2. `com.amitinside.featureflags.provider`
 3. `com.amitinside.featureflags.rest`
-4. `com.amitinside.featureflags.console`
-5. `com.amitinside.featureflags.example`
+4. `com.amitinside.featureflags.example`
 
-You don't need to install all five bundles. To use feature flags in OSGi environment, you could only use the API and provider bundles.
+You don't need to install all four bundles. To use feature flags in OSGi environment, you could only use the API and provider bundles.
 
 -----------------------------------------------------------------
 
@@ -84,16 +80,6 @@ Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> 
 
 ----------------------------------------------------------------
 
-#### Web Console
-
-1. Checkout this project
-2. Build using `mvn clean install -Dgpg.skip`
-3. Run packaged Apache Felix OSGi framework. See [How-To](https://github.com/amitjoy/feature-flags-osgi/wiki/Feature-Flags-Web-Administration)
-4. Install all the bundles to your OSGi runtime
-5. Open browser and access `http://localhost:8080/featureflags/page/index.html`
-
-----------------------------------------------------------------
-
 ### License
 
 This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/license-EPL-blue.svg)](http://www.eclipse.org/legal/epl-v10.html)
@@ -102,58 +88,15 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 
 ### Usage
 
-1. You can use `FeatureManager#createFeature(...)`, `FeatureManager#createGroup(...)` and `FeatureManager#createPropertyBasedStrategy(...)` to create features, groups and property based strategies.
-
-2. In your DS Component, use `FeatureService` to check if the feature is enabled
+1. In your DS Component, add an attribute definition to the existing object class definition
 
 ```java
-
-@Feature
-private static final String MY_FEATURE = "Myfeature";
-
-private FeatureManager featureManager;
-
-public void myMethod() {
-   if (featureManager.isFeatureEnabled(MY_FEATURE)) {
-         // do this
-   } else {
-         // do something else
-   }
-}
-
-@Reference
-void setFeatureManager(final FeatureManager featureManager) {
-   this.featureManager = featureManager;
-}
-    
-void unsetFeatureManager(final FeatureManager featureManager) {
-   this.featureManager = null;
+@ObjectClassDefinition(id = "feature.flag.example")
+@interface MyConfig {
+   @AttributeDefinition(description = "My Feature Description")
+   boolean osgi_feature_myfeature() default true;
 }
 ```
-6. You can also implement `Feature` interface and expose it as an OSGi service
-7. The strategy must be provided by implementing `ActivationStrategy` interface and exposing as an OSGi service
-8. You can also provide a feature group by implementing `FeatureGroup` interface and exposing as an OSGi service
+You can check the property value as specified in the atrtribute definition. For more information, have a look at the example project.
 
 --------------------------------------------------------------
-
-If a strategy is provided for one or more features, the strategy will be used to determine which feature(s) will be active in the runtime. If you don't provide any strategy, the `enabled` property (`Feature#isEnabled()` method) will be used for enablement of the feature. That is, a strategy always overrides any value explicitly set to `enabled` flag.
-
-Apart from this, you can also bundle multiple features into a specific group. Such feature group can even associate a strategy. If a
-valid strategy has been associated to a feature group, the strategy will be used to determine the enablements of all the features that belong to this group and if not, the `enabled` property (`FeatureGroup#isEnabled()` method) will be used for enablement of this feature group and this will eventually determine the enablements of all the features belonging to this group.
-
-**N.B:** A feature can also specify multiple feature groups to which it belongs. In such scenario, the active group would be responsible for the enablement of the feature.
-
-The following flowchart shows the control flow for the determination of feature enablement:
-
-![feature-flags](https://user-images.githubusercontent.com/13380182/32149859-65ab9eda-bd0b-11e7-9d63-c332c676f4d5.jpg)
-
-----------------------------------------------------------------
-
-**Strategies Included**:
-
-1. **Service Property Activation Strategy**: This strategy is responsible for checking configured property key and value in the feature or feature group's OSGi service property.
-2. **System Property Activation Strategy**: Likewise this strategy checks for specified property key and value in the system configured properties.
-
-----------------------------------------------------------------
-
-**Motivation of Feature Group**: Feature groups are primarily used to enable or disable multiple related features all-together. That's why enablement of any feature group is directly applied to the belonging features. Not all features should belong to feature group and hence a feature can optionally specify the feature group to which it belongs. Please note that use feature groups only if you have multiple features to group and whose enablements and disablements would happen together. If you do have various features whose enablements and disablements are not at all related, **do not specify any feature group** for those features. For more information, have a look at the flowchart as mentioned earlier.
