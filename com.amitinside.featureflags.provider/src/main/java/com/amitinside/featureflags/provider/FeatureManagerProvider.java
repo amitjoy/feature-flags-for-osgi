@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
@@ -61,8 +61,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         final int type = event.getType();
         final ServiceReference reference = event.getReference();
         final boolean isFeatureContainter = checkIfFeatureConfigExists(reference);
+        final String pid = event.getPid();
         if (isFeatureContainter && type == CM_UPDATED) {
-            final String pid = event.getPid();
             //@formatter:off
             final String[] keys = reference.getPropertyKeys();
             Arrays.stream(keys)
@@ -72,7 +72,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
             //@formatter:on
         }
         if (type == CM_DELETED) {
-            allFeatures.removeAll(event.getPid());
+            allFeatures.removeAll(pid);
         }
     }
 
@@ -192,7 +192,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
             return null;
         }
         final ConfigurationDTO dto = new ConfigurationDTO();
-        dto.features = ImmutableSet.copyOf(features);
+        dto.features = ImmutableList.copyOf(features);
         return dto;
     }
 

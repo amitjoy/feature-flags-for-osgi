@@ -9,7 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.dto;
 
-import java.util.Set;
+import java.util.List;
 
 import org.osgi.annotation.versioning.ConsumerType;
 import org.osgi.dto.DTO;
@@ -30,6 +30,6 @@ public class ConfigurationDTO extends DTO {
     /**
      * The list of features that are contained in this configuration
      */
-    public Set<String> features;
+    public List<String> features;
 
 }
