@@ -58,6 +58,19 @@ public interface FeatureManager {
     Stream<FeatureDTO> getFeatures(String configurationPID);
 
     /**
+     * Returns the known {@link ConfigurationDTO} instance
+     * <p>
+     * {@link ConfigurationDTO} instances are known if they comprise feature configurations
+     * </p>
+     *
+     * @param name The name of the configuration
+     * @return The {@link ConfigurationDTO} wrapped in {@link Optional} or empty {@link Optional}
+     *         instance if not known or the name is an empty string or {@code null}
+     * @throws NullPointerException if the specified argument is {@code null}
+     */
+    Optional<ConfigurationDTO> getConfiguration(String configurationPID);
+
+    /**
      * Returns the feature registered under the specified configuration PID with the given name
      * <p>
      * Features are known if they are registered with OSGi configuration.
@@ -72,28 +85,15 @@ public interface FeatureManager {
     Optional<FeatureDTO> getFeature(String configurationPID, String featureName);
 
     /**
-     * Returns the known {@link ConfigurationDTO} instance
-     * <p>
-     * {@link ConfigurationDTO} instances are known if they comprise feature configurations
-     * </p>
-     *
-     * @param name The name of the configuration
-     * @return The {@link ConfigurationDTO} wrapped in {@link Optional} or empty {@link Optional}
-     *         instance if not known or the name is an empty string or {@code null}
-     * @throws NullPointerException if the specified argument is {@code null}
-     */
-    Optional<ConfigurationDTO> getConfiguration(String configurationPID);
-
-    /**
      * Updates the specified feature registered under the specified configuration PID
      *
      * @param configurationPID The configuration PID
      * @param featureName The name of the feature.
-     * @param valueToSet the value for the enablement of the feature
+     * @param isEnabled the value for the enablement of the feature
      * @return {@code true} if the named feature is known and updated by this operation.
      *         Specifically {@code false} is also returned if the named feature
      *         is not known or the operation failed to update the feature
      * @throws NullPointerException if any of the specified arguments is {@code null}
      */
-    boolean updateFeature(String configurationPID, String featureName, boolean valueToSet);
+    boolean updateFeature(String configurationPID, String featureName, boolean isEnabled);
 }

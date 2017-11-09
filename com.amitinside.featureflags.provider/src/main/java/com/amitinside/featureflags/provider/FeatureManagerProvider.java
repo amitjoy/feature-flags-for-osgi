@@ -27,6 +27,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationEvent;
+import org.osgi.service.cm.ConfigurationListener;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -44,7 +45,7 @@ import com.google.common.collect.TreeMultimap;
  * This implements the {@link FeatureManager}.
  */
 @Component(name = "FeatureManager", immediate = true, service = FeatureManager.class)
-public final class FeatureManagerProvider implements FeatureManager, org.osgi.service.cm.ConfigurationListener {
+public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(FeatureManagerProvider.class);
@@ -98,6 +99,12 @@ public final class FeatureManagerProvider implements FeatureManager, org.osgi.se
     }
 
     @Override
+    public Optional<ConfigurationDTO> getConfiguration(final String configurationPID) {
+        requireNonNull(configurationPID, "Configuration PID cannot be null");
+        return Optional.ofNullable(convertToConfigurationDTO(configurationPID));
+    }
+
+    @Override
     public Optional<FeatureDTO> getFeature(final String configurationPID, final String featureName) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
@@ -113,18 +120,12 @@ public final class FeatureManagerProvider implements FeatureManager, org.osgi.se
     }
 
     @Override
-    public Optional<ConfigurationDTO> getConfiguration(final String configurationPID) {
-        requireNonNull(configurationPID, "Configuration PID cannot be null");
-        return Optional.ofNullable(convertToConfigurationDTO(configurationPID));
-    }
-
-    @Override
-    public boolean updateFeature(final String configurationPID, final String featureName, final boolean valueToSet) {
+    public boolean updateFeature(final String configurationPID, final String featureName, final boolean isEnabled) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
 
         final Map<String, Object> props = Maps.newHashMap();
-        props.put(FEATURE_AD_NAME_PREFIX + featureName, valueToSet);
+        props.put(FEATURE_AD_NAME_PREFIX + featureName, isEnabled);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID);
