@@ -10,15 +10,9 @@ Bundle-Icon: logo.png
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.amitinside.featureflags;version="[1.0,1.1)",
- com.amitinside.featureflags.annotation;version="[1.0,2.0)",
- com.amitinside.featureflags.feature;version="[1.0,1.1)",
- com.amitinside.featureflags.feature.group;version="[1.0,1.1)",
- com.amitinside.featureflags.listener;version="[1.0,2.0)",
- com.amitinside.featureflags.storage;version="[1.0,2.0)",
- com.amitinside.featureflags.strategy;version="[1.0,1.1)",
+ com.amitinside.featureflags.dto;version="[1.0,2.0)",
  com.google.common.base;version="15.0",
  com.google.common.collect;version="15.0",
- com.google.common.io;version="15.0",
  org.osgi.framework;version="[1.5,2.0)",
  org.osgi.service.cm;version="[1.3,2.0)",
  org.slf4j;version="[1.7,2.0)"

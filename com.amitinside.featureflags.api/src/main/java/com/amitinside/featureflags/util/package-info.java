@@ -8,9 +8,9 @@
  *
  *******************************************************************************/
 /**
- * Provides API to represent {@link com.amitinside.featureflags.listener.ConfigurationListener} instance
+ * Provides utility classes
  *
  * @since 1.0
  */
 @org.osgi.annotation.versioning.Version("1.0")
-package com.amitinside.featureflags.listener;
+package com.amitinside.featureflags.util;

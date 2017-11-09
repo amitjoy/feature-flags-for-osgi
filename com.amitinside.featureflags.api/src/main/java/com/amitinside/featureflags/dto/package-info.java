@@ -8,9 +8,9 @@
  *
  *******************************************************************************/
 /**
- * Provides annotation for managing expiration of features
+ * Provides API for managing features flags related {@link org.osgi.dto.DTO} instances
  *
  * @since 1.0
  */
 @org.osgi.annotation.versioning.Version("1.0")
-package com.amitinside.featureflags.annotation;
+package com.amitinside.featureflags.dto;

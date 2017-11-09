@@ -14,21 +14,19 @@ import java.util.stream.Stream;
 
 import org.osgi.annotation.versioning.ProviderType;
 
-import com.amitinside.featureflags.feature.Feature;
-import com.amitinside.featureflags.feature.group.FeatureGroup;
-import com.amitinside.featureflags.strategy.ActivationStrategy;
+import com.amitinside.featureflags.dto.ConfigurationDTO;
+import com.amitinside.featureflags.dto.FeatureDTO;
 
 /**
- * The {@link FeatureManager} service is the applications access point to the feature
- * flags functionality. It can be used to query the available features, groups and
- * strategies. It is also used to manage these instances easily.
+ * The {@link FeatureManager} service is the application access point to the feature
+ * flags functionality. It can be used to query the available features, configurations
+ * that contain these features. It is also used to manage these instances easily.
  *
- * @noimplement This interface is not intended to be implemented by feature providers.
- * @noextend This interface is not intended to be extended by feature providers.
+ * @noimplement This interface is not intended to be implemented by consumers.
+ * @noextend This interface is not intended to be extended by consumers.
  *
- * @see Feature
- * @see FeatureGroup
- * @see ActivationStrategy
+ * @see FeatureDTO
+ * @see ConfigurationDTO
  *
  * @ThreadSafe
  */
@@ -36,250 +34,66 @@ import com.amitinside.featureflags.strategy.ActivationStrategy;
 public interface FeatureManager {
 
     /**
-     * Retrieve all (known) {@link Feature}s.
+     * Retrieve all (known) {@link ConfigurationDTO} instances
      * <p>
-     * {@link Feature}s are known if they are registered as {@link Feature} services or
-     * are configured with OSGi configuration whose factory PID is
-     * {@code com.amitinside.featureflags.feature}.
+     * {@link ConfigurationDTO}s are known if they comprise features
      * </p>
      *
-     * @return The known {@link Feature}s
+     * @return The known {@link ConfigurationDTO} instances
      */
-    Stream<Feature> getFeatures();
+    Stream<ConfigurationDTO> getConfigurations();
 
     /**
-     * Retrieve all (known) {@link ActivationStrategy} instances.
+     * Retrieve all (known) {@link FeatureDTO} instances registered under the provided
+     * configuration PID
      * <p>
-     * {@link ActivationStrategy}s are known if they are registered as {@link ActivationStrategy}
-     * services
+     * {@link FeatureDTO}s are known if they are configured with OSGi configuration
+     * under the specified configuration PID
      * </p>
      *
-     * @return The known {@link ActivationStrategy} instances
+     * @param configurationPID The configuration PID
+     * @return The known {@link FeatureDTO} instances
+     * @throws NullPointerException if the specified argument is {@code null}
      */
-    Stream<ActivationStrategy> getStrategies();
+    Stream<FeatureDTO> getFeatures(String configurationPID);
 
     /**
-     * Retrieve all (known) {@link FeatureGroup} instances.
+     * Returns the feature registered under the specified configuration PID with the given name
      * <p>
-     * {@link FeatureGroup}s are known if they are registered as {@link FeatureGroup}
-     * services
+     * Features are known if they are registered with OSGi configuration.
      * </p>
      *
-     * @return The known {@link FeatureGroup} instances
+     * @param configurationPID The configuration PID
+     * @param featureName The name of the feature
+     * @return The {@link FeatureDTO} wrapped in {@link Optional} or empty {@link Optional}
+     *         instance if not known or the name is an empty string or {@code null}
+     * @throws NullPointerException if any of the specified arguments is {@code null}
      */
-    Stream<FeatureGroup> getGroups();
+    Optional<FeatureDTO> getFeature(String configurationPID, String featureName);
 
     /**
-     * Returns the feature with the given name.
+     * Returns the known {@link ConfigurationDTO} instance
      * <p>
-     * Features are known if they are registered as {@link Feature} services or
-     * are configured with OSGi configuration whose factory PID is
-     * {@code com.amitinside.featureflags.feature}.
+     * {@link ConfigurationDTO} instances are known if they comprise feature configurations
      * </p>
      *
-     * @param name The name of the feature.
-     * @return The feature wrapped in {@link Optional} or empty {@link Optional} instance
-     *         if not known or the name is an empty string or {@code null}.
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
+     * @param name The name of the configuration
+     * @return The {@link ConfigurationDTO} wrapped in {@link Optional} or empty {@link Optional}
+     *         instance if not known or the name is an empty string or {@code null}
+     * @throws NullPointerException if the specified argument is {@code null}
      */
-    Optional<Feature> getFeature(String name);
+    Optional<ConfigurationDTO> getConfiguration(String configurationPID);
 
     /**
-     * Returns the strategy with the given name.
-     * <p>
-     * {@link ActivationStrategy}s are known if they are registered as {@link ActivationStrategy}
-     * services
-     * </p>
+     * Updates the specified feature registered under the specified configuration PID
      *
-     * @param name The name of the strategy.
-     * @return The strategy wrapped in {@link Optional} or empty {@link Optional} instance
-     *         if not known or the name is an empty string or {@code null}.
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     */
-    Optional<ActivationStrategy> getStrategy(String name);
-
-    /**
-     * Returns the group with the given name.
-     * <p>
-     * {@link FeatureGroup}s are known if they are registered as {@link FeatureGroup}
-     * services
-     * </p>
-     *
-     * @param name The name of the group.
-     * @return The strategy wrapped in {@link Optional} or empty {@link Optional} instance
-     *         if not known or the name is an empty string or {@code null}.
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     */
-    Optional<FeatureGroup> getGroup(String name);
-
-    /**
-     * Creates a feature with the provided configuration.
-     *
-     * @param featureFactory The factory to be used to create the feature. (cannot be {@code null})
-     * @return configuration PID as created wrapped in {@link Optional} or empty {@link Optional}
-     *         instance if feature does not get created due to failure
-     *
-     * @throws NullPointerException if the specified argument {@code featureFactory} is {@code null}
-     *             or the factory has been configured with a {@code null} name
-     */
-    Optional<String> createFeature(StrategizableFactory featureFactory);
-
-    /**
-     * Creates a group with the provided configuration.
-     *
-     * @param groupFactory The factory to be used to create the group. (cannot be {@code null})
-     * @return configuration PID as created wrapped in {@link Optional} or empty {@link Optional}
-     *         instance if feature group does not get created due to failure
-     *
-     * @throws NullPointerException if the specified argument {@code groupFactory} is {@code null}
-     *             or the factory has been configured with a {@code null} name
-     */
-    Optional<String> createGroup(StrategizableFactory groupFactory);
-
-    /**
-     * Creates a property based strategy.
-     *
-     * @param strategyFactory The factory to be used to create the property based strategy. (cannot be {@code null})
-     * @return configuration PID as created wrapped in {@link Optional} or empty {@link Optional}
-     *         instance if strategy does not get created due to failure
-     *
-     * @throws NullPointerException if the specified argument {@code factory} is {@code null}
-     *             or the factory has been configured with a {@code null} name
-     */
-    Optional<String> createPropertyBasedStrategy(StrategyFactory strategyFactory);
-
-    /**
-     * Removes a feature.
-     *
-     * @param name The name of the feature. (cannot be {@code null})
-     * @return {@code true} if the named feature is known and removed by this operation.
-     *         Specifically {@code false} is also returned if the named feature
-     *         is not known or the operation failed to remove the feature
-     *
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     */
-    boolean removeFeature(String name);
-
-    /**
-     * Removes a group.
-     *
-     * @param name The name of the group. (cannot be {@code null})
-     * @return {@code true} if the named group is known and removed by this operation.
-     *         Specifically {@code false} is also returned if the named group
-     *         is not known or the operation failed to remove the group
-     *
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     */
-    boolean removeGroup(String name);
-
-    /**
-     * Removes a property based strategy.
-     *
-     * @param name The name of the property based strategy. (cannot be {@code null})
-     * @return {@code true} if the named strategy is known and removed by this operation.
-     *         Specifically {@code false} is also returned if the named strategy
-     *         is not known or the operation failed to remove the strategy
-     *
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     */
-    boolean removePropertyBasedStrategy(String name);
-
-    /**
-     * Updates a feature with the provided configuration.
-     *
-     * @param featureFactory The factory to be used to update the feature. (cannot be {@code null})
+     * @param configurationPID The configuration PID
+     * @param featureName The name of the feature.
+     * @param valueToSet the value for the enablement of the feature
      * @return {@code true} if the named feature is known and updated by this operation.
      *         Specifically {@code false} is also returned if the named feature
      *         is not known or the operation failed to update the feature
-     *
-     * @throws NullPointerException if the specified argument {@code featureFactory} is {@code null}
-     *             or the factory has been configured with a {@code null} name
+     * @throws NullPointerException if any of the specified arguments is {@code null}
      */
-    boolean updateFeature(StrategizableFactory featureFactory);
-
-    /**
-     * Updates a group with the provided configuration.
-     *
-     * @param groupFactory The factory to be used to update the group. (cannot be {@code null})
-     * @return {@code true} if the named group is known and updated by this operation.
-     *         Specifically {@code false} is also returned if the named group
-     *         is not known or the operation failed to update the group
-     *
-     * @throws NullPointerException if the specified argument {@code groupFactory} is {@code null}
-     *             or the factory has been configured with a {@code null} name
-     */
-    boolean updateGroup(StrategizableFactory groupFactory);
-
-    /**
-     * Updates a property based strategy.
-     *
-     * @param strategyFactory The factory to be used to update the property based strategy. (cannot be {@code null})
-     * @return {@code true} if the named strategy is known and updated by this operation.
-     *         Specifically {@code false} is also returned if the named strategy
-     *         is not known or the operation failed to update the strategy
-     *
-     * @throws NullPointerException if the specified argument {@code strategyFactory} is {@code null}
-     *             or the factory has been configured with a {@code null} name
-     */
-    boolean updatePropertyBasedStrategy(StrategyFactory strategyFactory);
-
-    /**
-     * Returns {@code true} if a feature with the given name is known and
-     * enabled under the feature associated strategy. The feature can belong
-     * to a feature group and the groups can also specify its enablement. In
-     * this case, the feature groups enablement configuration will be considered
-     * as the belonging feature's configuration.
-     * <p>
-     * Features are known if they are registered as {@link Feature} services or
-     * are configured with OSGi configuration whose factory PID is
-     * {@code com.amitinside.featureflags.feature}.
-     * </p>
-     * <p>
-     * If a feature belongs to a feature group, the feature groups configuration would
-     * be considered as the feature's configuration. If not, the activation or the enablement
-     * would be validated against a valid activation strategy if specified, otherwise
-     * the explicitly declared enabled flag in the feature would be used.
-     * </p>
-     * <p>
-     * If a feature belongs to multiple groups, then the enablement would be determined by the
-     * active group. If there are multiple groups enabled, then the feature would by default
-     * be enabled.
-     * </p>
-     *
-     * @see <a href=
-     *      "https://user-images.githubusercontent.com/13380182/32149859-65ab9eda-bd0b-11e7-9d63-c332c676f4d5.jpg">Control
-     *      flow for the determination of feature enablement</a>
-     *
-     * @param name The name of the feature to check for enablement.
-     * @return {@code true} if the named feature is known and enabled.
-     *         Specifically {@code false} is also returned if the named feature
-     *         is not known.
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     */
-    boolean isFeatureEnabled(String name);
-
-    /**
-     * Returns {@code true} if a feature group with the given name is known and
-     * enabled under the associated strategy.
-     * <p>
-     * Feature Groups are known if they are registered as {@link FeatureGroup} services
-     * or are configured with OSGi configuration whose factory PID is
-     * {@code com.amitinside.featureflags.feature.group}.
-     * </p>
-     * The activation or the enablement of a feature group would be validated against a
-     * valid activation strategy if specified, otherwise he explicitly declared enabled flag
-     * in the feature group would be used.
-     *
-     * @see <a href=
-     *      "https://user-images.githubusercontent.com/13380182/32149859-65ab9eda-bd0b-11e7-9d63-c332c676f4d5.jpg">Control
-     *      flow for the determination of feature enablement</a>
-     *
-     * @param name The name of the feature group to check for enablement.
-     * @return {@code true} if the named feature group is known and enabled.
-     *         Specifically {@code false} is also returned if the named feature group
-     *         is not known.
-     * @throws NullPointerException if the specified argument {@code name} is {@code null}
-     */
-    boolean isGroupEnabled(String name);
-
+    boolean updateFeature(String configurationPID, String featureName, boolean valueToSet);
 }

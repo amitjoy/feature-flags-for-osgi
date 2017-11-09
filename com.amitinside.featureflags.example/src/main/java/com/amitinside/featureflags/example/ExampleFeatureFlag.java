@@ -12,6 +12,7 @@ package com.amitinside.featureflags.example;
 import static javax.servlet.http.HttpServletResponse.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,40 +22,54 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
-import com.amitinside.featureflags.FeatureManager;
-import com.amitinside.featureflags.annotation.Feature;
+import com.amitinside.featureflags.example.ExampleFeatureFlag.MyConfig;
+import com.amitinside.featureflags.util.Configurable;
 
+@Designate(ocd = MyConfig.class)
 @Component(name = "ExampleFeatureFlag", immediate = true)
 public final class ExampleFeatureFlag extends HttpServlet {
 
-    private static final long serialVersionUID = 6674752488720831279L;
     private static final String ALIAS = "/exampleflag";
+    private static final String MY_FEATURE_NAME = "osgi.feature.feature1";
 
-    @Feature
-    private static final String FEATURE_ID = "feature.example";
-
-    /** Logger Instance */
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final long serialVersionUID = 6674752488720831279L;
 
     private HttpService httpService;
-    private FeatureManager featureManager;
+    private MyConfig config;
+
+    @ObjectClassDefinition(id = "feature.flag.xyz")
+    @interface MyConfig {
+        @AttributeDefinition(name = MY_FEATURE_NAME, description = "My Feature Description")
+        boolean myfeature() default true;
+    }
 
     /**
      * Component activation callback
      */
     @Activate
-    protected void activate() {
+    protected void activate(final Map<String, Object> properties) {
         try {
             httpService.registerServlet(ALIAS, this, null, new DisableAuthenticationHttpContext());
         } catch (ServletException | NamespaceException e) {
-            logger.error("{}", e.getMessage(), e);
+            // not required
         }
+        modified(properties);
+    }
+
+    /**
+     * Component activation callback
+     */
+    @Modified
+    protected void modified(final Map<String, Object> properties) {
+        config = Configurable.createConfigurable(MyConfig.class, properties);
     }
 
     /**
@@ -80,25 +95,10 @@ public final class ExampleFeatureFlag extends HttpServlet {
         this.httpService = null;
     }
 
-    /**
-     * {@link FeatureManager} service binding callback
-     */
-    @Reference
-    protected void setFeatureManager(final FeatureManager featureManager) {
-        this.featureManager = featureManager;
-    }
-
-    /**
-     * {@link FeatureManager} service unbinding callback
-     */
-    protected void unsetFeatureManager(final FeatureManager featureManager) {
-        this.featureManager = null;
-    }
-
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
-        if (featureManager.isFeatureEnabled(FEATURE_ID)) {
+        if (config.myfeature()) {
             resp.setStatus(SC_OK);
             return;
         }

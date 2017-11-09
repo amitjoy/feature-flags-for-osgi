@@ -7,15 +7,29 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags;
+package com.amitinside.featureflags.dto;
+
+import java.util.Set;
 
 import org.osgi.annotation.versioning.ConsumerType;
+import org.osgi.dto.DTO;
 
 /**
- * A class implements the {@code Configurable} interface to indicate that
- * the instance is configurable through OSGi Configuration Admin
- * and hence is a participant in this feature flags implementation.
+ * Data Transfer Object for a configuration instance comprising features
+ *
+ * @NotThreadSafe
  */
 @ConsumerType
-public interface Configurable {
+public class ConfigurationDTO extends DTO {
+
+    /**
+     * The PID of the configuration.
+     */
+    public String pid;
+
+    /**
+     * The list of features that are contained in this configuration
+     */
+    public Set<String> features;
+
 }
