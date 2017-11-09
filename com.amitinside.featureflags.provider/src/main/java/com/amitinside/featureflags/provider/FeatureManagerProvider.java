@@ -61,19 +61,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     private ConfigurationAdmin configurationAdmin;
 
     @Override
-    public void configurationEvent(final ConfigurationEvent event) {
-        final int type = event.getType();
-        final String pid = event.getPid();
-        final List<String> specifiedFeatues = getSpecifiedFeatures(pid);
-        if (!specifiedFeatues.isEmpty() && type == CM_UPDATED) {
-            specifiedFeatues.forEach(p -> allFeatures.put(pid, p));
-        }
-        if (type == CM_DELETED) {
-            allFeatures.removeAll(pid);
-        }
-    }
-
-    @Override
     public Stream<ConfigurationDTO> getConfigurations() {
         //@formatter:off
         return allFeatures.keys()
@@ -149,6 +136,19 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
      */
     protected void unsetConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
         this.configurationAdmin = null;
+    }
+
+    @Override
+    public void configurationEvent(final ConfigurationEvent event) {
+        final int type = event.getType();
+        final String pid = event.getPid();
+        final List<String> specifiedFeatues = getSpecifiedFeatures(pid);
+        if (!specifiedFeatues.isEmpty() && type == CM_UPDATED) {
+            specifiedFeatues.forEach(p -> allFeatures.put(pid, p));
+        }
+        if (type == CM_DELETED) {
+            allFeatures.removeAll(pid);
+        }
     }
 
     private List<String> getSpecifiedFeatures(final String configurationPID) {

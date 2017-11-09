@@ -88,7 +88,7 @@ public interface FeatureManager {
      * Updates the specified feature registered under the specified configuration PID
      *
      * @param configurationPID The configuration PID
-     * @param featureName The name of the feature.
+     * @param featureName The name of the feature
      * @param isEnabled the value for the enablement of the feature
      * @return {@code true} if the named feature is known and updated by this operation.
      *         Specifically {@code false} is also returned if the named feature
