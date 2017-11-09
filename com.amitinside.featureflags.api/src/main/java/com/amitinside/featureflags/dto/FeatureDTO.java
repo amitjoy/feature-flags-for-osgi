@@ -26,11 +26,6 @@ public class FeatureDTO extends DTO {
     public String name;
 
     /**
-     * The description of the feature.
-     */
-    public String description;
-
-    /**
      * Checks whether the feature is enabled in its configuration.
      */
     public boolean isEnabled;
