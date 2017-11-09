@@ -96,4 +96,16 @@ public interface FeatureManager {
      * @throws NullPointerException if any of the specified arguments is {@code null}
      */
     boolean updateFeature(String configurationPID, String featureName, boolean valueToSet);
+
+    /**
+     * Updates all the features registered under the specified configuration PID
+     *
+     * @param configurationPID The configuration PID
+     * @param valueToSet the value for the enablement of the features
+     * @return {@code true} if the features are updated by this operation.
+     *         Specifically {@code false} is also returned if the operation failed
+     *         to update the feature
+     * @throws NullPointerException if {@code configurationPID} is {@code null}
+     */
+    boolean updateFeatures(String configurationPID, boolean valueToSet);
 }

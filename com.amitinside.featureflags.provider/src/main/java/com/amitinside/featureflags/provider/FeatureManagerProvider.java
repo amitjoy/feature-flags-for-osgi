@@ -138,6 +138,28 @@ public final class FeatureManagerProvider implements FeatureManager, org.osgi.se
         return false;
     }
 
+    @Override
+    public boolean updateFeatures(final String configurationPID, final boolean valueToSet) {
+        requireNonNull(configurationPID, "Configuration PID cannot be null");
+
+        final Collection<String> features = allFeatures.get(configurationPID);
+        for (final String feature : features) {
+            final Map<String, Object> props = Maps.newHashMap();
+            props.put(FEATURE_AD_NAME_PREFIX + feature, valueToSet);
+            final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
+            try {
+                final Configuration configuration = configurationAdmin.getConfiguration(configurationPID);
+                if (configuration != null) {
+                    configuration.update(new Hashtable<>(filteredProps));
+                }
+            } catch (final IOException e) {
+                logger.trace("Cannot retrieve configuration for {}", configurationPID, e);
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * {@link ConfigurationAdmin} service binding callback
      */
