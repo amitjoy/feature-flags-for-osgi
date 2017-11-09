@@ -44,7 +44,7 @@ import com.google.common.collect.TreeMultimap;
 /**
  * This implements the {@link FeatureManager}.
  */
-@Component(name = "FeatureManager", immediate = true, service = FeatureManager.class)
+@Component(name = "FeatureManager", immediate = true)
 public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
 
     /** Logger Instance */
