@@ -99,4 +99,4 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 ```
 You can check the property value as specified in the atrtribute definition. For more information, have a look at the example project.
 
---------------------------------------------------------------
+---------------------------------------------------------------
