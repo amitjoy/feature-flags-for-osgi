@@ -38,17 +38,16 @@ import com.amitinside.featureflags.util.Configurable;
 public final class ExampleFeatureFlag extends HttpServlet {
 
     private static final String ALIAS = "/exampleflag";
-    private static final String MY_FEATURE_NAME = "osgi.feature.feature1";
 
     private static final long serialVersionUID = 6674752488720831279L;
 
     private HttpService httpService;
     private MyConfig config;
 
-    @ObjectClassDefinition(id = "feature.flag.xyz")
+    @ObjectClassDefinition(id = "feature.flag.example")
     @interface MyConfig {
-        @AttributeDefinition(name = MY_FEATURE_NAME, description = "My Feature Description")
-        boolean myfeature() default true;
+        @AttributeDefinition(description = "My Feature Description")
+        boolean osgi_feature_myfeature() default true;
     }
 
     /**
@@ -56,12 +55,12 @@ public final class ExampleFeatureFlag extends HttpServlet {
      */
     @Activate
     protected void activate(final Map<String, Object> properties) {
+        modified(properties);
         try {
             httpService.registerServlet(ALIAS, this, null, new DisableAuthenticationHttpContext());
         } catch (ServletException | NamespaceException e) {
             // not required
         }
-        modified(properties);
     }
 
     /**
@@ -98,7 +97,7 @@ public final class ExampleFeatureFlag extends HttpServlet {
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
-        if (config.myfeature()) {
+        if (config.osgi_feature_myfeature()) {
             resp.setStatus(SC_OK);
             return;
         }

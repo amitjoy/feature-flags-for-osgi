@@ -11,19 +11,20 @@ package com.amitinside.featureflags.provider;
 
 import static com.amitinside.featureflags.Constants.FEATURE_AD_NAME_PREFIX;
 import static java.util.Objects.requireNonNull;
+import static org.apache.felix.service.command.CommandProcessor.*;
 import static org.osgi.service.cm.ConfigurationEvent.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationEvent;
@@ -37,6 +38,7 @@ import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
@@ -44,7 +46,9 @@ import com.google.common.collect.TreeMultimap;
 /**
  * This implements the {@link FeatureManager}.
  */
-@Component(name = "FeatureManager", immediate = true)
+@SuppressWarnings("unchecked")
+@Component(name = "FeatureManager", immediate = true, property = { COMMAND_SCOPE + "=feature",
+        COMMAND_FUNCTION + "=updateFeature" })
 public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
 
     /** Logger Instance */
@@ -59,17 +63,10 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     @Override
     public void configurationEvent(final ConfigurationEvent event) {
         final int type = event.getType();
-        final ServiceReference reference = event.getReference();
-        final boolean isFeatureContainter = checkIfFeatureConfigExists(reference);
         final String pid = event.getPid();
-        if (isFeatureContainter && type == CM_UPDATED) {
-            //@formatter:off
-            final String[] keys = reference.getPropertyKeys();
-            Arrays.stream(keys)
-                  .filter(k -> k.startsWith(FEATURE_AD_NAME_PREFIX))
-                  .map(p -> p.substring(FEATURE_AD_NAME_PREFIX.length(), p.length()))
-                  .forEach(p -> allFeatures.put(pid, p));
-            //@formatter:on
+        final List<String> specifiedFeatues = getSpecifiedFeatures(pid);
+        if (!specifiedFeatues.isEmpty() && type == CM_UPDATED) {
+            specifiedFeatues.forEach(p -> allFeatures.put(pid, p));
         }
         if (type == CM_DELETED) {
             allFeatures.removeAll(pid);
@@ -128,7 +125,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         props.put(FEATURE_AD_NAME_PREFIX + featureName, isEnabled);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         try {
-            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID);
+            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             if (configuration != null) {
                 configuration.update(new Hashtable<>(filteredProps));
                 return true;
@@ -154,20 +151,29 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         this.configurationAdmin = null;
     }
 
-    private boolean checkIfFeatureConfigExists(final ServiceReference reference) {
-        //@formatter:off
-        final String[] keys = reference.getPropertyKeys();
-        return Arrays.stream(keys)
-                     .filter(k -> k.startsWith(FEATURE_AD_NAME_PREFIX))
-                     .findAny()
-                     .isPresent();
-        //@formatter:on
+    private List<String> getSpecifiedFeatures(final String configurationPID) {
+        final List<String> features = Lists.newArrayList();
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
+            if (configuration != null) {
+                final Dictionary<String, Object> properties = configuration.getProperties();
+                final Enumeration<String> keys = properties.keys();
+                while (keys.hasMoreElements()) {
+                    final String key = keys.nextElement();
+                    if (key.startsWith(FEATURE_AD_NAME_PREFIX)) {
+                        features.add(key.substring(FEATURE_AD_NAME_PREFIX.length(), key.length()));
+                    }
+                }
+            }
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve configuration for {}", configurationPID, e);
+        }
+        return features;
     }
 
-    @SuppressWarnings("unchecked")
     private FeatureDTO convertToFeatureDTO(final String configurationPID, final String featureName) {
         try {
-            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID);
+            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             if (configuration != null) {
                 final Dictionary<String, Object> properties = configuration.getProperties();
                 final Object value = properties.get(FEATURE_AD_NAME_PREFIX + featureName);
