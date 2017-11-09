@@ -14,7 +14,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/retriable.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-for-osgi/)
 
-----------------------------------------------------------------
+-----------------------------------------------------------------
 
 ### Requirements
 
@@ -22,7 +22,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 2. OSGi R4+ (For Core API and Implementation)
 3. OSGi R6+ (For REST Services and Web Console)
 
-----------------------------------------------------------------
+-----------------------------------------------------------------
 
 ### Dependencies
 
