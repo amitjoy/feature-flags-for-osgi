@@ -14,8 +14,10 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.*;
 import static org.apache.felix.service.command.CommandProcessor.*;
 import static org.osgi.service.cm.ConfigurationEvent.*;
+import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -26,12 +28,17 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationEvent;
 import org.osgi.service.cm.ConfigurationListener;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.AttributeDefinition;
+import org.osgi.service.metatype.MetaTypeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +67,11 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     /** Configuration Admin Service Instance Reference */
     private ConfigurationAdmin configurationAdmin;
+
+    /** Metatype Service Instance Reference */
+    private MetaTypeService metaTypeService;
+
+    private BundleContext bundleContext;
 
     @Override
     public Stream<ConfigurationDTO> getConfigurations() {
@@ -124,6 +136,11 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         return false;
     }
 
+    @Activate
+    protected void activate(final BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
+
     /**
      * {@link ConfigurationAdmin} service binding callback
      */
@@ -137,6 +154,21 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
      */
     protected void unsetConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
         this.configurationAdmin = null;
+    }
+
+    /**
+     * {@link MetaTypeService} service binding callback
+     */
+    @Reference
+    protected void setMetaTypeService(final MetaTypeService metaTypeService) {
+        this.metaTypeService = metaTypeService;
+    }
+
+    /**
+     * {@link MetaTypeService} service unbinding callback
+     */
+    protected void unsetMetaTypeService(final MetaTypeService metaTypeService) {
+        this.metaTypeService = null;
     }
 
     @Override
@@ -184,6 +216,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 }
                 final FeatureDTO dto = new FeatureDTO();
                 dto.name = featureName;
+                dto.description = getFeatureDescription(configurationPID, featureName).orElse(null);
                 dto.isEnabled = enabled;
                 return dto;
             }
@@ -201,6 +234,22 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         final ConfigurationDTO dto = new ConfigurationDTO();
         dto.features = getFeatures(configurationPID).collect(collectingAndThen(toList(), ImmutableList::copyOf));
         return dto;
+    }
+
+    private Optional<String> getFeatureDescription(final String configurationPID, final String featureName) {
+        final Bundle[] bundles = bundleContext.getBundles();
+        //@formatter:off
+        return Arrays.stream(bundles)
+                     .map(metaTypeService::getMetaTypeInformation)
+                     .filter(Objects::nonNull)
+                     .filter(m -> Lists.newArrayList(m.getPids()).contains(configurationPID))
+                     .map(m -> m.getObjectClassDefinition(configurationPID, null))
+                     .map(o -> o.getAttributeDefinitions(ALL))
+                     .flatMap(Arrays::stream)
+                     .filter(ad -> ad.getID().equals(FEATURE_AD_NAME_PREFIX + featureName))
+                     .map(AttributeDefinition::getDescription)
+                     .findAny();
+        //@formatter:on
     }
 
 }
