@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Feature Flags Example
+Bundle-Name: Feature Flags for OSGi Example
 Bundle-SymbolicName: com.amitinside.featureflags.example;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-License: https://www.eclipse.org/legal/epl-v10.html
