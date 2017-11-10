@@ -12,6 +12,7 @@ package com.amitinside.featureflags.rest;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.osgi.dto.DTO;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -28,17 +29,11 @@ public final class RESTResource implements REST {
     private FeatureManager featureService;
 
     public List<ConfigurationDTO> getConfigurations(final RESTRequest req) {
-        //@formatter:off
-        return featureService.getConfigurations()
-                             .collect(Collectors.toList());
-        //@formatter:on
+        return featureService.getConfigurations().collect(Collectors.toList());
     }
 
     public List<FeatureDTO> getFeatures(final RESTRequest req, final String configurationPID) {
-        //@formatter:off
-        return featureService.getFeatures(configurationPID)
-                             .collect(Collectors.toList());
-        //@formatter:on
+        return featureService.getFeatures(configurationPID).collect(Collectors.toList());
     }
 
     public ConfigurationDTO getConfiguration(final RESTRequest req, final String configurationPID) {
@@ -49,9 +44,19 @@ public final class RESTResource implements REST {
         return featureService.getFeature(configurationPID, featureName).orElse(null);
     }
 
-    public boolean putFeature(final RESTRequest req, final String configurationPID, final String featureName,
-            final boolean isEnabled) {
-        return featureService.updateFeature(configurationPID, featureName, isEnabled);
+    public boolean putFeature(final UpdateRequest req) {
+        final UpdateData data = req._body();
+        return featureService.updateFeature(data.configurationPID, data.featureName, data.isEnabled);
+    }
+
+    private interface UpdateRequest extends RESTRequest {
+        UpdateData _body();
+    }
+
+    private final class UpdateData extends DTO {
+        String configurationPID;
+        String featureName;
+        boolean isEnabled;
     }
 
     /**
