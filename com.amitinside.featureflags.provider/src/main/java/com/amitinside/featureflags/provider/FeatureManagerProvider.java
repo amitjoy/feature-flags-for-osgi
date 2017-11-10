@@ -11,6 +11,7 @@ package com.amitinside.featureflags.provider;
 
 import static com.amitinside.featureflags.Constants.FEATURE_AD_NAME_PREFIX;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.*;
 import static org.apache.felix.service.command.CommandProcessor.*;
 import static org.osgi.service.cm.ConfigurationEvent.*;
 
@@ -198,7 +199,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
             return null;
         }
         final ConfigurationDTO dto = new ConfigurationDTO();
-        dto.features = ImmutableList.copyOf(features);
+        dto.features = getFeatures(configurationPID).collect(collectingAndThen(toList(), ImmutableList::copyOf));
         return dto;
     }
 

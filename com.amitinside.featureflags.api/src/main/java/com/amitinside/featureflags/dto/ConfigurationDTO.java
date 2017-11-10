@@ -30,6 +30,6 @@ public class ConfigurationDTO extends DTO {
     /**
      * The list of features that are contained in this configuration
      */
-    public List<String> features;
+    public List<FeatureDTO> features;
 
 }
