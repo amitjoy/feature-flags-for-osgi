@@ -9,7 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.dto;
 
-import org.osgi.annotation.versioning.ConsumerType;
 import org.osgi.dto.DTO;
 
 /**
@@ -17,7 +16,6 @@ import org.osgi.dto.DTO;
  *
  * @NotThreadSafe
  */
-@ConsumerType
 public class FeatureDTO extends DTO {
 
     /**

@@ -11,7 +11,6 @@ package com.amitinside.featureflags.dto;
 
 import java.util.List;
 
-import org.osgi.annotation.versioning.ConsumerType;
 import org.osgi.dto.DTO;
 
 /**
@@ -19,7 +18,6 @@ import org.osgi.dto.DTO;
  *
  * @NotThreadSafe
  */
-@ConsumerType
 public class ConfigurationDTO extends DTO {
 
     /**
