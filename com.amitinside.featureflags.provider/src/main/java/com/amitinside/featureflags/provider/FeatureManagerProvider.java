@@ -9,7 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.Constants.FEATURE_AD_NAME_PREFIX;
+import static com.amitinside.featureflags.provider.Constants.FEATURE_AD_NAME_PREFIX;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.*;
 import static org.apache.felix.service.command.CommandProcessor.*;

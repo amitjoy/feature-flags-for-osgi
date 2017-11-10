@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags;
+package com.amitinside.featureflags.provider;
 
 /**
  * Constants required for feature flags.
