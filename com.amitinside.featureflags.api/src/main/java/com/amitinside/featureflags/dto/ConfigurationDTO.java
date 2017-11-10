@@ -24,6 +24,8 @@ public class ConfigurationDTO extends DTO {
 
     /**
      * The PID of the configuration.
+     *
+     * @see {@code Configuration#getPid()}
      */
     public String pid;
 
