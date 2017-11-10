@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationEvent;
@@ -144,6 +145,22 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     @Activate
     protected void activate(final BundleContext bundleContext) {
         this.bundleContext = bundleContext;
+        // track already existing configurations
+        try {
+            final Configuration[] existingConfigurations = configurationAdmin.listConfigurations(null);
+            for (final Configuration configuration : existingConfigurations) {
+                final String pid = configuration.getPid();
+                if (allFeatures.containsKey(pid)) {
+                    return;
+                }
+                final List<String> configuredFeatures = getConfiguredFeatures(pid);
+                if (!configuredFeatures.isEmpty()) {
+                    configuredFeatures.forEach(p -> allFeatures.put(pid, p));
+                }
+            }
+        } catch (final IOException | InvalidSyntaxException e) {
+            logger.error("Cannot retrieve configurations", e);
+        }
     }
 
     /**
