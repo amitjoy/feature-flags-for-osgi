@@ -9,7 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.provider.Constants.FEATURE_AD_NAME_PREFIX;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.*;
 import static org.apache.felix.service.command.CommandProcessor.*;
@@ -20,12 +19,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
@@ -46,6 +46,7 @@ import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -59,6 +60,9 @@ import com.google.common.collect.TreeMultimap;
         COMMAND_FUNCTION + "=updateFeature" })
 public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
 
+    /** Prefix required for attribute definitions in configuration */
+    private static final String FEATURE_AD_ID_PREFIX = "osgi.feature.";
+
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(FeatureManagerProvider.class);
 
@@ -71,6 +75,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     /** Metatype Service Instance Reference */
     private MetaTypeService metaTypeService;
 
+    /** Bundle Context Instance Reference */
     private BundleContext bundleContext;
 
     @Override
@@ -122,7 +127,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         requireNonNull(featureName, "Feature Name cannot be null");
 
         final Map<String, Object> props = Maps.newHashMap();
-        props.put(FEATURE_AD_NAME_PREFIX + featureName, isEnabled);
+        props.put(FEATURE_AD_ID_PREFIX + featureName, isEnabled);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
@@ -131,7 +136,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 return true;
             }
         } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", configurationPID, e);
+            logger.error("Cannot retrieve configuration for {}", configurationPID, e);
         }
         return false;
     }
@@ -175,33 +180,33 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     public void configurationEvent(final ConfigurationEvent event) {
         final int type = event.getType();
         final String pid = event.getPid();
-        final List<String> specifiedFeatues = getSpecifiedFeatures(pid);
-        if (!specifiedFeatues.isEmpty() && type == CM_UPDATED) {
-            specifiedFeatues.forEach(p -> allFeatures.put(pid, p));
+        final List<String> configuredFeatures = getConfiguredFeatures(pid);
+        if (!configuredFeatures.isEmpty() && type == CM_UPDATED) {
+            configuredFeatures.forEach(p -> allFeatures.put(pid, p));
         }
         if (type == CM_DELETED) {
             allFeatures.removeAll(pid);
         }
     }
 
-    private List<String> getSpecifiedFeatures(final String configurationPID) {
-        final List<String> features = Lists.newArrayList();
+    private List<String> getConfiguredFeatures(final String configurationPID) {
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             if (configuration != null) {
                 final Dictionary<String, Object> properties = configuration.getProperties();
-                final Enumeration<String> keys = properties.keys();
-                while (keys.hasMoreElements()) {
-                    final String key = keys.nextElement();
-                    if (key.startsWith(FEATURE_AD_NAME_PREFIX)) {
-                        features.add(key.substring(FEATURE_AD_NAME_PREFIX.length(), key.length()));
-                    }
-                }
+                final Iterator<String> keysIterator = Iterators.forEnumeration(properties.keys());
+                final Map<String, Object> props = Maps.toMap(keysIterator, properties::get);
+                //@formatter:off
+                return props.keySet().stream()
+                                     .filter(k -> k.startsWith(FEATURE_AD_ID_PREFIX))
+                                     .map(k -> k.substring(FEATURE_AD_ID_PREFIX.length(), k.length()))
+                                     .collect(Collectors.toList());
+                //@formatter:on
             }
         } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", configurationPID, e);
+            logger.error("Cannot retrieve configuration for {}", configurationPID, e);
         }
-        return features;
+        return ImmutableList.of();
     }
 
     private FeatureDTO convertToFeatureDTO(final String configurationPID, final String featureName) {
@@ -209,7 +214,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             if (configuration != null) {
                 final Dictionary<String, Object> properties = configuration.getProperties();
-                final Object value = properties.get(FEATURE_AD_NAME_PREFIX + featureName);
+                final Object value = properties.get(FEATURE_AD_ID_PREFIX + featureName);
                 boolean enabled = false;
                 if (value instanceof Boolean) {
                     enabled = (boolean) value;
@@ -221,7 +226,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 return dto;
             }
         } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", configurationPID, e);
+            logger.error("Cannot retrieve configuration for {}", configurationPID, e);
         }
         return null;
     }
@@ -246,7 +251,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                      .map(m -> m.getObjectClassDefinition(configurationPID, null))
                      .map(o -> o.getAttributeDefinitions(ALL))
                      .flatMap(Arrays::stream)
-                     .filter(ad -> ad.getID().equals(FEATURE_AD_NAME_PREFIX + featureName))
+                     .filter(ad -> ad.getID().equals(FEATURE_AD_ID_PREFIX + featureName))
                      .map(AttributeDefinition::getDescription)
                      .findAny();
         //@formatter:on
