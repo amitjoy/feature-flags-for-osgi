@@ -79,6 +79,54 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     /** Bundle Context Instance Reference */
     private BundleContext bundleContext;
 
+    @Activate
+    protected void activate(final BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+        // track already existing configurations
+        try {
+            final Configuration[] existingConfigurations = configurationAdmin.listConfigurations(null);
+            for (final Configuration configuration : existingConfigurations) {
+                final String pid = configuration.getPid();
+                final List<String> configuredFeatures = getConfiguredFeatures(pid);
+                if (!configuredFeatures.isEmpty()) {
+                    configuredFeatures.forEach(p -> allFeatures.put(pid, p));
+                }
+            }
+        } catch (final IOException | InvalidSyntaxException e) {
+            logger.error("Cannot retrieve configurations", e);
+        }
+    }
+
+    /**
+     * {@link ConfigurationAdmin} service binding callback
+     */
+    @Reference
+    protected void setConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
+        this.configurationAdmin = configurationAdmin;
+    }
+
+    /**
+     * {@link ConfigurationAdmin} service unbinding callback
+     */
+    protected void unsetConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
+        this.configurationAdmin = null;
+    }
+
+    /**
+     * {@link MetaTypeService} service binding callback
+     */
+    @Reference
+    protected void setMetaTypeService(final MetaTypeService metaTypeService) {
+        this.metaTypeService = metaTypeService;
+    }
+
+    /**
+     * {@link MetaTypeService} service unbinding callback
+     */
+    protected void unsetMetaTypeService(final MetaTypeService metaTypeService) {
+        this.metaTypeService = null;
+    }
+
     @Override
     public Stream<ConfigurationDTO> getConfigurations() {
         //@formatter:off
@@ -142,57 +190,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         return false;
     }
 
-    @Activate
-    protected void activate(final BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
-        // track already existing configurations
-        try {
-            final Configuration[] existingConfigurations = configurationAdmin.listConfigurations(null);
-            for (final Configuration configuration : existingConfigurations) {
-                final String pid = configuration.getPid();
-                if (allFeatures.containsKey(pid)) {
-                    return;
-                }
-                final List<String> configuredFeatures = getConfiguredFeatures(pid);
-                if (!configuredFeatures.isEmpty()) {
-                    configuredFeatures.forEach(p -> allFeatures.put(pid, p));
-                }
-            }
-        } catch (final IOException | InvalidSyntaxException e) {
-            logger.error("Cannot retrieve configurations", e);
-        }
-    }
-
-    /**
-     * {@link ConfigurationAdmin} service binding callback
-     */
-    @Reference
-    protected void setConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
-        this.configurationAdmin = configurationAdmin;
-    }
-
-    /**
-     * {@link ConfigurationAdmin} service unbinding callback
-     */
-    protected void unsetConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
-        this.configurationAdmin = null;
-    }
-
-    /**
-     * {@link MetaTypeService} service binding callback
-     */
-    @Reference
-    protected void setMetaTypeService(final MetaTypeService metaTypeService) {
-        this.metaTypeService = metaTypeService;
-    }
-
-    /**
-     * {@link MetaTypeService} service unbinding callback
-     */
-    protected void unsetMetaTypeService(final MetaTypeService metaTypeService) {
-        this.metaTypeService = null;
-    }
-
     @Override
     public void configurationEvent(final ConfigurationEvent event) {
         final int type = event.getType();
@@ -213,11 +210,12 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 final Dictionary<String, Object> properties = configuration.getProperties();
                 final Iterator<String> keysIterator = Iterators.forEnumeration(properties.keys());
                 final Map<String, Object> props = Maps.toMap(keysIterator, properties::get);
+                final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
                 //@formatter:off
-                return props.keySet().stream()
-                                     .filter(k -> k.startsWith(FEATURE_AD_ID_PREFIX))
-                                     .map(k -> k.substring(FEATURE_AD_ID_PREFIX.length(), k.length()))
-                                     .collect(Collectors.toList());
+                return filteredProps.keySet().stream()
+                                             .filter(k -> k.startsWith(FEATURE_AD_ID_PREFIX))
+                                             .map(k -> k.substring(FEATURE_AD_ID_PREFIX.length(), k.length()))
+                                             .collect(Collectors.toList());
                 //@formatter:on
             }
         } catch (final IOException e) {
