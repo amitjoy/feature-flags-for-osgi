@@ -7,10 +7,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
+package com.amitinside.featureflags.provider;
+
 /**
- * Provides API to represent {@link com.amitinside.featureflags.listener.ConfigurationListener} instance
- *
- * @since 1.0
+ * Constants required for feature flags.
  */
-@org.osgi.annotation.versioning.Version("1.0")
-package com.amitinside.featureflags.listener;
+public final class Constants {
+
+    /** Prefix required for attribute definitions in configuration */
+    public static final String FEATURE_AD_NAME_PREFIX = "osgi.feature.";
+
+    /** Constructor */
+    private Constants() {
+        throw new IllegalAccessError("Non-Instantiable");
+    }
+
+}

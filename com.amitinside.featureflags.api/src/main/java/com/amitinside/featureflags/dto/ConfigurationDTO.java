@@ -7,19 +7,29 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags.annotation;
+package com.amitinside.featureflags.dto;
+
+import java.util.List;
+
+import org.osgi.dto.DTO;
 
 /**
- * This enumeration is used to specify a feature expiration type
+ * Data Transfer Object for a configuration instance comprising features
+ *
+ * @NotThreadSafe
  */
-public enum ExpirationType {
-    /**
-     * This specifies the type that the feature never expires
-     */
-    NEVER,
+public class ConfigurationDTO extends DTO {
 
     /**
-     * This specifies the type that the feature associates an expiration date
+     * The PID of the configuration.
+     *
+     * @see {@code Configuration#getPid()}
      */
-    TIMED
+    public String pid;
+
+    /**
+     * The list of features that are contained in this configuration
+     */
+    public List<FeatureDTO> features;
+
 }

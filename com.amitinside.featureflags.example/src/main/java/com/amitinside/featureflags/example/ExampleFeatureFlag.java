@@ -9,100 +9,44 @@
  *******************************************************************************/
 package com.amitinside.featureflags.example;
 
-import static javax.servlet.http.HttpServletResponse.*;
-
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.http.HttpService;
-import org.osgi.service.http.NamespaceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
-import com.amitinside.featureflags.FeatureManager;
-import com.amitinside.featureflags.annotation.Feature;
+import com.amitinside.featureflags.example.ExampleFeatureFlag.MyConfig;
 
+@Designate(ocd = MyConfig.class)
 @Component(name = "ExampleFeatureFlag", immediate = true)
-public final class ExampleFeatureFlag extends HttpServlet {
+public final class ExampleFeatureFlag {
 
-    private static final long serialVersionUID = 6674752488720831279L;
-    private static final String ALIAS = "/exampleflag";
+    private volatile MyConfig config;
 
-    @Feature
-    private static final String FEATURE_ID = "feature.example";
+    @ObjectClassDefinition(id = "feature.flag.example")
+    @interface MyConfig {
+        @AttributeDefinition(name = "osgi.feature.myfeature", description = "My Feature Description")
+        boolean osgi_feature_myfeature() default true;
+    }
 
-    /** Logger Instance */
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private HttpService httpService;
-    private FeatureManager featureManager;
-
-    /**
-     * Component activation callback
-     */
     @Activate
-    protected void activate() {
-        try {
-            httpService.registerServlet(ALIAS, this, null, new DisableAuthenticationHttpContext());
-        } catch (ServletException | NamespaceException e) {
-            logger.error("{}", e.getMessage(), e);
-        }
+    protected void activate(final MyConfig config) {
+        modified(config);
     }
 
-    /**
-     * Component activation callback
-     */
-    @Deactivate
-    protected void deactivate() {
-        httpService.unregister(ALIAS);
+    @Modified
+    protected void modified(final MyConfig config) {
+        this.config = config;
+        doStuff();
     }
 
-    /**
-     * {@link HttpService} service binding callback
-     */
-    @Reference
-    protected void setHttpService(final HttpService httpService) {
-        this.httpService = httpService;
-    }
-
-    /**
-     * {@link HttpService} service unbinding callback
-     */
-    protected void unsetHttpService(final HttpService httpService) {
-        this.httpService = null;
-    }
-
-    /**
-     * {@link FeatureManager} service binding callback
-     */
-    @Reference
-    protected void setFeatureManager(final FeatureManager featureManager) {
-        this.featureManager = featureManager;
-    }
-
-    /**
-     * {@link FeatureManager} service unbinding callback
-     */
-    protected void unsetFeatureManager(final FeatureManager featureManager) {
-        this.featureManager = null;
-    }
-
-    @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (featureManager.isFeatureEnabled(FEATURE_ID)) {
-            resp.setStatus(SC_OK);
+    private void doStuff() {
+        if (config.osgi_feature_myfeature()) {
+            System.out.println("Example Feature Config >>Enabled<<");
             return;
+        } else {
+            System.out.println("Example Feature Config >>Disabled<<");
         }
-        resp.setStatus(SC_FORBIDDEN);
     }
-
 }

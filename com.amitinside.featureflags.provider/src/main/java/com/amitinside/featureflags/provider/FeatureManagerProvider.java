@@ -9,301 +9,136 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.ConfigurationEvent.Type.*;
-import static com.amitinside.featureflags.Constants.*;
-import static com.amitinside.featureflags.StrategyFactory.StrategyType.SERVICE_PROPERTY;
-import static com.amitinside.featureflags.provider.Config.*;
+import static com.amitinside.featureflags.provider.Constants.FEATURE_AD_NAME_PREFIX;
 import static java.util.Objects.requireNonNull;
-import static org.osgi.framework.Constants.*;
-import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
-import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
+import static java.util.stream.Collectors.*;
+import static org.apache.felix.service.command.CommandProcessor.*;
+import static org.osgi.service.cm.ConfigurationEvent.*;
+import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationEvent;
+import org.osgi.service.cm.ConfigurationListener;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.AttributeDefinition;
+import org.osgi.service.metatype.MetaTypeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amitinside.featureflags.Configurable;
-import com.amitinside.featureflags.ConfigurationEvent;
-import com.amitinside.featureflags.ConfigurationEvent.Type;
 import com.amitinside.featureflags.FeatureManager;
-import com.amitinside.featureflags.StrategizableFactory;
-import com.amitinside.featureflags.StrategyFactory;
-import com.amitinside.featureflags.feature.Feature;
-import com.amitinside.featureflags.feature.group.FeatureGroup;
-import com.amitinside.featureflags.listener.ConfigurationListener;
-import com.amitinside.featureflags.provider.util.ServiceHelper;
-import com.amitinside.featureflags.strategy.ActivationStrategy;
-import com.google.common.base.Strings;
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.ImmutableMap;
+import com.amitinside.featureflags.dto.ConfigurationDTO;
+import com.amitinside.featureflags.dto.FeatureDTO;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
 /**
- * This service implements the {@link FeatureManager}. It keeps track of all
- * {@link Feature}, {@link FeatureGroup} and {@link ActivationStrategy} services.
+ * This implements the {@link FeatureManager}.
  */
-@Component(name = "FeatureManager", immediate = true)
-public final class FeatureManagerProvider implements FeatureManager, org.osgi.service.cm.ConfigurationListener {
+@SuppressWarnings("unchecked")
+@Component(name = "FeatureManager", immediate = true, property = { COMMAND_SCOPE + "=feature",
+        COMMAND_FUNCTION + "=updateFeature" })
+public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
 
     /** Logger Instance */
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(FeatureManagerProvider.class);
 
-    private final Multimap<String, Description<Feature>> allFeatures = TreeMultimap.create();
-    private final Multimap<String, Description<ActivationStrategy>> allStrategies = TreeMultimap.create();
-    private final Multimap<String, Description<FeatureGroup>> allFeatureGroups = TreeMultimap.create();
+    /** Data container -> Key: Configuration PID Value: Feature Name(s) */
+    private final Multimap<String, String> allFeatures = TreeMultimap.create();
 
-    private final Map<String, Feature> activeFeatures = Maps.newHashMap();
-    private final Map<String, FeatureGroup> activeFeatureGroups = Maps.newHashMap();
-    private final Map<String, ActivationStrategy> activeStrategies = Maps.newHashMap();
-
-    private final List<ConfigurationListener> listeners = Lists.newCopyOnWriteArrayList();
-
-    private final Lock featuresLock = new ReentrantLock(true);
-    private final Lock strategiesLock = new ReentrantLock(true);
-    private final Lock featureGroupsLock = new ReentrantLock(true);
-
+    /** Configuration Admin Service Instance Reference */
     private ConfigurationAdmin configurationAdmin;
-    private BundleContext context;
+
+    /** Metatype Service Instance Reference */
+    private MetaTypeService metaTypeService;
+
+    private BundleContext bundleContext;
 
     @Override
-    public Stream<Feature> getFeatures() {
-        return activeFeatures.values().stream();
+    public Stream<ConfigurationDTO> getConfigurations() {
+        //@formatter:off
+        return allFeatures.keys()
+                          .stream()
+                          .map(this::convertToConfigurationDTO)
+                          .filter(Objects::nonNull);
+        //@formatter:on
     }
 
     @Override
-    public Stream<ActivationStrategy> getStrategies() {
-        return activeStrategies.values().stream();
+    public Stream<FeatureDTO> getFeatures(final String configurationPID) {
+        requireNonNull(configurationPID, "Configuration PID cannot be null");
+
+        //@formatter:off
+        return allFeatures.get(configurationPID)
+                          .stream()
+                          .map(f -> convertToFeatureDTO(configurationPID, f))
+                          .filter(Objects::nonNull);
+        //@formatter:on
     }
 
     @Override
-    public Stream<FeatureGroup> getGroups() {
-        return activeFeatureGroups.values().stream();
+    public Optional<ConfigurationDTO> getConfiguration(final String configurationPID) {
+        requireNonNull(configurationPID, "Configuration PID cannot be null");
+        return Optional.ofNullable(convertToConfigurationDTO(configurationPID));
     }
 
     @Override
-    public Optional<Feature> getFeature(final String featureName) {
-        requireNonNull(featureName, "Feature name cannot be null");
-        return Optional.ofNullable(activeFeatures.get(featureName.toLowerCase()));
+    public Optional<FeatureDTO> getFeature(final String configurationPID, final String featureName) {
+        requireNonNull(configurationPID, "Configuration PID cannot be null");
+        requireNonNull(featureName, "Feature Name cannot be null");
+
+        //@formatter:off
+        return allFeatures.get(configurationPID)
+                          .stream()
+                          .map(f -> convertToFeatureDTO(configurationPID, f))
+                          .filter(Objects::nonNull)
+                          .filter(f -> f.name.equalsIgnoreCase(featureName))
+                          .findAny();
+        //@formatter:on
     }
 
     @Override
-    public Optional<ActivationStrategy> getStrategy(final String strategyName) {
-        requireNonNull(strategyName, "Strategy name cannot be null");
-        return Optional.ofNullable(activeStrategies.get(strategyName.toLowerCase()));
-    }
+    public boolean updateFeature(final String configurationPID, final String featureName, final boolean isEnabled) {
+        requireNonNull(configurationPID, "Configuration PID cannot be null");
+        requireNonNull(featureName, "Feature Name cannot be null");
 
-    @Override
-    public Optional<FeatureGroup> getGroup(final String groupName) {
-        requireNonNull(groupName, "Group name cannot be null");
-        return Optional.ofNullable(activeFeatureGroups.get(groupName.toLowerCase()));
-    }
-
-    @Override
-    public boolean isFeatureEnabled(final String featureName) {
-        requireNonNull(featureName, "Feature name cannot be null");
-        final Feature feature = getFeature(featureName).orElse(null);
-        return feature != null ? checkEnablement(feature) : false;
-    }
-
-    @Override
-    public boolean isGroupEnabled(final String groupName) {
-        requireNonNull(groupName, "Group name cannot be null");
-        final FeatureGroup group = getGroup(groupName).orElse(null);
-        return group != null ? checkGroupEnablement(group) : false;
-    }
-
-    @Override
-    public void configurationEvent(final org.osgi.service.cm.ConfigurationEvent event) {
-        final ServiceReference reference = event.getReference();
-        try {
-            final Object service = context.getService(reference);
-            if (service instanceof Configurable) {
-                final Configurable instance = (Configurable) service;
-                listeners.forEach(l -> l.accept(getEvent(instance, event.getType())));
-            }
-        } finally {
-            context.ungetService(reference);
-        }
-    }
-
-    @Override
-    public Optional<String> createFeature(final StrategizableFactory featureFactory) {
-        requireNonNull(featureFactory, "Feature factory cannot be null");
-        final List<String> groups = featureFactory.getGroups();
-        final Map<String, Object> props = extractData(featureFactory);
-        props.put(GROUPS.value(), groups.toArray(new String[0]));
+        final Map<String, Object> props = Maps.newHashMap();
+        props.put(FEATURE_AD_NAME_PREFIX + featureName, isEnabled);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         try {
-            final Configuration configuration = configurationAdmin.createFactoryConfiguration(FEATURE_FACTORY_PID);
-            configuration.update(new Hashtable<>(filteredProps));
-            return Optional.ofNullable(configuration.getPid());
-        } catch (final IOException e) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Optional<String> createGroup(final StrategizableFactory groupFactory) {
-        requireNonNull(groupFactory, "Group factory cannot be null");
-        final Map<String, Object> props = extractData(groupFactory);
-        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-        try {
-            final Configuration configuration = configurationAdmin
-                    .createFactoryConfiguration(FEATURE_GROUP_FACTORY_PID);
-            configuration.update(new Hashtable<>(filteredProps));
-            return Optional.ofNullable(configuration.getPid());
-        } catch (final IOException e) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Optional<String> createPropertyBasedStrategy(final StrategyFactory factory) {
-        requireNonNull(factory, "Strategy factory cannot be null");
-        final Map<String, Object> props = extractStrategyData(factory);
-        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-        final String type = factory.getType() == SERVICE_PROPERTY ? STRATEGY_SERVICE_PROPERTY_PID
-                : STRATEGY_SYSTEM_PROPERTY_PID;
-        try {
-            final Configuration configuration = configurationAdmin.createFactoryConfiguration(type);
-            configuration.update(new Hashtable<>(filteredProps));
-            return Optional.ofNullable(configuration.getPid());
-        } catch (final IOException e) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public boolean updateFeature(final StrategizableFactory featureFactory) {
-        requireNonNull(featureFactory, "Feature factory cannot be null");
-        final List<String> groups = featureFactory.getGroups();
-        final Map<String, Object> props = extractData(featureFactory);
-        props.put(GROUPS.value(), groups.toArray(new String[0]));
-        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-        final String name = featureFactory.getName();
-        final String pid = getFeaturePID(name);
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(pid);
+            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             if (configuration != null) {
                 configuration.update(new Hashtable<>(filteredProps));
                 return true;
             }
         } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", name, e);
+            logger.trace("Cannot retrieve configuration for {}", configurationPID, e);
         }
         return false;
     }
 
-    @Override
-    public boolean updateGroup(final StrategizableFactory groupFactory) {
-        requireNonNull(groupFactory, "Group factory cannot be null");
-        final Map<String, Object> props = extractData(groupFactory);
-        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-        final String name = groupFactory.getName();
-        final String pid = getGroupPID(name);
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(pid);
-            if (configuration != null) {
-                configuration.update(new Hashtable<>(filteredProps));
-                return true;
-            }
-        } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", name, e);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean updatePropertyBasedStrategy(final StrategyFactory strategyFactory) {
-        requireNonNull(strategyFactory, "Strategy factory cannot be null");
-        final Map<String, Object> props = extractStrategyData(strategyFactory);
-        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-        final String name = strategyFactory.getName();
-        final String pid = getStrategyPID(name);
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(pid);
-            if (configuration != null) {
-                configuration.update(new Hashtable<>(filteredProps));
-                return true;
-            }
-        } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", name, e);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean removeFeature(final String name) {
-        requireNonNull(name, "Feature name cannot be null");
-        //@formatter:off
-        allFeatures.values().stream()
-                            .sorted()
-                            .filter(x -> x.instance.getName().equalsIgnoreCase(name))
-                            .map(f -> f.props)
-                            .map(m -> m.get(SERVICE_PID))
-                            .map(String.class::cast)
-                            .forEach(p -> deleteConfiguration(name, p));
-        //@formatter:on
-        return true;
-    }
-
-    @Override
-    public boolean removeGroup(final String name) {
-        requireNonNull(name, "Feature Group name cannot be null");
-        //@formatter:off
-        allFeatureGroups.values().stream()
-                                 .sorted()
-                                 .filter(x -> x.instance.getName().equalsIgnoreCase(name))
-                                 .map(f -> f.props)
-                                 .map(m -> m.get(SERVICE_PID))
-                                 .map(String.class::cast)
-                                 .forEach(p -> deleteConfiguration(name, p));
-        //@formatter:on
-        return true;
-    }
-
-    @Override
-    public boolean removePropertyBasedStrategy(final String name) {
-        requireNonNull(name, "Strategy name cannot be null");
-        //@formatter:off
-        allStrategies.values().stream()
-                              .sorted()
-                              .filter(x -> x.instance.getName().equalsIgnoreCase(name))
-                              .map(f -> f.props)
-                              .map(m -> m.get(SERVICE_PID))
-                              .map(String.class::cast)
-                              .forEach(p -> deleteConfiguration(name, p));
-        //@formatter:on
-        return true;
-    }
-
-    /**
-     * OSGi Service Component Activation Callback
-     */
     @Activate
-    protected void activate(final BundleContext context) {
-        this.context = context;
+    protected void activate(final BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
     }
 
     /**
@@ -322,342 +157,99 @@ public final class FeatureManagerProvider implements FeatureManager, org.osgi.se
     }
 
     /**
-     * {@link Feature} service binding callback
+     * {@link MetaTypeService} service binding callback
      */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindFeature(final Feature feature, final Map<String, Object> props) {
-        featuresLock.lock();
-        try {
-            final String name = feature.getName();
-            // ignore if null or empty
-            if (Strings.isNullOrEmpty(name)) {
-                return;
-            }
-            bindInstance(feature, name, props, allFeatures, activeFeatures);
-        } finally {
-            featuresLock.unlock();
-        }
+    @Reference
+    protected void setMetaTypeService(final MetaTypeService metaTypeService) {
+        this.metaTypeService = metaTypeService;
     }
 
     /**
-     * {@link Feature} service unbinding callback
+     * {@link MetaTypeService} service unbinding callback
      */
-    protected void unbindFeature(final Feature feature, final Map<String, Object> props) {
-        featuresLock.lock();
+    protected void unsetMetaTypeService(final MetaTypeService metaTypeService) {
+        this.metaTypeService = null;
+    }
+
+    @Override
+    public void configurationEvent(final ConfigurationEvent event) {
+        final int type = event.getType();
+        final String pid = event.getPid();
+        final List<String> specifiedFeatues = getSpecifiedFeatures(pid);
+        if (!specifiedFeatues.isEmpty() && type == CM_UPDATED) {
+            specifiedFeatues.forEach(p -> allFeatures.put(pid, p));
+        }
+        if (type == CM_DELETED) {
+            allFeatures.removeAll(pid);
+        }
+    }
+
+    private List<String> getSpecifiedFeatures(final String configurationPID) {
+        final List<String> features = Lists.newArrayList();
         try {
-            final String name = feature.getName();
-            unbindInstance(feature, name, props, allFeatures, activeFeatures);
-        } finally {
-            featuresLock.unlock();
-        }
-    }
-
-    /**
-     * {@link ActivationStrategy} service binding callback
-     */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
-        strategiesLock.lock();
-        try {
-            final String name = strategy.getName();
-            // ignore if null or empty
-            if (Strings.isNullOrEmpty(name)) {
-                return;
-            }
-            bindInstance(strategy, name, props, allStrategies, activeStrategies);
-        } finally {
-            strategiesLock.unlock();
-        }
-    }
-
-    /**
-     * {@link ActivationStrategy} service unbinding callback
-     */
-    protected void unbindStrategy(final ActivationStrategy strategy, final Map<String, Object> props) {
-        strategiesLock.lock();
-        try {
-            final String name = strategy.getName();
-            unbindInstance(strategy, name, props, allStrategies, activeStrategies);
-        } finally {
-            strategiesLock.unlock();
-        }
-    }
-
-    /**
-     * {@link FeatureGroup} service binding callback
-     */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
-        featureGroupsLock.lock();
-        try {
-            final String name = group.getName();
-            // ignore if null or empty
-            if (Strings.isNullOrEmpty(name)) {
-                return;
-            }
-            bindInstance(group, name, props, allFeatureGroups, activeFeatureGroups);
-        } finally {
-            featureGroupsLock.unlock();
-        }
-    }
-
-    /**
-     * {@link FeatureGroup} service unbinding callback
-     */
-    protected void unbindFeatureGroup(final FeatureGroup group, final Map<String, Object> props) {
-        featureGroupsLock.lock();
-        try {
-            final String name = group.getName();
-            unbindInstance(group, name, props, allFeatureGroups, activeFeatureGroups);
-        } finally {
-            featureGroupsLock.unlock();
-        }
-    }
-
-    /**
-     * {@link ConfigurationListener} service binding callback
-     */
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    protected void bindConfigurationListener(final ConfigurationListener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * {@link ConfigurationListener} service unbinding callback
-     */
-    protected void unbindConfigurationListener(final ConfigurationListener listener) {
-        listeners.remove(listener);
-    }
-
-    private <T> void bindInstance(final T instance, final String name, final Map<String, Object> props,
-            final Multimap<String, Description<T>> allInstances, final Map<String, T> activeInstances) {
-        final Description<T> info = new Description<>(instance, props);
-        allInstances.put(name.toLowerCase(), info);
-        calculateActiveInstances(allInstances, activeInstances);
-    }
-
-    private <T> void unbindInstance(final T instance, final String name, final Map<String, Object> props,
-            final Multimap<String, Description<T>> allInstances, final Map<String, T> activeInstances) {
-        final Description<T> info = new Description<>(instance, props);
-        allInstances.remove(name.toLowerCase(), info);
-        calculateActiveInstances(allInstances, activeInstances);
-    }
-
-    private ConfigurationEvent getEvent(final Configurable instance, final int type) {
-        Map<String, Object> properties = ImmutableMap.of();
-        if (instance instanceof Feature) {
-            properties = getFeatureProperties((Feature) instance);
-        } else if (instance instanceof FeatureGroup) {
-            properties = getFeatureGroupProperties((FeatureGroup) instance);
-        } else if (instance instanceof ActivationStrategy) {
-            properties = getStrategyProperties((ActivationStrategy) instance);
-        }
-        final Type eventType = type == 1 ? UPDATED : DELETED;
-        return new ConfigurationEvent(eventType, instance, properties);
-    }
-
-    private String getFeaturePID(final String featureName) {
-        //@formatter:off
-        return allFeatures.values().stream()
-                .sorted()
-                .filter(x -> x.instance.getName().equalsIgnoreCase(featureName))
-                .findFirst()
-                .map(f -> f.props)
-                .map(m -> m.get(SERVICE_PID))
-                .map(String.class::cast)
-                .orElse("");
-        //@formatter:on
-    }
-
-    private String getGroupPID(final String groupName) {
-        //@formatter:off
-        return allFeatureGroups.values().stream()
-                .sorted()
-                .filter(x -> x.instance.getName().equalsIgnoreCase(groupName))
-                .findFirst()
-                .map(g -> g.props)
-                .map(m -> m.get(SERVICE_PID))
-                .map(String.class::cast)
-                .orElse("");
-        //@formatter:on
-    }
-
-    private String getStrategyPID(final String strategyName) {
-        //@formatter:off
-        return allStrategies.values().stream()
-                .sorted()
-                .filter(x -> x.instance.getName().equalsIgnoreCase(strategyName))
-                .findFirst()
-                .map(s -> s.props)
-                .map(m -> m.get(SERVICE_PID))
-                .map(String.class::cast)
-                .orElse("");
-        //@formatter:on
-    }
-
-    private Map<String, Object> extractData(final StrategizableFactory factory) {
-        final String name = factory.getName();
-        final String description = factory.getDescription().orElse(null);
-        final String strategy = factory.getStrategy().orElse(null);
-        final boolean isEnabled = factory.isEnabled();
-        final Map<String, Object> serviceProperties = factory.getProperties();
-
-        final Map<String, Object> props = Maps.newHashMap();
-        props.put(NAME.value(), name);
-        props.put(DESCRIPTION.value(), description);
-        props.put(STRATEGY.value(), strategy);
-        props.put(ENABLED.value(), isEnabled);
-        props.putAll(serviceProperties);
-        return props;
-    }
-
-    private Map<String, Object> extractStrategyData(final StrategyFactory factory) {
-        final String name = factory.getName();
-        final String description = factory.getDescription().orElse(null);
-        final String key = factory.getKey().orElse(null);
-        final String value = factory.getValue().orElse(null);
-
-        final Map<String, Object> props = Maps.newHashMap();
-        props.put(NAME.value(), name);
-        props.put(DESCRIPTION.value(), description);
-        props.put(PROPERTY_KEY.value(), key);
-        props.put(PROPERTY_VALUE.value(), value);
-        return props;
-    }
-
-    private boolean checkEnablement(final Feature feature) {
-        final long noOfGroups = feature.getGroups().count();
-        if (noOfGroups > 0) {
-            if (noOfGroups == 1) {
-                final FeatureGroup group = getGroup(feature.getGroups().findAny().orElse("")).orElse(null);
-                return group == null ? false : checkGroupEnablement(group);
-            } else {
-                return feature.getGroups().anyMatch(this::isGroupEnabled);
-            }
-        }
-        return checkFeatureStrategyEnablement(feature);
-    }
-
-    private boolean checkGroupEnablement(final FeatureGroup group) {
-        //@formatter:off
-        return group.getStrategy()
-                    .map(this::getStrategy)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .map(x -> x.isEnabled(group, getFeatureGroupProperties(group)))
-                    .orElse(group.isEnabled());
-        //@formatter:on
-    }
-
-    private boolean checkFeatureStrategyEnablement(final Feature feature) {
-        //@formatter:off
-        return feature.getStrategy()
-                      .map(this::getStrategy)
-                      .filter(Optional::isPresent)
-                      .map(Optional::get)
-                      .map(x -> x.isEnabled(feature, getFeatureProperties(feature)))
-                      .orElse(feature.isEnabled());
-        //@formatter:on
-    }
-
-    private Map<String, Object> getFeatureProperties(final Feature feature) {
-        return ServiceHelper.getServiceProperties(context, feature, Feature.class, null);
-    }
-
-    private Map<String, Object> getFeatureGroupProperties(final FeatureGroup group) {
-        return ServiceHelper.getServiceProperties(context, group, FeatureGroup.class, null);
-    }
-
-    private Map<String, Object> getStrategyProperties(final ActivationStrategy strategy) {
-        return ServiceHelper.getServiceProperties(context, strategy, ActivationStrategy.class, null);
-    }
-
-    private boolean deleteConfiguration(final String name, final String pid) {
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(pid);
+            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             if (configuration != null) {
-                configuration.delete();
-                return true;
+                final Dictionary<String, Object> properties = configuration.getProperties();
+                final Enumeration<String> keys = properties.keys();
+                while (keys.hasMoreElements()) {
+                    final String key = keys.nextElement();
+                    if (key.startsWith(FEATURE_AD_NAME_PREFIX)) {
+                        features.add(key.substring(FEATURE_AD_NAME_PREFIX.length(), key.length()));
+                    }
+                }
             }
         } catch (final IOException e) {
-            logger.trace("Cannot retrieve configuration for {}", name, e);
+            logger.trace("Cannot retrieve configuration for {}", configurationPID, e);
         }
-        return false;
+        return features;
     }
 
-    /**
-     * Calculates map of active elements (Strategy or Feature) (eliminating name
-     * collisions)
-     */
-    private <T> void calculateActiveInstances(final Multimap<String, Description<T>> allElements,
-            final Map<String, T> activeInstance) {
-        final Map<String, T> activeMap = Maps.newHashMap();
-        for (final Entry<String, Description<T>> entry : allElements.entries()) {
-            final String key = entry.getKey();
-            final SortedSet<Description<T>> value = (SortedSet<Description<T>>) allElements.get(key);
-            final T instance = value.first().instance;
-            activeMap.put(key, instance);
-            if (value.size() > 1) {
-                logger.warn("More than one " + instance.getClass().getSimpleName()
-                        + " services with same name - [{}] are available.", key);
+    private FeatureDTO convertToFeatureDTO(final String configurationPID, final String featureName) {
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
+            if (configuration != null) {
+                final Dictionary<String, Object> properties = configuration.getProperties();
+                final Object value = properties.get(FEATURE_AD_NAME_PREFIX + featureName);
+                boolean enabled = false;
+                if (value instanceof Boolean) {
+                    enabled = (boolean) value;
+                }
+                final FeatureDTO dto = new FeatureDTO();
+                dto.name = featureName;
+                dto.description = getFeatureDescription(configurationPID, featureName).orElse(null);
+                dto.isEnabled = enabled;
+                return dto;
             }
+        } catch (final IOException e) {
+            logger.trace("Cannot retrieve configuration for {}", configurationPID, e);
         }
-        activeInstance.clear();
-        activeInstance.putAll(activeMap);
+        return null;
     }
 
-    /**
-     * Internal class caching some feature or strategy meta data like service ID and
-     * ranking.
-     */
-    private static final class Description<T> implements Comparable<Description<T>> {
-        private final int ranking;
-        private final long serviceId;
-        private final T instance;
-        private final Map<String, Object> props;
-
-        public Description(final T instance, final Map<String, Object> props) {
-            this.instance = instance;
-            this.props = ImmutableMap.copyOf(props);
-            final Object sr = props.get(SERVICE_RANKING);
-            ranking = Optional.ofNullable(sr).filter(e -> e instanceof Integer).map(Integer.class::cast).orElse(0);
-            serviceId = (long) props.get(SERVICE_ID);
+    private ConfigurationDTO convertToConfigurationDTO(final String configurationPID) {
+        final Collection<String> features = allFeatures.get(configurationPID);
+        if (features.isEmpty()) {
+            return null;
         }
+        final ConfigurationDTO dto = new ConfigurationDTO();
+        dto.features = getFeatures(configurationPID).collect(collectingAndThen(toList(), ImmutableList::copyOf));
+        return dto;
+    }
 
-        /**
-         * First sort by highest service rankings. If service rankings are equal,
-         * then sort by service ID in descending order.
-         */
-        @Override
-        public int compareTo(final Description<T> o) {
-            return ComparisonChain.start().compare(o.ranking, ranking).compare(serviceId, o.serviceId).result();
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (!(obj instanceof Description)) {
-                return false;
-            }
-            final long otherServiceId = ((Description<?>) obj).serviceId;
-            return serviceId == otherServiceId;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(serviceId);
-        }
-
-        @Override
-        public String toString() {
-            //@formatter:off
-            return com.google.common.base.Objects.toStringHelper(this)
-                                        .add("Ranking", ranking)
-                                        .add("ServiceID", serviceId)
-                                        .add("Instance", instance)
-                                        .add("Properties", props)
-                                        .toString();
-            //@formatter:on
-        }
+    private Optional<String> getFeatureDescription(final String configurationPID, final String featureName) {
+        final Bundle[] bundles = bundleContext.getBundles();
+        //@formatter:off
+        return Arrays.stream(bundles)
+                     .map(metaTypeService::getMetaTypeInformation)
+                     .filter(Objects::nonNull)
+                     .filter(m -> Lists.newArrayList(m.getPids()).contains(configurationPID))
+                     .map(m -> m.getObjectClassDefinition(configurationPID, null))
+                     .map(o -> o.getAttributeDefinitions(ALL))
+                     .flatMap(Arrays::stream)
+                     .filter(ad -> ad.getID().equals(FEATURE_AD_NAME_PREFIX + featureName))
+                     .map(AttributeDefinition::getDescription)
+                     .findAny();
+        //@formatter:on
     }
 
 }

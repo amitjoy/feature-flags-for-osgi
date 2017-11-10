@@ -54,7 +54,6 @@
 		<module>com.amitinside.featureflags.api</module>
 		<module>com.amitinside.featureflags.provider</module>
 		<module>com.amitinside.featureflags.rest</module>
-		<module>com.amitinside.featureflags.console</module>
 		<module>com.amitinside.featureflags.example</module>
 	</modules>
 

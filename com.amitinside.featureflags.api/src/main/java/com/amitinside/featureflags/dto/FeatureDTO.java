@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright (c) 2017 Amit Kumar Mondal
  *
@@ -8,11 +7,30 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-import com.amitinside.featureflags.annotation.Feature;
+package com.amitinside.featureflags.dto;
 
-public final class FeatureWithoutExpiry {
+import org.osgi.dto.DTO;
 
-    @Feature
-    public static final String MY_FEATURE = "feature.identifier";
+/**
+ * Data Transfer Object for a feature instance.
+ *
+ * @NotThreadSafe
+ */
+public class FeatureDTO extends DTO {
+
+    /**
+     * The name of the feature.
+     */
+    public String name;
+
+    /**
+     * The description of the feature.
+     */
+    public String description;
+
+    /**
+     * Checks whether the feature is enabled in its configuration.
+     */
+    public boolean isEnabled;
 
 }
