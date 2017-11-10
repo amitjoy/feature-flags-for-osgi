@@ -60,10 +60,10 @@ public interface FeatureManager {
     /**
      * Returns the known {@link ConfigurationDTO} instance
      * <p>
-     * {@link ConfigurationDTO} instances are known if they comprise feature configurations
+     * {@link ConfigurationDTO} instances are known if they comprise features
      * </p>
      *
-     * @param name The name of the configuration
+     * @param name The configuration PID
      * @return The {@link ConfigurationDTO} wrapped in {@link Optional} or empty {@link Optional}
      *         instance if not known or the name is an empty string or {@code null}
      * @throws NullPointerException if the specified argument is {@code null}
@@ -90,9 +90,9 @@ public interface FeatureManager {
      * @param configurationPID The configuration PID
      * @param featureName The name of the feature
      * @param isEnabled the value for the enablement of the feature
-     * @return {@code true} if the named feature is known and updated by this operation.
-     *         Specifically {@code false} is also returned if the named feature
-     *         is not known or the operation failed to update the feature
+     * @return {@code true} if the feature is known and updated by this operation.
+     *         Specifically {@code false} is also returned if the feature is not
+     *         known or the operation failed to update the feature
      * @throws NullPointerException if any of the specified arguments is {@code null}
      */
     boolean updateFeature(String configurationPID, String featureName, boolean isEnabled);
