@@ -15,16 +15,12 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.example.ExampleFeatureFlag.MyConfig;
 
 @Designate(ocd = MyConfig.class)
 @Component(name = "ExampleFeatureFlag", immediate = true)
 public final class ExampleFeatureFlag {
-
-    private final Logger logger = LoggerFactory.getLogger(ExampleFeatureFlag.class);
 
     private volatile MyConfig config;
 
@@ -48,11 +44,9 @@ public final class ExampleFeatureFlag {
     private void doStuff() {
         if (config.osgi_feature_myfeature()) {
             System.out.println("Example Feature Config >>Enabled<<");
-            logger.debug("Example Feature Config >>Enabled<<");
             return;
         } else {
             System.out.println("Example Feature Config >>Disabled<<");
-            logger.debug("Example Feature Config >>Disabled<<");
         }
     }
 }
