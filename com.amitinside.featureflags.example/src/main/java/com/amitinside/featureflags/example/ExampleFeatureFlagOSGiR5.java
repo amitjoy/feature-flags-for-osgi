@@ -16,15 +16,15 @@ import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
-import com.amitinside.featureflags.example.ExampleFeatureFlag.MyConfig;
+import com.amitinside.featureflags.example.ExampleFeatureFlagOSGiR5.MyConfig;
 
 @Designate(ocd = MyConfig.class)
-@Component(name = "ExampleFeatureFlag", immediate = true)
-public final class ExampleFeatureFlag {
+@Component(name = "ExampleFeatureFlagOSGiR5", immediate = true)
+public final class ExampleFeatureFlagOSGiR5 {
 
     private MyConfig config;
 
-    @ObjectClassDefinition(id = "feature.flag.example")
+    @ObjectClassDefinition(id = "feature.flag.example1")
     @interface MyConfig {
         @AttributeDefinition(name = "osgi.feature.myfeature", description = "My Feature Description")
         boolean osgi_feature_myfeature() default true;
@@ -43,9 +43,9 @@ public final class ExampleFeatureFlag {
 
     private void doStuff() {
         if (config.osgi_feature_myfeature()) {
-            System.out.println("Example Feature is >>Enabled<<");
+            System.out.println("Example Feature (OSGi R5) is >>Enabled<<");
         } else {
-            System.out.println("Example Feature is >>Disabled<<");
+            System.out.println("Example Feature (OSGi R5) is >>Disabled<<");
         }
     }
 }
