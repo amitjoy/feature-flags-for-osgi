@@ -42,10 +42,7 @@ As test dependencies, the following test libraries are used:
 1. JUnit 4.12 (EPL 1.0)
 3. Mockito Core 2.10 (MIT)
 
-The bundle comprising REST services requires:
-
-1. OSGi enRoute REST Provider (Implementation of proposed OSGi REST Specification)
-2. OSGi enRoute DTOs (Implementation of proposed OSGi DTO Service)
+The REST bundle requires [OSGi JAX-RS Connector](https://github.com/hstaudacher/osgi-jax-rs-connector)
 
 ----------------------------------------------------------------
 
