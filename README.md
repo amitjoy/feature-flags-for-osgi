@@ -99,6 +99,8 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 ```
 2. The primary contract of using feature flags in your codebase is to introduce boolean attribute definitions to existing or new object class definitions. The IDs of the attribute definitions must be **osgi.feature.X** where X is the name of your feature.
 
+#### The primary benefit of this approach is that developers can use feature flags without having any dependency to any external APIs.
+
 For more information, have a look at the [example project](https://github.com/amitjoy/feature-flags-for-osgi/blob/master/com.amitinside.featureflags.example/src/main/java/com/amitinside/featureflags/example/ExampleFeatureFlag.java).
 
 ---------------------------------------------------------------
