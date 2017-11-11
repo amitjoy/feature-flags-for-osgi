@@ -76,7 +76,7 @@ Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> 
 
 #### Building from Source
 
-1. Run `mvn clean install -Dgpg.skip` in the project folder
+Run `mvn clean install -Dgpg.skip` in the project folder
 
 ----------------------------------------------------------------
 
@@ -91,14 +91,14 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 1. In your DS Component, add an attribute definition to the existing object class definition
 
 ```java
-@ObjectClassDefinition(id = "feature.flag.example")
+@ObjectClassDefinition
 @interface MyConfig {
-   @AttributeDefinition(name = "osgi.feature.myfeature", description = "My Feature Description")
-   boolean osgi_feature_myfeature() default true;
+      @AttributeDefinition(name = "osgi.feature.myfeature", description = "My Feature Description")
+      boolean osgi_feature_myfeature() default true;
 }
 ```
-2. The primary contract of using feature flags in your codebase is to introduce boolean attribute definitions to existing or new object class definitions. The IDs of the attribute definitions must be "osgi.feature.X" where X is the name of your feature.
+2. The primary contract of using feature flags in your codebase is to introduce boolean attribute definitions to existing or new object class definitions. The IDs of the attribute definitions must be **osgi.feature.X** where X is the name of your feature.
 
-You can check the property value as specified in the attribute definition. For more information, have a look at the [example project](https://github.com/amitjoy/feature-flags-for-osgi/blob/master/com.amitinside.featureflags.example/src/main/java/com/amitinside/featureflags/example/ExampleFeatureFlag.java).
+For more information, have a look at the [example project](https://github.com/amitjoy/feature-flags-for-osgi/blob/master/com.amitinside.featureflags.example/src/main/java/com/amitinside/featureflags/example/ExampleFeatureFlag.java).
 
 ---------------------------------------------------------------
