@@ -125,6 +125,6 @@ or
 
 #### The primary benefit of this approach is that developers can use feature flags without having any dependency to any external API.
 
-For more information, have a look at the [example project](https://github.com/amitjoy/feature-flags-for-osgi/blob/master/com.amitinside.featureflags.example/src/main/java/com/amitinside/featureflags/example/ExampleFeatureFlag.java).
+For more information, have a look at the [example project](https://github.com/amitjoy/feature-flags-for-osgi/tree/master/com.amitinside.featureflags.example/src/main/java/com/amitinside/featureflags/example).
 
 ---------------------------------------------------------------
