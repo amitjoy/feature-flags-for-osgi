@@ -17,18 +17,19 @@ import java.util.stream.Collectors;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import com.amitinside.featureflags.Feature;
+import com.amitinside.featureflags.FeatureConfiguration;
 import com.amitinside.featureflags.FeatureManager;
-import com.amitinside.featureflags.dto.ConfigurationDTO;
-import com.amitinside.featureflags.dto.FeatureDTO;
 
 @Path("/featureflags")
 @Component(name = "FeatureFlagsRESTResource", immediate = true)
-@SuppressWarnings("unused")
 public final class RESTResource {
 
     private FeatureManager featureService;
@@ -36,34 +37,36 @@ public final class RESTResource {
     @GET
     @Path("/configurations")
     @Produces(APPLICATION_JSON)
-    public List<Configuration> getConfigurations() {
-        return featureService.getConfigurations().map(this::convertDTO).collect(Collectors.toList());
+    public List<FeatureConfiguration> getConfigurations() {
+        return featureService.getConfigurations().collect(Collectors.toList());
     }
 
     @GET
     @Path("/features")
     @Produces(APPLICATION_JSON)
-    public List<Feature> getFeatures(final String configurationPID) {
-        return featureService.getFeatures(configurationPID).map(this::convertDTO).collect(Collectors.toList());
+    public List<Feature> getFeatures(@QueryParam("configurationPID") final String configurationPID) {
+        return featureService.getFeatures(configurationPID).collect(Collectors.toList());
     }
 
     @GET
-    @Path("/configuration")
+    @Path("/configurations/{configurationPID}")
     @Produces(APPLICATION_JSON)
-    public Configuration getConfiguration(final String configurationPID) {
-        return featureService.getConfiguration(configurationPID).map(this::convertDTO).orElse(null);
+    public FeatureConfiguration getConfiguration(final String configurationPID) {
+        return featureService.getConfiguration(configurationPID).orElse(null);
     }
 
     @GET
-    @Path("/feature")
+    @Path("/features/{featureName}")
     @Produces(APPLICATION_JSON)
-    public Feature getFeature(final String configurationPID, final String featureName) {
-        return featureService.getFeature(configurationPID, featureName).map(this::convertDTO).orElse(null);
+    public Feature getFeature(@QueryParam("configurationPID") final String configurationPID,
+            @PathParam("featureName") final String featureName) {
+        return featureService.getFeature(configurationPID, featureName).orElse(null);
     }
 
     @PUT
-    @Path("/feature")
-    public boolean putFeature(final String configurationPID, final String featureName, final boolean isEnabled) {
+    @Path("/features/{featureName}")
+    public boolean putFeature(@QueryParam("configurationPID") final String configurationPID,
+            @PathParam("featureName") final String featureName, @QueryParam("isEnabled") final boolean isEnabled) {
         return featureService.updateFeature(configurationPID, featureName, isEnabled);
     }
 
@@ -80,32 +83,6 @@ public final class RESTResource {
      */
     protected void unsetFeatureService(final FeatureManager featureService) {
         this.featureService = null;
-    }
-
-    private Feature convertDTO(final FeatureDTO dto) {
-        final Feature feature = new Feature();
-        feature.name = dto.name;
-        feature.description = dto.description;
-        feature.isEnabled = dto.isEnabled;
-        return feature;
-    }
-
-    private Configuration convertDTO(final ConfigurationDTO dto) {
-        final Configuration config = new Configuration();
-        config.pid = dto.pid;
-        config.features = dto.features.stream().map(this::convertDTO).collect(Collectors.toList());
-        return config;
-    }
-
-    private static class Configuration {
-        public String pid;
-        public List<Feature> features;
-    }
-
-    private static class Feature {
-        public String name;
-        public String description;
-        public boolean isEnabled;
     }
 
 }
