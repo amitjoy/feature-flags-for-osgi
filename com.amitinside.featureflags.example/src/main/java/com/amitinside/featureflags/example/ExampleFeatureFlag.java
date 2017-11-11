@@ -22,7 +22,7 @@ import com.amitinside.featureflags.example.ExampleFeatureFlag.MyConfig;
 @Component(name = "ExampleFeatureFlag", immediate = true)
 public final class ExampleFeatureFlag {
 
-    private volatile MyConfig config;
+    private MyConfig config;
 
     @ObjectClassDefinition(id = "feature.flag.example")
     @interface MyConfig {
@@ -43,10 +43,9 @@ public final class ExampleFeatureFlag {
 
     private void doStuff() {
         if (config.osgi_feature_myfeature()) {
-            System.out.println("Example Feature Config >>Enabled<<");
-            return;
+            System.out.println("Example Feature is >>Enabled<<");
         } else {
-            System.out.println("Example Feature Config >>Disabled<<");
+            System.out.println("Example Feature is >>Disabled<<");
         }
     }
 }
