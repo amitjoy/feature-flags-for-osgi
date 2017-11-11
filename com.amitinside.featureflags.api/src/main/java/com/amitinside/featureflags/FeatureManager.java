@@ -54,6 +54,7 @@ public interface FeatureManager {
      * @param configurationPID The configuration PID
      * @return The known {@link FeatureDTO} instances
      * @throws NullPointerException if the specified argument is {@code null}
+     * @throws IllegalArgumentException if the specified argument is empty
      */
     Stream<FeatureDTO> getFeatures(String configurationPID);
 
@@ -67,6 +68,7 @@ public interface FeatureManager {
      * @return The {@link ConfigurationDTO} wrapped in {@link Optional} or empty {@link Optional}
      *         instance if not known or the name is an empty string or {@code null}
      * @throws NullPointerException if the specified argument is {@code null}
+     * @throws IllegalArgumentException if the specified argument is empty
      */
     Optional<ConfigurationDTO> getConfiguration(String configurationPID);
 
@@ -81,6 +83,7 @@ public interface FeatureManager {
      * @return The {@link FeatureDTO} wrapped in {@link Optional} or empty {@link Optional}
      *         instance if not known or the name is an empty string or {@code null}
      * @throws NullPointerException if any of the specified arguments is {@code null}
+     * @throws IllegalArgumentException if any of the specified arguments is empty
      */
     Optional<FeatureDTO> getFeature(String configurationPID, String featureName);
 
@@ -94,6 +97,7 @@ public interface FeatureManager {
      *         Specifically {@code false} is also returned if the feature is not
      *         known or the operation failed to update the feature
      * @throws NullPointerException if any of the specified arguments is {@code null}
+     * @throws IllegalArgumentException if any of the specified arguments is empty
      */
     boolean updateFeature(String configurationPID, String featureName, boolean isEnabled);
 }

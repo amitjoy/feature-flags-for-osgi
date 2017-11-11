@@ -9,6 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.*;
 import static org.apache.felix.service.command.CommandProcessor.*;
@@ -143,6 +144,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     @Override
     public Stream<FeatureDTO> getFeatures(final String configurationPID) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
+        checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
         //@formatter:off
         return allFeatures.get(configurationPID)
@@ -155,6 +157,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     @Override
     public Optional<ConfigurationDTO> getConfiguration(final String configurationPID) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
+        checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
+
         return Optional.ofNullable(convertToConfigurationDTO(configurationPID));
     }
 
@@ -162,6 +166,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     public Optional<FeatureDTO> getFeature(final String configurationPID, final String featureName) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
+        checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
+        checkArgument(!featureName.isEmpty(), "Feature Name cannot be empty");
 
         //@formatter:off
         return allFeatures.get(configurationPID)
@@ -177,6 +183,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     public boolean updateFeature(final String configurationPID, final String featureName, final boolean isEnabled) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
+        checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
+        checkArgument(!featureName.isEmpty(), "Feature Name cannot be empty");
 
         final Map<String, Object> props = Maps.newHashMap();
         props.put(FEATURE_AD_ID_PREFIX + featureName, isEnabled);
