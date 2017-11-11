@@ -19,7 +19,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 ### Requirements
 
 1. Java 8+
-2. OSGi R6+
+2. OSGi R4+
 
 -----------------------------------------------------------------
 
@@ -93,6 +93,33 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
       @AttributeDefinition(name = "osgi.feature.myfeature", description = "My Feature Description")
       boolean osgi_feature_myfeature() default true;
 }
+```
+
+or
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.1.0" localization="en_us"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.1.0 http://www.osgi.org/xmlns/metatype/v1.1.0">
+          
+    <OCD id="org.osgi.mybundle.config" 
+         name="My Bundle Configuration">
+
+        <AD id="osgi.feature.myfeature"
+            name="osgi.feature.myfeature"
+            type="Boolean"
+            cardinality="0"
+            required="true"
+            default="true"
+            description="My Feature Description" />
+
+    </OCD>
+    
+    <Designate pid="org.osgi.mybundle.config">
+        <Object ocdref="org.osgi.mybundle.config"/>
+    </Designate>
+</MetaData>
 ```
 2. The primary contract of using feature flags in your codebase is to introduce boolean attribute definitions to existing or new object class definitions. The IDs of the attribute definitions must be **osgi.feature.X** where X is the name of your feature.
 
