@@ -2,7 +2,7 @@
 
 ## Why? [![start with what and why](https://img.shields.io/badge/start%20with-why%3F-brightgreen.svg?style=flat)](http://featureflags.io/feature-flags/)
 
-This is an implementation of the Feature Toggles pattern (also known as Feature Flags) for OSGi Service Platform. Feature Flags (also known as Feature Toggles and Feature Controls) is a software development practice that facilitates the easy enablement and disablement of deployed functionalities. Besides, feature flags ease the management of the feature's entire lifecycle. These allow you to manage components and compartmentalize risk. We can also roll out the features to a specific group of users or exclude the group from accessing it, perform A/B test and much more. It’s also way to test how your features perform in the real world and not just in an artificial test environment. Therefore, feature toggle is a widespread agile development practice in the context of continuous deployment and delivery.
+This is an implementation of the Feature Toggles pattern (also known as Feature Flags) for OSGi Service Platform. Feature Flags (also known as Feature Toggles and Feature Controls) is a software development practice that facilitates the easy enablement and disablement of deployed functionalities. Besides, feature flags ease the management of the feature's entire lifecycle. These allow you to manage components and compartmentalise risk. We can also roll out the features to a specific group of users or exclude the group from accessing it, perform A/B test and much more. It’s also the way to test how your features function in the real world and not just in an artificial test environment. Therefore, feature toggle is a widespread agile development practice in the context of continuous deployment and delivery.
 
 ----------------------------------------------------------------
 
@@ -32,12 +32,12 @@ This project comprises four bundles -
 3. `com.amitinside.featureflags.rest` - REST Services to manage features
 4. `com.amitinside.featureflags.example` - Example project showing how to use core feature flags in codebase
 
-The core implementation bundle does require few open source libraries that are listed below.
+The core implementation bundle does require following open source libraries.
 
 1. SLF4J 1.7+ (MIT)
 2. Google Guava 15+ (Apache 2.0)
 
-As Test Dependencies, it uses the following test libraries:
+As test dependencies, the following test libraries are used:
 
 1. JUnit 4.12 (EPL 1.0)
 3. Mockito Core 2.10 (MIT)
@@ -45,7 +45,7 @@ As Test Dependencies, it uses the following test libraries:
 The bundle comprising REST services requires:
 
 1. OSGi enRoute REST Provider (Implementation of proposed OSGi REST Specification)
-2. OSGi enRoute DTOs (Implementation of proposed OSGi DTO Service) 
+2. OSGi enRoute DTOs (Implementation of proposed OSGi DTO Service)
 
 ----------------------------------------------------------------
 
@@ -58,13 +58,13 @@ The bundle comprising REST services requires:
 
 You don't need to install all four bundles. To use feature flags in OSGi environment, you could only use the API and provider bundles.
 
------------------------------------------------------------------
+----------------------------------------------------------------
 
 ### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/feature-flags-osgi/issues)
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/feature-flags-osgi/blob/master/CONTRIBUTING.md)
 
------------------------------------------------------------------
+----------------------------------------------------------------
 
 #### Project Import
 
@@ -93,10 +93,12 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 ```java
 @ObjectClassDefinition(id = "feature.flag.example")
 @interface MyConfig {
-   @AttributeDefinition(description = "My Feature Description")
+   @AttributeDefinition(name = "osgi.feature.myfeature", description = "My Feature Description")
    boolean osgi_feature_myfeature() default true;
 }
 ```
-You can check the property value as specified in the atrtribute definition. For more information, have a look at the example project.
+2. The primary contract of using feature flags in your codebase is to introduce boolean attribute definitions to existing or new object class definitions. The IDs of the attribute definitions must be "osgi.feature.X" where X is the name of your feature.
+
+You can check the property value as specified in the attribute definition. For more information, have a look at the [example project](https://github.com/amitjoy/feature-flags-for-osgi/blob/master/com.amitinside.featureflags.example/src/main/java/com/amitinside/featureflags/example/ExampleFeatureFlag.java).
 
 ---------------------------------------------------------------
