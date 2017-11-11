@@ -32,7 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public class Feature {
 
     /** The prefix of the feature name pattern */
-    public static final String FEATURE_NAME_PREFIX = "osgi.feature";
+    public static final String FEATURE_NAME_PREFIX = "osgi.feature.";
 
     private final String name;
     private final String description;
