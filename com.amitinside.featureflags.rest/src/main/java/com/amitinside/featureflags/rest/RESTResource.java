@@ -28,6 +28,7 @@ import com.amitinside.featureflags.dto.FeatureDTO;
 
 @Path("/featureflags")
 @Component(name = "FeatureFlagsRESTResource", immediate = true)
+@SuppressWarnings("unused")
 public final class RESTResource {
 
     private FeatureManager featureService;
@@ -35,29 +36,29 @@ public final class RESTResource {
     @GET
     @Path("/configurations")
     @Produces(APPLICATION_JSON)
-    public List<ConfigurationDTO> getConfigurations() {
-        return featureService.getConfigurations().collect(Collectors.toList());
+    public List<Configuration> getConfigurations() {
+        return featureService.getConfigurations().map(this::convertDTO).collect(Collectors.toList());
     }
 
     @GET
     @Path("/features")
     @Produces(APPLICATION_JSON)
-    public List<FeatureDTO> getFeatures(final String configurationPID) {
-        return featureService.getFeatures(configurationPID).collect(Collectors.toList());
+    public List<Feature> getFeatures(final String configurationPID) {
+        return featureService.getFeatures(configurationPID).map(this::convertDTO).collect(Collectors.toList());
     }
 
     @GET
     @Path("/configuration")
     @Produces(APPLICATION_JSON)
-    public ConfigurationDTO getConfiguration(final String configurationPID) {
-        return featureService.getConfiguration(configurationPID).orElse(null);
+    public Configuration getConfiguration(final String configurationPID) {
+        return featureService.getConfiguration(configurationPID).map(this::convertDTO).orElse(null);
     }
 
     @GET
     @Path("/feature")
     @Produces(APPLICATION_JSON)
-    public FeatureDTO getFeature(final String configurationPID, final String featureName) {
-        return featureService.getFeature(configurationPID, featureName).orElse(null);
+    public Feature getFeature(final String configurationPID, final String featureName) {
+        return featureService.getFeature(configurationPID, featureName).map(this::convertDTO).orElse(null);
     }
 
     @PUT
@@ -79,6 +80,32 @@ public final class RESTResource {
      */
     protected void unsetFeatureService(final FeatureManager featureService) {
         this.featureService = null;
+    }
+
+    private Feature convertDTO(final FeatureDTO dto) {
+        final Feature feature = new Feature();
+        feature.name = dto.name;
+        feature.description = dto.description;
+        feature.isEnabled = dto.isEnabled;
+        return feature;
+    }
+
+    private Configuration convertDTO(final ConfigurationDTO dto) {
+        final Configuration config = new Configuration();
+        config.pid = dto.pid;
+        config.features = dto.features.stream().map(this::convertDTO).collect(Collectors.toList());
+        return config;
+    }
+
+    private static class Configuration {
+        public String pid;
+        public List<Feature> features;
+    }
+
+    private static class Feature {
+        public String name;
+        public String description;
+        public boolean isEnabled;
     }
 
 }
