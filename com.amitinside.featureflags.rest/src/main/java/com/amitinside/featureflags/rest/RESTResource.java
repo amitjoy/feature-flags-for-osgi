@@ -9,10 +9,16 @@
  *******************************************************************************/
 package com.amitinside.featureflags.rest;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.osgi.dto.DTO;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -20,43 +26,44 @@ import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
 
-import osgi.enroute.rest.api.REST;
-import osgi.enroute.rest.api.RESTRequest;
-
+@Path("/featureflags")
 @Component(name = "FeatureFlagsRESTResource", immediate = true)
-public final class RESTResource implements REST {
+public final class RESTResource {
 
     private FeatureManager featureService;
 
-    public List<ConfigurationDTO> getConfigurations(final RESTRequest req) {
+    @GET
+    @Path("/configurations")
+    @Produces(APPLICATION_JSON)
+    public List<ConfigurationDTO> getConfigurations() {
         return featureService.getConfigurations().collect(Collectors.toList());
     }
 
-    public List<FeatureDTO> getFeatures(final RESTRequest req, final String configurationPID) {
+    @GET
+    @Path("/features")
+    @Produces(APPLICATION_JSON)
+    public List<FeatureDTO> getFeatures(final String configurationPID) {
         return featureService.getFeatures(configurationPID).collect(Collectors.toList());
     }
 
-    public ConfigurationDTO getConfiguration(final RESTRequest req, final String configurationPID) {
+    @GET
+    @Path("/configuration")
+    @Produces(APPLICATION_JSON)
+    public ConfigurationDTO getConfiguration(final String configurationPID) {
         return featureService.getConfiguration(configurationPID).orElse(null);
     }
 
-    public FeatureDTO getFeature(final RESTRequest req, final String configurationPID, final String featureName) {
+    @GET
+    @Path("/feature")
+    @Produces(APPLICATION_JSON)
+    public FeatureDTO getFeature(final String configurationPID, final String featureName) {
         return featureService.getFeature(configurationPID, featureName).orElse(null);
     }
 
-    public boolean putFeature(final UpdateRequest req) {
-        final UpdateData data = req._body();
-        return featureService.updateFeature(data.configurationPID, data.featureName, data.isEnabled);
-    }
-
-    private interface UpdateRequest extends RESTRequest {
-        UpdateData _body();
-    }
-
-    private final class UpdateData extends DTO {
-        String configurationPID;
-        String featureName;
-        boolean isEnabled;
+    @PUT
+    @Path("/feature")
+    public boolean putFeature(final String configurationPID, final String featureName, final boolean isEnabled) {
+        return featureService.updateFeature(configurationPID, featureName, isEnabled);
     }
 
     /**

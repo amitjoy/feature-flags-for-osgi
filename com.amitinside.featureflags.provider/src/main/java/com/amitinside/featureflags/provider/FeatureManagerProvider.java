@@ -85,6 +85,9 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         // track already existing configurations
         try {
             final Configuration[] existingConfigurations = configurationAdmin.listConfigurations(null);
+            if (existingConfigurations == null) {
+                return;
+            }
             for (final Configuration configuration : existingConfigurations) {
                 final String pid = configuration.getPid();
                 final List<String> configuredFeatures = getConfiguredFeatures(pid);
