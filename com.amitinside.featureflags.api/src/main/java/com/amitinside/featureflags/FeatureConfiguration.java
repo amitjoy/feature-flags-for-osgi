@@ -25,11 +25,12 @@ import org.osgi.annotation.versioning.ProviderType;
  * aforementioned.
  * </p>
  *
- * This interface is not intended to be implemented by consumers.
+ * @noextend This class is not intended to be extended by consumers.
  *
  * @see Feature
  * @see FeatureManager
  *
+ * @Immutable
  * @ThreadSafe
  */
 @ProviderType
@@ -39,9 +40,9 @@ public class FeatureConfiguration {
     private final List<Feature> features;
 
     /**
-     * Constructor
+     * Creates a new instance of {@link FeatureConfiguration}
      *
-     * @param pid The configuration PID of the configuration
+     * @param pid The configuration PID
      * @param features The list of associated features
      *
      * @throws NullPointerException if any of the specified arguments is {@code null}
@@ -55,9 +56,9 @@ public class FeatureConfiguration {
     }
 
     /**
-     * Returns the configuration PID of the configuration
+     * Returns the configuration PID
      *
-     * @return the configuration PID of the configuration (cannot be {@code null})
+     * @return the configuration PID (cannot be {@code null})
      */
     public String getPid() {
         return pid;

@@ -21,17 +21,22 @@ import org.osgi.annotation.versioning.ProviderType;
  * {@code osgi.feature.X} where X is the name of your feature.
  * </p>
  *
- * This interface is not intended to be implemented by consumers.
+ * @noextend This class is not intended to be extended by consumers.
  *
  * @see FeatureConfiguration
  * @see FeatureManager
  *
+ * @Immutable
  * @ThreadSafe
  */
 @ProviderType
 public class Feature {
 
-    /** The prefix of the feature name pattern */
+    /**
+     * The prefix of the feature name pattern. This prefix should be used with
+     * the feature name in OSGi Configuration to identify unique features in an
+     * OSGi configuration.
+     */
     public static final String FEATURE_NAME_PREFIX = "osgi.feature.";
 
     private final String name;
@@ -39,7 +44,7 @@ public class Feature {
     private final boolean isEnabled;
 
     /**
-     * Constructor
+     * Creates a new instance of {@link Feature}
      *
      * @param name The name of the feature
      * @param description The description of the feature
