@@ -11,6 +11,7 @@ package com.amitinside.featureflags;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -52,7 +53,7 @@ public class FeatureConfiguration {
         requireNonNull(features, "List of Features cannot be null");
 
         this.pid = pid;
-        this.features = features;
+        this.features = Collections.unmodifiableList(features);
     }
 
     /**
@@ -65,7 +66,7 @@ public class FeatureConfiguration {
     }
 
     /**
-     * Returns the associated features
+     * Returns the associated features (immutable view)
      *
      * @return the associated features (cannot be {@code null})
      */

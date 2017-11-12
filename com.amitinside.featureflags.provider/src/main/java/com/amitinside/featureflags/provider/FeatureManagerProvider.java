@@ -12,7 +12,7 @@ package com.amitinside.featureflags.provider;
 import static com.amitinside.featureflags.Feature.FEATURE_NAME_PREFIX;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 import static org.apache.felix.service.command.CommandProcessor.*;
 import static org.osgi.service.cm.ConfigurationEvent.*;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
@@ -87,13 +86,12 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
             if (existingConfigurations == null) {
                 return;
             }
-            for (final Configuration configuration : existingConfigurations) {
-                final String pid = configuration.getPid();
+            Arrays.stream(existingConfigurations).map(Configuration::getPid).forEach(pid -> {
                 final List<String> configuredFeatures = getConfiguredFeatures(pid);
                 if (!configuredFeatures.isEmpty()) {
                     configuredFeatures.forEach(p -> allFeatures.put(pid, p));
                 }
-            }
+            });
         } catch (final IOException | InvalidSyntaxException e) {
             logger.error("Cannot retrieve configurations", e);
         }
@@ -224,7 +222,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 return filteredProps.keySet().stream()
                                              .filter(k -> k.startsWith(FEATURE_NAME_PREFIX))
                                              .map(k -> k.substring(FEATURE_NAME_PREFIX.length(), k.length()))
-                                             .collect(Collectors.toList());
+                                             .collect(toList());
                 //@formatter:on
             }
         } catch (final IOException e) {
@@ -257,8 +255,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         if (features.isEmpty()) {
             return null;
         }
-        final List<Feature> specifiedFeatures = getFeatures(configurationPID)
-                .collect(collectingAndThen(toList(), ImmutableList::copyOf));
+        final List<Feature> specifiedFeatures = getFeatures(configurationPID).collect(toList());
         return new FeatureConfiguration(configurationPID, specifiedFeatures);
     }
 
