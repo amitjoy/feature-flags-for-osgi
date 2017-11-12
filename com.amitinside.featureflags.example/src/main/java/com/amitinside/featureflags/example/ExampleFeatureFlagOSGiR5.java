@@ -43,9 +43,9 @@ public final class ExampleFeatureFlagOSGiR5 {
 
     private void doStuff() {
         if (config.osgi_feature_myfeature()) {
-            System.out.println("Example Feature (OSGi R5) is >>Enabled<<");
+            System.out.println("[R5] Example Feature is >>Enabled<<");
         } else {
-            System.out.println("Example Feature (OSGi R5) is >>Disabled<<");
+            System.out.println("[R5] Example Feature is >>Disabled<<");
         }
     }
 }

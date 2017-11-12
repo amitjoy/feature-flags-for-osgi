@@ -39,15 +39,18 @@ public final class ExampleFeatureFlagOSGiR4 {
 
     @Modified
     protected void modified(final Map<String, Object> properties) {
-        isFeatureEnabled = (boolean) properties.get("osgi.feature.myfeature");
+        final Object value = properties.get("osgi.feature.myfeature");
+        if (value instanceof Boolean) {
+            isFeatureEnabled = Boolean.valueOf(value.toString());
+        }
         doStuff();
     }
 
     private void doStuff() {
         if (isFeatureEnabled) {
-            System.out.println("Example Feature (OSGi R4) is >>Enabled<<");
+            System.out.println("[R4] Example Feature is >>Enabled<<");
         } else {
-            System.out.println("Example Feature (OSGi R4) is >>Disabled<<");
+            System.out.println("[R4] Example Feature is >>Disabled<<");
         }
     }
 }
