@@ -99,7 +99,7 @@ or
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.1.0" localization="en_us"
+<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="en_us"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.1.0 http://www.osgi.org/xmlns/metatype/v1.1.0">
           
