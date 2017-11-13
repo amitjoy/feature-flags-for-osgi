@@ -184,6 +184,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     @Override
     public CompletableFuture<Void> updateFeature(final String configurationPID, final String featureName,
             final boolean isEnabled) {
+        checkPermission();
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
