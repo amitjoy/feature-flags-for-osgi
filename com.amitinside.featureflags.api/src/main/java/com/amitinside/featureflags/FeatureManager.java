@@ -10,6 +10,7 @@
 package com.amitinside.featureflags;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -17,7 +18,20 @@ import org.osgi.annotation.versioning.ProviderType;
 /**
  * The {@link FeatureManager} service is the application access point to the feature
  * flags functionality. It can be used to query the available features, configurations
- * that contain these features. It is also used to manage these instances easily.
+ * that contain these features. It is also used to manage these instances pretty easily.
+ * Therefore {@link FeatureManager} service allows introspection of the features and the
+ * configuration instances available in runtime.
+ *
+ * <p>
+ * This service differentiates between {@link Feature} and {@link FeatureConfiguration}.
+ * A {@link Feature} instance is a representation of a feature whereas a
+ * {@link FeatureConfiguration} instance is a representation of an OSGi Configuration in
+ * which the features are specified.
+ * <p>
+ *
+ * Access to this service requires the {@code ServicePermission[FeatureManager, GET]}
+ * permission. It is intended that only administrative bundles should be granted this
+ * permission to limit access to the potentially intrusive methods provided by this service.
  *
  * @noimplement This interface is not intended to be implemented by consumers.
  * @noextend This interface is not intended to be extended by consumers.
@@ -90,11 +104,11 @@ public interface FeatureManager {
      * @param configurationPID The configuration PID
      * @param featureName The name of the feature
      * @param isEnabled the value for the enablement of the feature
-     * @return {@code true} if the feature is known and updated by this operation.
-     *         Specifically {@code false} is also returned if the feature is not
-     *         known or the operation failed to update the feature
+     * @return A promise that will be resolved if the feature is known and updated by
+     *         this operation. It is also returned if the feature is not known or the
+     *         operation failed to update the feature.
      * @throws NullPointerException if any of the specified arguments is {@code null}
      * @throws IllegalArgumentException if any of the specified arguments is empty
      */
-    boolean updateFeature(String configurationPID, String featureName, boolean isEnabled);
+    CompletableFuture<Void> updateFeature(String configurationPID, String featureName, boolean isEnabled);
 }
