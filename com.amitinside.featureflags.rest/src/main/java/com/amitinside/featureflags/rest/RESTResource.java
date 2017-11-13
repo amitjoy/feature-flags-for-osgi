@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -33,27 +34,28 @@ import com.amitinside.featureflags.FeatureManager;
 @Component(name = "FeatureFlagsRESTResource", immediate = true)
 public final class RESTResource {
 
-    private FeatureManager featureService;
+    private FeatureManager featureManager;
 
     @GET
     @Path("/configurations")
     @Produces(APPLICATION_JSON)
     public List<FeatureConfiguration> getConfigurations() {
-        return featureService.getConfigurations().collect(Collectors.toList());
+        return featureManager.getConfigurations().collect(Collectors.toList());
     }
 
     @GET
     @Path("/features")
     @Produces(APPLICATION_JSON)
     public List<Feature> getFeatures(@QueryParam("configurationPID") final String configurationPID) {
-        return featureService.getFeatures(configurationPID).collect(Collectors.toList());
+        return featureManager.getFeatures(configurationPID).collect(Collectors.toList());
     }
 
     @GET
     @Path("/configurations/{configurationPID}")
     @Produces(APPLICATION_JSON)
-    public FeatureConfiguration getConfiguration(final String configurationPID) {
-        return featureService.getConfiguration(configurationPID).orElse(null);
+    public FeatureConfiguration getConfiguration(@PathParam("configurationPID") final String configurationPID) {
+        return featureManager.getConfiguration(configurationPID).orElseThrow(
+                () -> new NotFoundException(String.format("Configuration %s not found", configurationPID)));
     }
 
     @GET
@@ -61,30 +63,31 @@ public final class RESTResource {
     @Produces(APPLICATION_JSON)
     public Feature getFeature(@QueryParam("configurationPID") final String configurationPID,
             @PathParam("featureName") final String featureName) {
-        return featureService.getFeature(configurationPID, featureName).orElse(null);
+        return featureManager.getFeature(configurationPID, featureName)
+                .orElseThrow(() -> new NotFoundException(String.format("Feature %s not found", featureName)));
     }
 
     @PUT
     @Path("/features/{featureName}")
-    public void putFeature(@QueryParam("configurationPID") final String configurationPID,
+    public void updateFeature(@QueryParam("configurationPID") final String configurationPID,
             @PathParam("featureName") final String featureName, @QueryParam("isEnabled") final boolean isEnabled)
             throws InterruptedException, ExecutionException {
-        featureService.updateFeature(configurationPID, featureName, isEnabled).get();
+        featureManager.updateFeature(configurationPID, featureName, isEnabled).get();
     }
 
     /**
      * {@link FeatureManager} service binding callback
      */
     @Reference
-    protected void setFeatureService(final FeatureManager featureService) {
-        this.featureService = featureService;
+    protected void setFeatureService(final FeatureManager featureManager) {
+        this.featureManager = featureManager;
     }
 
     /**
      * {@link FeatureManager} service unbinding callback
      */
-    protected void unsetFeatureService(final FeatureManager featureService) {
-        this.featureService = null;
+    protected void unsetFeatureService(final FeatureManager featureManager) {
+        this.featureManager = null;
     }
 
 }
