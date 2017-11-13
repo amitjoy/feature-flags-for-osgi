@@ -18,7 +18,6 @@ import static org.osgi.service.cm.ConfigurationEvent.*;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
 import java.io.IOException;
-import java.security.AccessController;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
@@ -34,7 +33,6 @@ import java.util.stream.Stream;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServicePermission;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationEvent;
@@ -60,7 +58,6 @@ import com.google.common.collect.TreeMultimap;
 /**
  * This implements the {@link FeatureManager}.
  */
-@SuppressWarnings("unchecked")
 @Component(name = "FeatureManager", immediate = true, property = { COMMAND_SCOPE + "=feature",
         COMMAND_FUNCTION + "=updateFeature" })
 public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
@@ -142,7 +139,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     @Override
     public Stream<Feature> getFeatures(final String configurationPID) {
-        checkPermission();
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
@@ -156,7 +152,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     @Override
     public Optional<FeatureConfiguration> getConfiguration(final String configurationPID) {
-        checkPermission();
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
@@ -165,7 +160,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     @Override
     public Optional<Feature> getFeature(final String configurationPID, final String featureName) {
-        checkPermission();
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
@@ -184,7 +178,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     @Override
     public CompletableFuture<Void> updateFeature(final String configurationPID, final String featureName,
             final boolean isEnabled) {
-        checkPermission();
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
@@ -223,6 +216,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             if (configuration != null) {
+                @SuppressWarnings("unchecked")
                 final Dictionary<String, Object> properties = configuration.getProperties();
                 final Iterator<String> keysIterator = Iterators.forEnumeration(properties.keys());
                 final Map<String, Object> props = Maps.toMap(keysIterator, properties::get);
@@ -283,11 +277,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                      .map(AttributeDefinition::getDescription)
                      .findAny();
         //@formatter:on
-    }
-
-    private void checkPermission() {
-        final ServicePermission permission = new ServicePermission("com.amitinside.featureflags.FeatureManager", "get");
-        AccessController.checkPermission(permission);
     }
 
 }
