@@ -234,16 +234,16 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     private Feature convertToFeature(final String configurationPID, final String featureName) {
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
-            if (configuration != null) {
-                final Dictionary<String, Object> properties = configuration.getProperties();
-                final Object value = properties.get(FEATURE_NAME_PREFIX + featureName);
-                boolean enabled = false;
-                if (value instanceof Boolean) {
-                    enabled = (boolean) value;
-                }
-                final String description = getFeatureDescription(configurationPID, featureName).orElse(null);
-                return new Feature(featureName, description, enabled);
-            }
+            //@formatter:off
+            final boolean enabled = Optional.ofNullable(configuration)
+                                            .map(Configuration::getProperties)
+                                            .map(p -> p.get(FEATURE_NAME_PREFIX + featureName))
+                                            .filter(v -> v instanceof Boolean)
+                                            .map(boolean.class::cast)
+                                            .orElse(false);
+            //@formatter:on
+            final String description = getFeatureDescription(configurationPID, featureName).orElse(null);
+            return new Feature(featureName, description, enabled);
         } catch (final IOException e) {
             logger.error("Cannot retrieve configuration for {}", configurationPID, e);
         }
