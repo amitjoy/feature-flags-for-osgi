@@ -268,6 +268,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                      .filter(m -> Lists.newArrayList(m.getPids()).contains(configurationPID))
                      .map(m -> m.getObjectClassDefinition(configurationPID, null))
                      .map(o -> o.getAttributeDefinitions(ALL))
+                     .filter(Objects::nonNull)
                      .flatMap(Arrays::stream)
                      .filter(ad -> ad.getID().equals(FEATURE_NAME_PREFIX + featureName))
                      .map(AttributeDefinition::getDescription)
