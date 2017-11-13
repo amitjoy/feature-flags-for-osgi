@@ -12,6 +12,7 @@ package com.amitinside.featureflags.rest;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
@@ -65,9 +66,10 @@ public final class RESTResource {
 
     @PUT
     @Path("/features/{featureName}")
-    public boolean putFeature(@QueryParam("configurationPID") final String configurationPID,
-            @PathParam("featureName") final String featureName, @QueryParam("isEnabled") final boolean isEnabled) {
-        return featureService.updateFeature(configurationPID, featureName, isEnabled);
+    public void putFeature(@QueryParam("configurationPID") final String configurationPID,
+            @PathParam("featureName") final String featureName, @QueryParam("isEnabled") final boolean isEnabled)
+            throws InterruptedException, ExecutionException {
+        featureService.updateFeature(configurationPID, featureName, isEnabled).get();
     }
 
     /**

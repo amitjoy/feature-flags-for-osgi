@@ -18,6 +18,7 @@ import static org.osgi.service.cm.ConfigurationEvent.*;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
 import java.io.IOException;
+import java.security.AccessController;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
@@ -27,11 +28,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServicePermission;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationEvent;
@@ -139,6 +142,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     @Override
     public Stream<Feature> getFeatures(final String configurationPID) {
+        checkPermission();
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
@@ -152,6 +156,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     @Override
     public Optional<FeatureConfiguration> getConfiguration(final String configurationPID) {
+        checkPermission();
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
@@ -160,6 +165,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     @Override
     public Optional<Feature> getFeature(final String configurationPID, final String featureName) {
+        checkPermission();
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
@@ -176,7 +182,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     }
 
     @Override
-    public boolean updateFeature(final String configurationPID, final String featureName, final boolean isEnabled) {
+    public CompletableFuture<Void> updateFeature(final String configurationPID, final String featureName,
+            final boolean isEnabled) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
@@ -185,16 +192,17 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         final Map<String, Object> props = Maps.newHashMap();
         props.put(FEATURE_NAME_PREFIX + featureName, isEnabled);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
-            if (configuration != null) {
-                configuration.update(new Hashtable<>(filteredProps));
-                return true;
+        return CompletableFuture.runAsync(() -> {
+            try {
+                final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
+                if (configuration != null) {
+                    configuration.update(new Hashtable<>(filteredProps));
+                }
+            } catch (final IOException e) {
+                throw new RuntimeException(
+                        String.format("Cannot update feature [%s] with PID [%s]", featureName, configurationPID));
             }
-        } catch (final IOException e) {
-            logger.error("Cannot retrieve configuration for {}", configurationPID, e);
-        }
-        return false;
+        });
     }
 
     @Override
@@ -274,6 +282,11 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                      .map(AttributeDefinition::getDescription)
                      .findAny();
         //@formatter:on
+    }
+
+    private void checkPermission() {
+        final ServicePermission permission = new ServicePermission("com.amitinside.featureflags.FeatureManager", "get");
+        AccessController.checkPermission(permission);
     }
 
 }
