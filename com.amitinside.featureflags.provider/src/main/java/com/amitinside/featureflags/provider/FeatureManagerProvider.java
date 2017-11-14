@@ -11,61 +11,64 @@ package com.amitinside.featureflags.provider;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
-import static org.apache.felix.service.command.CommandProcessor.*;
+import static java.util.stream.Collectors.*;
+import static org.osgi.framework.Bundle.ACTIVE;
 import static org.osgi.service.cm.ConfigurationEvent.*;
-import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationEvent;
 import org.osgi.service.cm.ConfigurationListener;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeService;
+import org.osgi.util.tracker.BundleTracker;
+import org.osgi.util.tracker.BundleTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
 
 /**
  * This implements the {@link FeatureManager}.
  */
-@Component(name = "FeatureManager", immediate = true, property = { COMMAND_SCOPE + "=feature",
-        COMMAND_FUNCTION + "=updateFeature" })
+@Component(name = "FeatureManager", immediate = true)
 public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
 
     /** Logger Instance */
     private final Logger logger = LoggerFactory.getLogger(FeatureManagerProvider.class);
 
-    /** Data container -> Key: Configuration PID Value: Feature Name(s) */
-    private final Multimap<String, String> allFeatures = TreeMultimap.create();
+    /** Data container -> Key: Configuration PID Value: Feature DTOs */
+    private final Multimap<String, FeatureDTO> allFeatures = ArrayListMultimap.create();
+
+    /** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
+    private final Multimap<Bundle, String> bundlePids = ArrayListMultimap.create();
 
     /** Configuration Admin Service Instance Reference */
     private ConfigurationAdmin configurationAdmin;
@@ -73,26 +76,22 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     /** Metatype Service Instance Reference */
     private MetaTypeService metaTypeService;
 
-    /** Bundle Context Instance Reference */
-    private BundleContext bundleContext;
+    /** Bundle Tracker Instance Reference */
+    private BundleTracker bundleTracker;
 
     @Activate
     protected void activate(final BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
-        // track already existing configurations
-        try {
-            final Configuration[] existingConfigurations = configurationAdmin.listConfigurations(null);
-            if (existingConfigurations == null) {
-                return;
-            }
-            Arrays.stream(existingConfigurations).map(Configuration::getPid).forEach(pid -> {
-                final List<String> configuredFeatures = getConfiguredFeatures(pid);
-                if (!configuredFeatures.isEmpty()) {
-                    configuredFeatures.forEach(p -> allFeatures.put(pid, p));
-                }
-            });
-        } catch (final IOException | InvalidSyntaxException e) {
-            logger.error("Cannot retrieve configurations", e);
+        // track all bundles to check existing features
+        final BundleTrackerCustomizer customizer = new FeatureMetaTypeTracker(metaTypeService, bundlePids, allFeatures);
+        bundleTracker = new BundleTracker(bundleContext, ACTIVE, customizer);
+        bundleTracker.open();
+    }
+
+    @Deactivate
+    protected void deactivate() {
+        if (bundleTracker != null) {
+            bundleTracker.close();
+            bundleTracker = null;
         }
     }
 
@@ -126,6 +125,16 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         this.metaTypeService = null;
     }
 
+    public List<ConfigurationDTO> getConfigs() {
+        //@formatter:off
+        return allFeatures.keys()
+                          .stream()
+                          .map(this::convertToConfiguration)
+                          .filter(Objects::nonNull)
+                          .collect(toList());
+        //@formatter:on
+    }
+
     @Override
     public Stream<ConfigurationDTO> getConfigurations() {
         //@formatter:off
@@ -141,12 +150,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
-        //@formatter:off
-        return allFeatures.get(configurationPID)
-                          .stream()
-                          .map(f -> convertToFeature(configurationPID, f))
-                          .filter(Objects::nonNull);
-        //@formatter:on
+        return allFeatures.get(configurationPID).stream();
     }
 
     @Override
@@ -167,8 +171,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         //@formatter:off
         return allFeatures.get(configurationPID)
                           .stream()
-                          .map(f -> convertToFeature(configurationPID, f))
-                          .filter(Objects::nonNull)
                           .filter(f -> f.name.equalsIgnoreCase(featureName))
                           .findAny();
         //@formatter:on
@@ -202,16 +204,25 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     public void configurationEvent(final ConfigurationEvent event) {
         final int type = event.getType();
         final String pid = event.getPid();
-        final List<String> configuredFeatures = getConfiguredFeatures(pid);
+        final Map<String, Boolean> configuredFeatures = getConfiguredFeatures(pid);
         if (!configuredFeatures.isEmpty() && type == CM_UPDATED) {
-            configuredFeatures.forEach(p -> allFeatures.put(pid, p));
+            for (final Entry<String, Boolean> entry : configuredFeatures.entrySet()) {
+                final String featureName = entry.getKey();
+                final boolean isEnabled = entry.getValue();
+                final Collection<FeatureDTO> features = allFeatures.get(pid);
+                //@formatter:off
+                features.stream()
+                        .filter(f -> f.name.equalsIgnoreCase(featureName))
+                        .forEach(f -> f.isEnabled = isEnabled);
+                //@formatter:on
+            }
         }
         if (type == CM_DELETED) {
             allFeatures.removeAll(pid);
         }
     }
 
-    private List<String> getConfiguredFeatures(final String configurationPID) {
+    private Map<String, Boolean> getConfiguredFeatures(final String configurationPID) {
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             if (configuration != null) {
@@ -221,69 +232,28 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 final Map<String, Object> props = Maps.toMap(keysIterator, properties::get);
                 final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
                 //@formatter:off
-                return filteredProps.keySet().stream()
-                                             .filter(k -> k.startsWith(FEATURE_NAME_PREFIX))
-                                             .map(k -> k.substring(FEATURE_NAME_PREFIX.length(), k.length()))
-                                             .collect(toList());
+                final Function<? super Entry<String, Object>, ? extends String> nameMapper =
+                                                    k -> k.getKey().substring(FEATURE_NAME_PREFIX.length(),
+                                                                                       k.getKey().length());
+                final Function<? super Entry<String, Object>, ? extends Boolean> valueMapper =
+                                                    v -> (Boolean) v.getValue();
+                return filteredProps.entrySet().stream()
+                                               .filter(e -> e.getKey().startsWith(FEATURE_NAME_PREFIX))
+                                               .collect(toMap(nameMapper, valueMapper));
                 //@formatter:on
             }
         } catch (final IOException e) {
             logger.error("Cannot retrieve configuration for {}", configurationPID, e);
         }
-        return ImmutableList.of();
-    }
-
-    private FeatureDTO convertToFeature(final String configurationPID, final String featureName) {
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
-            //@formatter:off
-            final boolean enabled = Optional.ofNullable(configuration)
-                                            .map(Configuration::getProperties)
-                                            .map(p -> p.get(FEATURE_NAME_PREFIX + featureName))
-                                            .filter(v -> v instanceof Boolean)
-                                            .map(boolean.class::cast)
-                                            .orElse(false);
-            //@formatter:on
-            final String description = getFeatureDescription(configurationPID, featureName).orElse(null);
-            return createFeature(featureName, description, enabled);
-        } catch (final IOException e) {
-            logger.error("Cannot retrieve configuration for {}", configurationPID, e);
-        }
-        return null;
+        return ImmutableMap.of();
     }
 
     private ConfigurationDTO convertToConfiguration(final String configurationPID) {
-        final Collection<String> features = allFeatures.get(configurationPID);
+        final Collection<FeatureDTO> features = allFeatures.get(configurationPID);
         if (features.isEmpty()) {
             return null;
         }
-        final List<FeatureDTO> specifiedFeatures = getFeatures(configurationPID).collect(toList());
-        return createConfiguration(configurationPID, specifiedFeatures);
-    }
-
-    private Optional<String> getFeatureDescription(final String configurationPID, final String featureName) {
-        final Bundle[] bundles = bundleContext.getBundles();
-        //@formatter:off
-        return Arrays.stream(bundles)
-                     .map(metaTypeService::getMetaTypeInformation)
-                     .filter(Objects::nonNull)
-                     .filter(m -> Lists.newArrayList(m.getPids()).contains(configurationPID))
-                     .map(m -> m.getObjectClassDefinition(configurationPID, null))
-                     .map(o -> o.getAttributeDefinitions(ALL))
-                     .filter(Objects::nonNull)
-                     .flatMap(Arrays::stream)
-                     .filter(ad -> ad.getID().equals(FEATURE_NAME_PREFIX + featureName))
-                     .map(AttributeDefinition::getDescription)
-                     .findAny();
-        //@formatter:on
-    }
-
-    private static FeatureDTO createFeature(final String name, final String description, final boolean isEnabled) {
-        final FeatureDTO feature = new FeatureDTO();
-        feature.name = name;
-        feature.description = description;
-        feature.isEnabled = isEnabled;
-        return feature;
+        return createConfiguration(configurationPID, Lists.newArrayList(features));
     }
 
     private static ConfigurationDTO createConfiguration(final String pid, final List<FeatureDTO> features) {
