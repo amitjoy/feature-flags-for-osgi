@@ -39,8 +39,7 @@ import com.amitinside.featureflags.FeatureManager;
  * @see FeatureDTO
  * @see FeatureManager
  *
- * @Immutable
- * @ThreadSafe
+ * @NotThreadSafe
  */
 @ProviderType
 public class ConfigurationDTO {
