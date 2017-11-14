@@ -7,11 +7,13 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags;
+package com.amitinside.featureflags.dto;
 
 import static java.util.Objects.requireNonNull;
 
 import org.osgi.annotation.versioning.ProviderType;
+
+import com.amitinside.featureflags.FeatureManager;
 
 /**
  * A feature is defined by its name, description and flag denoting whether
@@ -23,14 +25,14 @@ import org.osgi.annotation.versioning.ProviderType;
  *
  * @noextend This class is not intended to be extended by consumers.
  *
- * @see FeatureConfiguration
+ * @see ConfigurationDTO
  * @see FeatureManager
  *
  * @Immutable
  * @ThreadSafe
  */
 @ProviderType
-public class Feature {
+public class FeatureDTO {
 
     /**
      * The prefix of the feature name pattern. This prefix should be used with
@@ -44,7 +46,7 @@ public class Feature {
     private final boolean isEnabled;
 
     /**
-     * Creates a new instance of {@link Feature}
+     * Creates a new instance of {@link FeatureDTO}
      *
      * @param name The name of the feature
      * @param description The description of the feature
@@ -52,7 +54,7 @@ public class Feature {
      *
      * @throws NullPointerException if any of the specified arguments is {@code null}
      */
-    public Feature(final String name, final String description, final boolean isEnabled) {
+    public FeatureDTO(final String name, final String description, final boolean isEnabled) {
         requireNonNull(name, "Feature name cannot be null");
         requireNonNull(description, "Feature description cannot be null");
 

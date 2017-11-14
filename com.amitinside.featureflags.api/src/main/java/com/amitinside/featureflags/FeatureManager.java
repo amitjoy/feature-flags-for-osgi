@@ -15,6 +15,9 @@ import java.util.stream.Stream;
 
 import org.osgi.annotation.versioning.ProviderType;
 
+import com.amitinside.featureflags.dto.FeatureDTO;
+import com.amitinside.featureflags.dto.ConfigurationDTO;
+
 /**
  * The {@link FeatureManager} service is the application access point to the feature
  * flags functionality. It can be used to query the available features, configurations
@@ -23,9 +26,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * configuration instances available in runtime.
  *
  * <p>
- * This service differentiates between {@link Feature} and {@link FeatureConfiguration}.
- * A {@link Feature} instance is a representation of a feature whereas a
- * {@link FeatureConfiguration} instance is a representation of an OSGi Configuration in
+ * This service differentiates between {@link FeatureDTO} and {@link ConfigurationDTO}.
+ * A {@link FeatureDTO} instance is a representation of a feature whereas a
+ * {@link ConfigurationDTO} instance is a representation of an OSGi Configuration in
  * which the features are specified.
  * <p>
  *
@@ -36,8 +39,8 @@ import org.osgi.annotation.versioning.ProviderType;
  * @noimplement This interface is not intended to be implemented by consumers.
  * @noextend This interface is not intended to be extended by consumers.
  *
- * @see Feature
- * @see FeatureConfiguration
+ * @see FeatureDTO
+ * @see ConfigurationDTO
  *
  * @ThreadSafe
  */
@@ -45,58 +48,58 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface FeatureManager {
 
     /**
-     * Retrieve all (known) {@link FeatureConfiguration} instances
+     * Retrieve all (known) {@link ConfigurationDTO} instances
      * <p>
-     * {@link FeatureConfiguration}s are known if they comprise features
+     * {@link ConfigurationDTO}s are known if they comprise features
      * </p>
      *
-     * @return The known {@link FeatureConfiguration} instances
+     * @return The known {@link ConfigurationDTO} instances
      */
-    Stream<FeatureConfiguration> getConfigurations();
+    Stream<ConfigurationDTO> getConfigurations();
 
     /**
-     * Retrieve all (known) {@link Feature} instances registered under the provided
+     * Retrieve all (known) {@link FeatureDTO} instances registered under the provided
      * configuration PID
      * <p>
-     * {@link Feature}s are known if they are configured with OSGi configuration
+     * {@link FeatureDTO}s are known if they are configured with OSGi configuration
      * under the specified configuration PID
      * </p>
      *
      * @param configurationPID The configuration PID
-     * @return The known {@link Feature} instances
+     * @return The known {@link FeatureDTO} instances
      * @throws NullPointerException if the specified argument is {@code null}
      * @throws IllegalArgumentException if the specified argument is empty
      */
-    Stream<Feature> getFeatures(String configurationPID);
+    Stream<FeatureDTO> getFeatures(String configurationPID);
 
     /**
-     * Returns the known {@link FeatureConfiguration} instance
+     * Returns the known {@link ConfigurationDTO} instance
      * <p>
-     * {@link FeatureConfiguration} instances are known if they comprise features
+     * {@link ConfigurationDTO} instances are known if they comprise features
      * </p>
      *
      * @param name The configuration PID
-     * @return The {@link FeatureConfiguration} wrapped in {@link Optional} or empty {@link Optional}
+     * @return The {@link ConfigurationDTO} wrapped in {@link Optional} or empty {@link Optional}
      *         instance if not known or the name is an empty string or {@code null}
      * @throws NullPointerException if the specified argument is {@code null}
      * @throws IllegalArgumentException if the specified argument is empty
      */
-    Optional<FeatureConfiguration> getConfiguration(String configurationPID);
+    Optional<ConfigurationDTO> getConfiguration(String configurationPID);
 
     /**
      * Returns the feature registered under the specified configuration PID with the given name
      * <p>
-     * {@link Feature} instances are known if they are registered with OSGi configuration.
+     * {@link FeatureDTO} instances are known if they are registered with OSGi configuration.
      * </p>
      *
      * @param configurationPID The configuration PID
      * @param featureName The name of the feature
-     * @return The {@link Feature} wrapped in {@link Optional} or empty {@link Optional}
+     * @return The {@link FeatureDTO} wrapped in {@link Optional} or empty {@link Optional}
      *         instance if not known or the name is an empty string or {@code null}
      * @throws NullPointerException if any of the specified arguments is {@code null}
      * @throws IllegalArgumentException if any of the specified arguments is empty
      */
-    Optional<Feature> getFeature(String configurationPID, String featureName);
+    Optional<FeatureDTO> getFeature(String configurationPID, String featureName);
 
     /**
      * Updates the specified feature registered under the specified configuration PID

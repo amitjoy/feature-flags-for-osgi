@@ -26,9 +26,9 @@ import javax.ws.rs.QueryParam;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import com.amitinside.featureflags.Feature;
-import com.amitinside.featureflags.FeatureConfiguration;
 import com.amitinside.featureflags.FeatureManager;
+import com.amitinside.featureflags.dto.FeatureDTO;
+import com.amitinside.featureflags.dto.ConfigurationDTO;
 
 @Path("/featureflags")
 @Component(name = "FeatureFlagsRESTResource", immediate = true)
@@ -39,21 +39,21 @@ public final class RESTResource {
     @GET
     @Path("/configurations")
     @Produces(APPLICATION_JSON)
-    public List<FeatureConfiguration> getConfigurations() {
+    public List<ConfigurationDTO> getConfigurations() {
         return featureManager.getConfigurations().collect(Collectors.toList());
     }
 
     @GET
     @Path("/features")
     @Produces(APPLICATION_JSON)
-    public List<Feature> getFeatures(@QueryParam("configurationPID") final String configurationPID) {
+    public List<FeatureDTO> getFeatures(@QueryParam("configurationPID") final String configurationPID) {
         return featureManager.getFeatures(configurationPID).collect(Collectors.toList());
     }
 
     @GET
     @Path("/configurations/{configurationPID}")
     @Produces(APPLICATION_JSON)
-    public FeatureConfiguration getConfiguration(@PathParam("configurationPID") final String configurationPID) {
+    public ConfigurationDTO getConfiguration(@PathParam("configurationPID") final String configurationPID) {
         return featureManager.getConfiguration(configurationPID).orElseThrow(
                 () -> new NotFoundException(String.format("Configuration %s not found", configurationPID)));
     }
@@ -61,7 +61,7 @@ public final class RESTResource {
     @GET
     @Path("/features/{featureName}")
     @Produces(APPLICATION_JSON)
-    public Feature getFeature(@QueryParam("configurationPID") final String configurationPID,
+    public FeatureDTO getFeature(@QueryParam("configurationPID") final String configurationPID,
             @PathParam("featureName") final String featureName) {
         return featureManager.getFeature(configurationPID, featureName)
                 .orElseThrow(() -> new NotFoundException(String.format("Feature %s not found", featureName)));

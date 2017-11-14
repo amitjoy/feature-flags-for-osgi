@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package com.amitinside.featureflags;
+package com.amitinside.featureflags.dto;
 
 import static java.util.Objects.requireNonNull;
 
@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.osgi.annotation.versioning.ProviderType;
+
+import com.amitinside.featureflags.FeatureManager;
 
 /**
  * A feature configuration is defined by its associated configuration PID and list
@@ -28,27 +30,27 @@ import org.osgi.annotation.versioning.ProviderType;
  *
  * @noextend This class is not intended to be extended by consumers.
  *
- * @see Feature
+ * @see FeatureDTO
  * @see FeatureManager
  *
  * @Immutable
  * @ThreadSafe
  */
 @ProviderType
-public class FeatureConfiguration {
+public class ConfigurationDTO {
 
     private final String pid;
-    private final List<Feature> features;
+    private final List<FeatureDTO> features;
 
     /**
-     * Creates a new instance of {@link FeatureConfiguration}
+     * Creates a new instance of {@link ConfigurationDTO}
      *
      * @param pid The configuration PID
      * @param features The list of associated features
      *
      * @throws NullPointerException if any of the specified arguments is {@code null}
      */
-    public FeatureConfiguration(final String pid, final List<Feature> features) {
+    public ConfigurationDTO(final String pid, final List<FeatureDTO> features) {
         requireNonNull(pid, "Configuration PID cannot be null");
         requireNonNull(features, "List of Features cannot be null");
 
@@ -70,7 +72,7 @@ public class FeatureConfiguration {
      *
      * @return the associated features (cannot be {@code null})
      */
-    public List<Feature> getFeatures() {
+    public List<FeatureDTO> getFeatures() {
         return features;
     }
 

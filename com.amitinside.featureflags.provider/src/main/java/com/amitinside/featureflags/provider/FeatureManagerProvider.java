@@ -9,7 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.Feature.FEATURE_NAME_PREFIX;
+import static com.amitinside.featureflags.dto.FeatureDTO.FEATURE_NAME_PREFIX;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
@@ -45,9 +45,9 @@ import org.osgi.service.metatype.MetaTypeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amitinside.featureflags.Feature;
-import com.amitinside.featureflags.FeatureConfiguration;
 import com.amitinside.featureflags.FeatureManager;
+import com.amitinside.featureflags.dto.FeatureDTO;
+import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -128,7 +128,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     }
 
     @Override
-    public Stream<FeatureConfiguration> getConfigurations() {
+    public Stream<ConfigurationDTO> getConfigurations() {
         //@formatter:off
         return allFeatures.keys()
                           .stream()
@@ -138,7 +138,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     }
 
     @Override
-    public Stream<Feature> getFeatures(final String configurationPID) {
+    public Stream<FeatureDTO> getFeatures(final String configurationPID) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
@@ -151,7 +151,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     }
 
     @Override
-    public Optional<FeatureConfiguration> getConfiguration(final String configurationPID) {
+    public Optional<ConfigurationDTO> getConfiguration(final String configurationPID) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
@@ -159,7 +159,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     }
 
     @Override
-    public Optional<Feature> getFeature(final String configurationPID, final String featureName) {
+    public Optional<FeatureDTO> getFeature(final String configurationPID, final String featureName) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         requireNonNull(featureName, "Feature Name cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
@@ -234,7 +234,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         return ImmutableList.of();
     }
 
-    private Feature convertToFeature(final String configurationPID, final String featureName) {
+    private FeatureDTO convertToFeature(final String configurationPID, final String featureName) {
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             //@formatter:off
@@ -246,20 +246,20 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                                             .orElse(false);
             //@formatter:on
             final String description = getFeatureDescription(configurationPID, featureName).orElse(null);
-            return new Feature(featureName, description, enabled);
+            return new FeatureDTO(featureName, description, enabled);
         } catch (final IOException e) {
             logger.error("Cannot retrieve configuration for {}", configurationPID, e);
         }
         return null;
     }
 
-    private FeatureConfiguration convertToConfiguration(final String configurationPID) {
+    private ConfigurationDTO convertToConfiguration(final String configurationPID) {
         final Collection<String> features = allFeatures.get(configurationPID);
         if (features.isEmpty()) {
             return null;
         }
-        final List<Feature> specifiedFeatures = getFeatures(configurationPID).collect(toList());
-        return new FeatureConfiguration(configurationPID, specifiedFeatures);
+        final List<FeatureDTO> specifiedFeatures = getFeatures(configurationPID).collect(toList());
+        return new ConfigurationDTO(configurationPID, specifiedFeatures);
     }
 
     private Optional<String> getFeatureDescription(final String configurationPID, final String featureName) {
