@@ -32,8 +32,20 @@ import com.amitinside.featureflags.FeatureManager;
 @ProviderType
 public class FeatureDTO {
 
+    /**
+     * The name of the feature
+     */
     public String name;
+
+    /**
+     * The description of the feature
+     */
     public String description;
+
+    /**
+     * The enablement flag of the feature that denotes whether the feature
+     * is enabled or not
+     */
     public boolean isEnabled;
 
 }

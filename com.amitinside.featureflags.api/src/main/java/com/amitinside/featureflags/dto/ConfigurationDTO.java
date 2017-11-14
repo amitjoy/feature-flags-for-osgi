@@ -36,7 +36,14 @@ import com.amitinside.featureflags.FeatureManager;
 @ProviderType
 public class ConfigurationDTO {
 
+    /**
+     * The configuration PID in which the associated features are specified
+     */
     public String pid;
+
+    /**
+     * The associated features
+     */
     public List<FeatureDTO> features;
 
 }
