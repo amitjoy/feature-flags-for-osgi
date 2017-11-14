@@ -65,7 +65,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     private final Logger logger = LoggerFactory.getLogger(FeatureManagerProvider.class);
 
     /** Data container -> Key: Configuration PID Value: Feature DTOs */
-    private final Multimap<String, FeatureDTO> allFeatures = ArrayListMultimap.create();
+    private final Multimap<String, Feature> allFeatures = ArrayListMultimap.create();
 
     /** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
     private final Multimap<Bundle, String> bundlePids = ArrayListMultimap.create();
@@ -150,7 +150,10 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
-        return allFeatures.get(configurationPID).stream();
+        //@formatter:off
+        return allFeatures.get(configurationPID).stream()
+                                                .map(FeatureManagerProvider::createFeatureDTOFromFeature);
+        //@formatter:on
     }
 
     @Override
@@ -172,7 +175,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         return allFeatures.get(configurationPID)
                           .stream()
                           .filter(f -> f.name.equalsIgnoreCase(featureName))
-                          .findAny();
+                          .findAny()
+                          .map(FeatureManagerProvider::createFeatureDTOFromFeature);
         //@formatter:on
     }
 
@@ -209,7 +213,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
             for (final Entry<String, Boolean> entry : configuredFeatures.entrySet()) {
                 final String featureName = entry.getKey();
                 final boolean isEnabled = entry.getValue();
-                final Collection<FeatureDTO> features = allFeatures.get(pid);
+                final Collection<Feature> features = allFeatures.get(pid);
                 //@formatter:off
                 features.stream()
                         .filter(f -> f.name.equalsIgnoreCase(featureName))
@@ -249,18 +253,39 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     }
 
     private ConfigurationDTO convertToConfiguration(final String configurationPID) {
-        final Collection<FeatureDTO> features = allFeatures.get(configurationPID);
+        final Collection<Feature> features = allFeatures.get(configurationPID);
         if (features.isEmpty()) {
             return null;
         }
         return createConfiguration(configurationPID, Lists.newArrayList(features));
     }
 
-    private static ConfigurationDTO createConfiguration(final String pid, final List<FeatureDTO> features) {
+    private static ConfigurationDTO createConfiguration(final String pid, final List<Feature> features) {
         final ConfigurationDTO config = new ConfigurationDTO();
         config.pid = pid;
-        config.features = features;
+        //@formatter:off
+        config.features = features.stream()
+                                  .map(FeatureManagerProvider::createFeatureDTOFromFeature)
+                                  .collect(toList());
+        //@formatter:on
         return config;
+    }
+
+    private static FeatureDTO createFeatureDTOFromFeature(final Feature f) {
+        final FeatureDTO feature = new FeatureDTO();
+        feature.name = f.name;
+        feature.description = f.description;
+        feature.isEnabled = f.isEnabled;
+        return feature;
+    }
+
+    /**
+     * Placeholder for Feature DTO. Used for internal purposes.
+     */
+    static class Feature {
+        public String name;
+        public String description;
+        public boolean isEnabled;
     }
 
 }

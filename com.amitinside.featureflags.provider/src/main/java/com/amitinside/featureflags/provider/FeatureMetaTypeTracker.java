@@ -26,7 +26,7 @@ import org.osgi.service.metatype.MetaTypeInformation;
 import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 
-import com.amitinside.featureflags.dto.FeatureDTO;
+import com.amitinside.featureflags.provider.FeatureManagerProvider.Feature;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
@@ -39,10 +39,10 @@ public final class FeatureMetaTypeTracker implements BundleTrackerCustomizer {
     private final Multimap<Bundle, String> bundlePids;
 
     /** Data container -> Key: Configuration PID Value: Feature DTOs */
-    private final Multimap<String, FeatureDTO> allFeatures;
+    private final Multimap<String, Feature> allFeatures;
 
     public FeatureMetaTypeTracker(final MetaTypeService metaTypeService, final Multimap<Bundle, String> bundlePids,
-            final Multimap<String, FeatureDTO> allFeatures) {
+            final Multimap<String, Feature> allFeatures) {
         this.metaTypeService = metaTypeService;
         this.bundlePids = bundlePids;
         this.allFeatures = allFeatures;
@@ -101,8 +101,8 @@ public final class FeatureMetaTypeTracker implements BundleTrackerCustomizer {
         //@formatter:on
     }
 
-    private static FeatureDTO createFeature(final String name, final String description, final boolean isEnabled) {
-        final FeatureDTO feature = new FeatureDTO();
+    private static Feature createFeature(final String name, final String description, final boolean isEnabled) {
+        final Feature feature = new Feature();
         feature.name = name;
         feature.description = description;
         feature.isEnabled = isEnabled;
