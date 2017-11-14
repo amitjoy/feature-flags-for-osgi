@@ -95,7 +95,7 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 }
 ```
 
-or
+or provide a metatype XML with the required configuration in your bundle's `OSGI-INF/metatype` directory
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
