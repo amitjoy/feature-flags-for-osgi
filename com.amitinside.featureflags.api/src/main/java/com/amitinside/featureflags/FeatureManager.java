@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 
 import org.osgi.annotation.versioning.ProviderType;
 
-import com.amitinside.featureflags.dto.FeatureDTO;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
+import com.amitinside.featureflags.dto.FeatureDTO;
 
 /**
  * The {@link FeatureManager} service is the application access point to the feature
@@ -46,6 +46,13 @@ import com.amitinside.featureflags.dto.ConfigurationDTO;
  */
 @ProviderType
 public interface FeatureManager {
+
+    /**
+     * The prefix of the feature name pattern. This prefix should be used with
+     * the feature name in OSGi Configuration to identify unique features in an
+     * OSGi configuration.
+     */
+    public static final String FEATURE_NAME_PREFIX = "osgi.feature.";
 
     /**
      * Retrieve all (known) {@link ConfigurationDTO} instances
