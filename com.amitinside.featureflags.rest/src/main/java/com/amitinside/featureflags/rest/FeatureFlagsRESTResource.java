@@ -27,12 +27,25 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import com.amitinside.featureflags.FeatureManager;
-import com.amitinside.featureflags.dto.FeatureDTO;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
+import com.amitinside.featureflags.dto.FeatureDTO;
 
-@Path("/featureflags")
-@Component(name = "FeatureFlagsRESTResource", immediate = true)
-public final class RESTResource {
+/**
+ * This class exposes REST Resource Endpoints to manage features
+ * <p>
+ * The URI patterns are as follows:
+ * <ul>
+ * <li>GET: /featureflags/configurations</li>
+ * <li>GET: /featureflags/configurations/{configurationPID}</li>
+ * <li>GET: /featureflags/features?configurationPID=XYZ</li>
+ * <li>GET: /featureflags/features/{featureName}?configurationPID=XYZ</li>
+ * <li>PUT: /featureflags/features/{featureName}?configurationPID=XYZ</li>
+ * </ul>
+ * </p>
+ */
+@Path("featureflags")
+@Component(name = "FeatureFlagsRESTResource", immediate = true, service = FeatureFlagsRESTResource.class)
+public final class FeatureFlagsRESTResource {
 
     private FeatureManager featureManager;
 
