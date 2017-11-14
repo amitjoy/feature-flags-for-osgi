@@ -9,8 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.dto;
 
-import static java.util.Objects.requireNonNull;
-
 import org.osgi.annotation.versioning.ProviderType;
 
 import com.amitinside.featureflags.FeatureManager;
@@ -34,61 +32,8 @@ import com.amitinside.featureflags.FeatureManager;
 @ProviderType
 public class FeatureDTO {
 
-    /**
-     * The prefix of the feature name pattern. This prefix should be used with
-     * the feature name in OSGi Configuration to identify unique features in an
-     * OSGi configuration.
-     */
-    public static final String FEATURE_NAME_PREFIX = "osgi.feature.";
-
-    private final String name;
-    private final String description;
-    private final boolean isEnabled;
-
-    /**
-     * Creates a new instance of {@link FeatureDTO}
-     *
-     * @param name The name of the feature
-     * @param description The description of the feature
-     * @param isEnabled The flag denoting whether the feature is enabled
-     *
-     * @throws NullPointerException if any of the specified arguments is {@code null}
-     */
-    public FeatureDTO(final String name, final String description, final boolean isEnabled) {
-        requireNonNull(name, "Feature name cannot be null");
-        requireNonNull(description, "Feature description cannot be null");
-
-        this.name = name;
-        this.description = description;
-        this.isEnabled = isEnabled;
-    }
-
-    /**
-     * Returns the name of the feature
-     *
-     * @return the name of the feature (cannot be {@code null})
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the description of the feature
-     *
-     * @return the description of the feature (cannot be {@code null})
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Returns the flag of the feature that denotes whether the feature
-     * is enabled
-     *
-     * @return the flag of the feature
-     */
-    public boolean isEnabled() {
-        return isEnabled;
-    }
+    public String name;
+    public String description;
+    public boolean isEnabled;
 
 }

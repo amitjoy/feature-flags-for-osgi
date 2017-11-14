@@ -9,9 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.dto;
 
-import static java.util.Objects.requireNonNull;
-
-import java.util.Collections;
 import java.util.List;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -39,41 +36,7 @@ import com.amitinside.featureflags.FeatureManager;
 @ProviderType
 public class ConfigurationDTO {
 
-    private final String pid;
-    private final List<FeatureDTO> features;
-
-    /**
-     * Creates a new instance of {@link ConfigurationDTO}
-     *
-     * @param pid The configuration PID
-     * @param features The list of associated features
-     *
-     * @throws NullPointerException if any of the specified arguments is {@code null}
-     */
-    public ConfigurationDTO(final String pid, final List<FeatureDTO> features) {
-        requireNonNull(pid, "Configuration PID cannot be null");
-        requireNonNull(features, "List of Features cannot be null");
-
-        this.pid = pid;
-        this.features = Collections.unmodifiableList(features);
-    }
-
-    /**
-     * Returns the configuration PID
-     *
-     * @return the configuration PID (cannot be {@code null})
-     */
-    public String getPid() {
-        return pid;
-    }
-
-    /**
-     * Returns the associated features (immutable view)
-     *
-     * @return the associated features (cannot be {@code null})
-     */
-    public List<FeatureDTO> getFeatures() {
-        return features;
-    }
+    public String pid;
+    public List<FeatureDTO> features;
 
 }

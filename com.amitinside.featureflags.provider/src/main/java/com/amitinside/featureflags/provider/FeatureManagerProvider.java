@@ -9,7 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.dto.FeatureDTO.FEATURE_NAME_PREFIX;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
@@ -46,8 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.FeatureManager;
-import com.amitinside.featureflags.dto.FeatureDTO;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
+import com.amitinside.featureflags.dto.FeatureDTO;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -170,7 +169,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                           .stream()
                           .map(f -> convertToFeature(configurationPID, f))
                           .filter(Objects::nonNull)
-                          .filter(f -> f.getName().equalsIgnoreCase(featureName))
+                          .filter(f -> f.name.equalsIgnoreCase(featureName))
                           .findAny();
         //@formatter:on
     }
@@ -246,7 +245,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                                             .orElse(false);
             //@formatter:on
             final String description = getFeatureDescription(configurationPID, featureName).orElse(null);
-            return new FeatureDTO(featureName, description, enabled);
+            return createFeature(featureName, description, enabled);
         } catch (final IOException e) {
             logger.error("Cannot retrieve configuration for {}", configurationPID, e);
         }
@@ -259,7 +258,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
             return null;
         }
         final List<FeatureDTO> specifiedFeatures = getFeatures(configurationPID).collect(toList());
-        return new ConfigurationDTO(configurationPID, specifiedFeatures);
+        return createConfiguration(configurationPID, specifiedFeatures);
     }
 
     private Optional<String> getFeatureDescription(final String configurationPID, final String featureName) {
@@ -277,6 +276,21 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                      .map(AttributeDefinition::getDescription)
                      .findAny();
         //@formatter:on
+    }
+
+    private static FeatureDTO createFeature(final String name, final String description, final boolean isEnabled) {
+        final FeatureDTO feature = new FeatureDTO();
+        feature.name = name;
+        feature.description = description;
+        feature.isEnabled = isEnabled;
+        return feature;
+    }
+
+    private static ConfigurationDTO createConfiguration(final String pid, final List<FeatureDTO> features) {
+        final ConfigurationDTO config = new ConfigurationDTO();
+        config.pid = pid;
+        config.features = features;
+        return config;
     }
 
 }
