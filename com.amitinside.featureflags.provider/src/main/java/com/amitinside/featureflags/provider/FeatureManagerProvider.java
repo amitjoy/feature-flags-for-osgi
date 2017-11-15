@@ -81,8 +81,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     @Activate
     protected void activate(final BundleContext bundleContext) {
-        // track all bundles to check existing features
-        final BundleTrackerCustomizer customizer = new FeatureMetaTypeTracker(metaTypeService, bundlePids, allFeatures);
+        // track all bundles for existing features in metatype
+        final BundleTrackerCustomizer customizer = new MetaTypeTrackerCustomizer(metaTypeService, bundlePids, allFeatures);
         bundleTracker = new BundleTracker(bundleContext, ACTIVE, customizer);
         bundleTracker.open();
     }
@@ -129,7 +129,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         //@formatter:off
         return allFeatures.keys()
                           .stream()
-                          .map(this::convertToConfiguration)
+                          .map(this::toConfigurationDTO)
                           .filter(Objects::nonNull)
                           .collect(toList());
         //@formatter:on
@@ -140,7 +140,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         //@formatter:off
         return allFeatures.keys()
                           .stream()
-                          .map(this::convertToConfiguration)
+                          .map(this::toConfigurationDTO)
                           .filter(Objects::nonNull);
         //@formatter:on
     }
@@ -151,8 +151,9 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
         //@formatter:off
-        return allFeatures.get(configurationPID).stream()
-                                                .map(FeatureManagerProvider::createFeatureDTOFromFeature);
+        return allFeatures.get(configurationPID)
+                          .stream()
+                          .map(FeatureManagerProvider::toFeatureDTO);
         //@formatter:on
     }
 
@@ -161,7 +162,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         requireNonNull(configurationPID, "Configuration PID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
 
-        return Optional.ofNullable(convertToConfiguration(configurationPID));
+        return Optional.ofNullable(toConfigurationDTO(configurationPID));
     }
 
     @Override
@@ -176,7 +177,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                           .stream()
                           .filter(f -> f.name.equalsIgnoreCase(featureName))
                           .findAny()
-                          .map(FeatureManagerProvider::createFeatureDTOFromFeature);
+                          .map(FeatureManagerProvider::toFeatureDTO);
         //@formatter:on
     }
 
@@ -235,14 +236,16 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 final Iterator<String> keysIterator = Iterators.forEnumeration(properties.keys());
                 final Map<String, Object> props = Maps.toMap(keysIterator, properties::get);
                 final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
+
+                final Function<? super Entry<String, Object>, ? extends String> nameMapper = e -> e.getKey()
+                        .substring(FEATURE_NAME_PREFIX.length(), e.getKey().length());
+                final Function<? super Entry<String, Object>, ? extends Boolean> valueMapper = e -> (Boolean) e
+                        .getValue();
+
                 //@formatter:off
-                final Function<? super Entry<String, Object>, ? extends String> nameMapper =
-                                                    k -> k.getKey().substring(FEATURE_NAME_PREFIX.length(),
-                                                                                       k.getKey().length());
-                final Function<? super Entry<String, Object>, ? extends Boolean> valueMapper =
-                                                    v -> (Boolean) v.getValue();
                 return filteredProps.entrySet().stream()
                                                .filter(e -> e.getKey().startsWith(FEATURE_NAME_PREFIX))
+                                               .filter(e -> e.getValue() instanceof Boolean)
                                                .collect(toMap(nameMapper, valueMapper));
                 //@formatter:on
             }
@@ -252,26 +255,26 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         return ImmutableMap.of();
     }
 
-    private ConfigurationDTO convertToConfiguration(final String configurationPID) {
+    private ConfigurationDTO toConfigurationDTO(final String configurationPID) {
         final Collection<Feature> features = allFeatures.get(configurationPID);
         if (features.isEmpty()) {
             return null;
         }
-        return createConfiguration(configurationPID, Lists.newArrayList(features));
+        return toConfigurationDTO(configurationPID, Lists.newArrayList(features));
     }
 
-    private static ConfigurationDTO createConfiguration(final String pid, final List<Feature> features) {
+    private static ConfigurationDTO toConfigurationDTO(final String pid, final List<Feature> features) {
         final ConfigurationDTO config = new ConfigurationDTO();
         config.pid = pid;
         //@formatter:off
         config.features = features.stream()
-                                  .map(FeatureManagerProvider::createFeatureDTOFromFeature)
+                                  .map(FeatureManagerProvider::toFeatureDTO)
                                   .collect(toList());
         //@formatter:on
         return config;
     }
 
-    private static FeatureDTO createFeatureDTOFromFeature(final Feature f) {
+    private static FeatureDTO toFeatureDTO(final Feature f) {
         final FeatureDTO feature = new FeatureDTO();
         feature.name = f.name;
         feature.description = f.description;
