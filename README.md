@@ -73,7 +73,7 @@ Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> 
 
 #### Building from Source
 
-Run `mvn clean install -Dgpg.skip` in the project folder
+Run `mvn clean install -Dgpg.skip` in the project root directory
 
 ----------------------------------------------------------------
 
@@ -85,7 +85,7 @@ This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/l
 
 ### Usage
 
-1. In your DS Component, add an attribute definition to the existing object class definition
+1. In your DS Component, add an attribute definition to the existing or new object class definition.
 
 ```java
 @ObjectClassDefinition
