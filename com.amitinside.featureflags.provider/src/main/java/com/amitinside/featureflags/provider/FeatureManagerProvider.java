@@ -82,7 +82,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     @Activate
     protected void activate(final BundleContext bundleContext) {
         // track all bundles for existing features in metatype
-        final BundleTrackerCustomizer customizer = new MetaTypeTrackerCustomizer(metaTypeService, bundlePids, allFeatures);
+        final BundleTrackerCustomizer customizer = new MetaTypeTrackerCustomizer(metaTypeService, bundlePids,
+                allFeatures);
         bundleTracker = new BundleTracker(bundleContext, ACTIVE, customizer);
         bundleTracker.open();
     }
@@ -237,8 +238,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 final Map<String, Object> props = Maps.toMap(keysIterator, properties::get);
                 final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
 
-                final Function<? super Entry<String, Object>, ? extends String> nameMapper = e -> e.getKey()
-                        .substring(FEATURE_NAME_PREFIX.length(), e.getKey().length());
+                final Function<? super Entry<String, Object>, ? extends String> nameMapper = e -> extractName(
+                        e.getKey());
                 final Function<? super Entry<String, Object>, ? extends Boolean> valueMapper = e -> (Boolean) e
                         .getValue();
 
@@ -280,6 +281,10 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         feature.description = f.description;
         feature.isEnabled = f.isEnabled;
         return feature;
+    }
+
+    private static String extractName(final String name) {
+        return name.substring(FEATURE_NAME_PREFIX.length(), name.length());
     }
 
     /**

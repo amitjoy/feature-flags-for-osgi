@@ -81,14 +81,14 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
 
         pids.stream().forEach(pid -> bundlePids.put(bundle, pid));
 
-        //retrieve list of attribute definitions
+        //retrieve list of specified attribute definitions
         for (final String pid : pids) {
             final List<AttributeDefinition> attributeDefinitions = getAttributeDefinitions(bundle, pid);
             attributeDefinitions.stream()
-                                .filter(ad -> ad.getID().contains(FEATURE_NAME_PREFIX))
-                                .map(ad -> toFeature(ad.getName(),
-                                                         ad.getDescription(),
-                                                         Boolean.valueOf(ad.getDefaultValue()[0])))
+                                .filter(ad -> ad.getID().startsWith(FEATURE_NAME_PREFIX))
+                                .map(ad -> toFeature(ad.getID(),
+                                                     ad.getDescription(),
+                                                     Boolean.valueOf(ad.getDefaultValue()[0])))
                                 .forEach(f -> allFeatures.put(pid, f));
         }
         //@formatter:on
@@ -125,10 +125,14 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
 
     private static Feature toFeature(final String name, final String description, final boolean isEnabled) {
         final Feature feature = new Feature();
-        feature.name = name;
+        feature.name = extractName(name);
         feature.description = description;
         feature.isEnabled = isEnabled;
         return feature;
+    }
+
+    private static String extractName(final String name) {
+        return name.substring(FEATURE_NAME_PREFIX.length(), name.length());
     }
 
 }
