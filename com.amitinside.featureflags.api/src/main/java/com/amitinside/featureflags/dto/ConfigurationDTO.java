@@ -11,8 +11,6 @@ package com.amitinside.featureflags.dto;
 
 import java.util.List;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 import com.amitinside.featureflags.FeatureManager;
 
 /**
@@ -41,7 +39,6 @@ import com.amitinside.featureflags.FeatureManager;
  *
  * @NotThreadSafe
  */
-@ProviderType
 public class ConfigurationDTO {
 
     /**

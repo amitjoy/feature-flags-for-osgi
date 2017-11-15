@@ -9,8 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.dto;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 import com.amitinside.featureflags.FeatureManager;
 
 /**
@@ -35,7 +33,6 @@ import com.amitinside.featureflags.FeatureManager;
  *
  * @NotThreadSafe
  */
-@ProviderType
 public class FeatureDTO {
 
     /**
