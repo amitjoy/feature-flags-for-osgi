@@ -9,7 +9,8 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.FeatureManager.FEATURE_NAME_PREFIX;
+import static com.amitinside.featureflags.FeatureManager.FEATURE_ID_PREFIX;
+import static com.amitinside.featureflags.provider.FeatureManagerProvider.extractFeatureID;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
@@ -17,6 +18,7 @@ import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,6 +31,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 
 import com.amitinside.featureflags.provider.FeatureManagerProvider.Feature;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
@@ -85,10 +88,13 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
         for (final String pid : pids) {
             final List<AttributeDefinition> attributeDefinitions = getAttributeDefinitions(bundle, pid);
             attributeDefinitions.stream()
-                                .filter(ad -> ad.getID().startsWith(FEATURE_NAME_PREFIX))
+                                .filter(ad -> ad.getID().startsWith(FEATURE_ID_PREFIX))
                                 .map(ad -> toFeature(ad.getID(),
+                                                     ad.getName(),
                                                      ad.getDescription(),
-                                                     Boolean.valueOf(ad.getDefaultValue()[0])))
+                                                     getDefaultValue(ad),
+                                                     ad.getOptionLabels(),
+                                                     ad.getOptionValues()))
                                 .forEach(f -> allFeatures.put(pid, f));
         }
         //@formatter:on
@@ -123,16 +129,31 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
         //@formatter:on
     }
 
-    private static Feature toFeature(final String name, final String description, final boolean isEnabled) {
+    private static Feature toFeature(final String id, final String name, final String description,
+            final boolean isEnabled, final String[] labels, final String[] values) {
         final Feature feature = new Feature();
-        feature.name = extractName(name);
+        feature.id = extractFeatureID(id);
+        feature.name = name;
         feature.description = description;
         feature.isEnabled = isEnabled;
+        feature.tags = combineArrays(labels, values);
         return feature;
     }
 
-    private static String extractName(final String name) {
-        return name.substring(FEATURE_NAME_PREFIX.length(), name.length());
+    private static Map<String, String> combineArrays(final String[] labels, final String[] values) {
+        if (labels == null || values == null) {
+            return null;
+        }
+        final Map<String, String> data = Maps.newHashMap();
+        for (int i = 0; i < values.length; i++) {
+            data.put(labels[i], values[i]);
+        }
+        return data;
+    }
+
+    private static boolean getDefaultValue(final AttributeDefinition ad) {
+        final String[] values = ad.getDefaultValue();
+        return values == null ? false : Boolean.valueOf(values[0]);
     }
 
 }

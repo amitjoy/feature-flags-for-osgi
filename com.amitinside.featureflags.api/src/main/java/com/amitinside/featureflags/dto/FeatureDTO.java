@@ -9,20 +9,22 @@
  *******************************************************************************/
 package com.amitinside.featureflags.dto;
 
+import java.util.Map;
+
 import com.amitinside.featureflags.FeatureManager;
 
 /**
  * Data Transfer Object for a feature.
  *
  * <p>
- * A feature is defined by its name, description and flag denoting whether
- * the feature is enabled.
+ * A feature is defined by its identifier, name, description,flag denoting whether
+ * the feature is enabled and extra tags to better categorize the feature
  * </p>
  *
  * <p>
- * A feature is specified in OSGi configuration with a name format of
- * {@code osgi.feature.X} where X is the name of your feature and {@code osgi.feature.}
- * ({@link FeatureManager#FEATURE_NAME_PREFIX}) is a standard prefix to specify the
+ * A feature is specified in OSGi configuration with a id format of
+ * {@code osgi.feature.X} where X is the id of your feature and {@code osgi.feature.}
+ * ({@link FeatureManager#FEATURE_ID_PREFIX}) is a standard prefix to specify the
  * features.
  * </p>
  *
@@ -34,6 +36,11 @@ import com.amitinside.featureflags.FeatureManager;
  * @NotThreadSafe
  */
 public class FeatureDTO {
+
+    /**
+     * The identifier of the feature.
+     */
+    public String id;
 
     /**
      * The name of the feature
@@ -50,5 +57,10 @@ public class FeatureDTO {
      * is enabled or not
      */
     public boolean isEnabled;
+
+    /**
+     * The extra tags to categorize the feature
+     */
+    public Map<String, String> tags;
 
 }

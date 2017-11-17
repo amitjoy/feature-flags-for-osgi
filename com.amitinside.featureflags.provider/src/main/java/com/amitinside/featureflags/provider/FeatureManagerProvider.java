@@ -191,7 +191,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         checkArgument(!featureName.isEmpty(), "Feature Name cannot be empty");
 
         final Map<String, Object> props = Maps.newHashMap();
-        props.put(FEATURE_NAME_PREFIX + featureName, isEnabled);
+        props.put(FEATURE_ID_PREFIX + featureName, isEnabled);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         return CompletableFuture.runAsync(() -> {
             try {
@@ -213,12 +213,12 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         final Map<String, Boolean> configuredFeatures = getConfiguredFeatures(pid);
         if (!configuredFeatures.isEmpty() && type == CM_UPDATED) {
             for (final Entry<String, Boolean> entry : configuredFeatures.entrySet()) {
-                final String featureName = entry.getKey();
+                final String featureID = entry.getKey();
                 final boolean isEnabled = entry.getValue();
                 final Collection<Feature> features = allFeatures.get(pid);
                 //@formatter:off
                 features.stream()
-                        .filter(f -> f.name.equalsIgnoreCase(featureName))
+                        .filter(f -> f.id.equalsIgnoreCase(featureID))
                         .forEach(f -> f.isEnabled = isEnabled);
                 //@formatter:on
             }
@@ -238,16 +238,16 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 final Map<String, Object> props = Maps.toMap(keysIterator, properties::get);
                 final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
 
-                final Function<? super Entry<String, Object>, ? extends String> nameMapper = e -> extractName(
+                final Function<? super Entry<String, Object>, ? extends String> keyMapper = e -> extractFeatureID(
                         e.getKey());
                 final Function<? super Entry<String, Object>, ? extends Boolean> valueMapper = e -> (Boolean) e
                         .getValue();
 
                 //@formatter:off
                 return filteredProps.entrySet().stream()
-                                               .filter(e -> e.getKey().startsWith(FEATURE_NAME_PREFIX))
+                                               .filter(e -> e.getKey().startsWith(FEATURE_ID_PREFIX))
                                                .filter(e -> e.getValue() instanceof Boolean)
-                                               .collect(toMap(nameMapper, valueMapper));
+                                               .collect(toMap(keyMapper, valueMapper));
                 //@formatter:on
             }
         } catch (final IOException e) {
@@ -277,23 +277,27 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     private static FeatureDTO toFeatureDTO(final Feature f) {
         final FeatureDTO feature = new FeatureDTO();
+        feature.id = f.id;
         feature.name = f.name;
         feature.description = f.description;
         feature.isEnabled = f.isEnabled;
+        feature.tags = f.tags;
         return feature;
     }
 
-    private static String extractName(final String name) {
-        return name.substring(FEATURE_NAME_PREFIX.length(), name.length());
+    static String extractFeatureID(final String id) {
+        return id.substring(FEATURE_ID_PREFIX.length(), id.length());
     }
 
     /**
      * Placeholder for Feature DTO. Used for internal purposes.
      */
     static class Feature {
+        public String id;
         public String name;
         public String description;
         public boolean isEnabled;
+        public Map<String, String> tags;
     }
 
 }

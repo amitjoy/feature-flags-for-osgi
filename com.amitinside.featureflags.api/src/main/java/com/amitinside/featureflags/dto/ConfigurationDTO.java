@@ -22,9 +22,9 @@ import com.amitinside.featureflags.FeatureManager;
  * </p>
  *
  * <p>
- * A feature is specified in OSGi configuration with a name format of
- * {@code osgi.feature.X} where X is the name of your feature and {@code osgi.feature.}
- * ({@link FeatureManager#FEATURE_NAME_PREFIX}) is a standard prefix to specify the
+ * A feature is specified in OSGi configuration with a id format of
+ * {@code osgi.feature.X} where X is the id of your feature and {@code osgi.feature.}
+ * ({@link FeatureManager#FEATURE_ID_PREFIX}) is a standard prefix to specify the
  * features.
  * <br/>
  * <br/>
