@@ -103,21 +103,28 @@ or provide a metatype XML with the required configuration in your bundle's `OSGI
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.1.0 http://www.osgi.org/xmlns/metatype/v1.1.0">
           
-    <OCD id="org.osgi.mybundle.config" 
-         name="My Bundle Configuration">
+    <OCD id="ExampleFeatureFlagOSGiR4WithXML" 
+         name="My Feature Configuration">
 
         <AD id="osgi.feature.myfeature"
-            name="osgi.feature.myfeature"
+            name="My First Feature"
+            description="My Feature Description"
             type="Boolean"
             cardinality="0"
             required="true"
-            default="true"
-            description="My Feature Description" />
+            default="true">
+            <Option label="Label 1"
+                    value="Value 1"/>
+            <Option label="developer"
+                    value="amit"/>
+            <Option label="team"
+                    value="runtime"/>
+        </AD>
 
     </OCD>
     
-    <Designate pid="org.osgi.mybundle.config">
-        <Object ocdref="org.osgi.mybundle.config"/>
+    <Designate pid="ExampleFeatureFlagOSGiR4WithXML">
+        <Object ocdref="ExampleFeatureFlagOSGiR4WithXML"/>
     </Designate>
 </MetaData>
 ```
