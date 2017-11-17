@@ -28,7 +28,7 @@ public final class ExampleFeatureFlagOSGiR4 {
 
     @ObjectClassDefinition(id = "feature.flag.example2")
     @interface MyConfig {
-        @AttributeDefinition(name = "osgi.feature.myfeature", description = "My Feature Description")
+        @AttributeDefinition(name = "My First Feature", description = "My Feature Description")
         boolean osgi_feature_myfeature() default true;
     }
 
