@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
@@ -141,13 +142,11 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
     }
 
     private static Map<String, String> combineArrays(final String[] labels, final String[] values) {
-        if (labels == null || values == null) {
+        if (labels == null || values == null || labels.length != values.length) {
             return null;
         }
         final Map<String, String> data = Maps.newHashMap();
-        for (int i = 0; i < values.length; i++) {
-            data.put(labels[i], values[i]);
-        }
+        IntStream.range(0, values.length).forEach(i -> data.put(labels[i], values[i]));
         return data;
     }
 
