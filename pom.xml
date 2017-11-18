@@ -64,6 +64,7 @@
 		<felix.core.version>1.4.0</felix.core.version>
 		<felix.compendium.version>1.4.0</felix.compendium.version>
 		<felix.compendium.version>1.4.0</felix.compendium.version>
+		<osgi.dto.version>1.0.0</osgi.dto.version>
 		<guava.version>15.0</guava.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<servlet.version>4.0.0</servlet.version>
@@ -110,6 +111,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.dto</artifactId>
+			<version>${osgi.dto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.service.component.annotations</artifactId>
 			<version>${osgi.annotation.version}</version>
 			<scope>provided</scope>
@@ -151,10 +157,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>${javax.ws.rs.version}</version>
-        </dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>${javax.ws.rs.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -10,7 +10,7 @@
 package com.amitinside.featureflags.dto;
 
 import java.util.Map;
-
+import org.osgi.dto.DTO;
 import com.amitinside.featureflags.FeatureManager;
 
 /**
@@ -35,7 +35,7 @@ import com.amitinside.featureflags.FeatureManager;
  *
  * @NotThreadSafe
  */
-public class FeatureDTO {
+public class FeatureDTO extends DTO {
 
     /**
      * The identifier of the feature.

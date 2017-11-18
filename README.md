@@ -36,6 +36,7 @@ The core implementation bundle does require following open source libraries.
 
 1. SLF4J 1.7+ (MIT)
 2. Google Guava 15+ (Apache 2.0)
+3. OSGi DTO (Apache 2.0) (**Required** if and only if **OSGi Version prior to R5**)
 
 As test dependencies, the following test libraries are used:
 

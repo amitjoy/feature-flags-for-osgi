@@ -11,6 +11,8 @@ package com.amitinside.featureflags.dto;
 
 import java.util.List;
 
+import org.osgi.dto.DTO;
+
 import com.amitinside.featureflags.FeatureManager;
 
 /**
@@ -39,7 +41,7 @@ import com.amitinside.featureflags.FeatureManager;
  *
  * @NotThreadSafe
  */
-public class ConfigurationDTO {
+public class ConfigurationDTO extends DTO {
 
     /**
      * The configuration PID in which the associated features are specified
