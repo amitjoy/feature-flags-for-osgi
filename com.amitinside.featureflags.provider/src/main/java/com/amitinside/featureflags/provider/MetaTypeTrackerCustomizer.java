@@ -12,7 +12,7 @@ package com.amitinside.featureflags.provider;
 import static com.amitinside.featureflags.FeatureManager.FEATURE_ID_PREFIX;
 import static com.amitinside.featureflags.provider.FeatureManagerProvider.extractFeatureID;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
 import java.util.Arrays;
@@ -32,7 +32,6 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 
 import com.amitinside.featureflags.provider.FeatureManagerProvider.Feature;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
@@ -145,9 +144,11 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
         if (labels == null || values == null || labels.length != values.length) {
             return null;
         }
-        final Map<String, String> data = Maps.newHashMap();
-        IntStream.range(0, values.length).forEach(i -> data.put(labels[i], values[i]));
-        return data;
+        //@formatter:off
+        return IntStream.range(0, values.length)
+                        .boxed()
+                        .collect(toMap(i -> labels[i], i -> values[i]));
+        //@formatter:on
     }
 
     private static boolean getDefaultValue(final AttributeDefinition ad) {
