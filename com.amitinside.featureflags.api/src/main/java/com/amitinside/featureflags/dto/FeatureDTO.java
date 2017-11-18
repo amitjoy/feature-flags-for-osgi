@@ -17,8 +17,8 @@ import com.amitinside.featureflags.FeatureManager;
  * Data Transfer Object for a feature.
  *
  * <p>
- * A feature is defined by its identifier, name, description,flag denoting whether
- * the feature is enabled and extra tags to better categorize the feature
+ * A feature is defined by its identifier, name, description, flag denoting whether
+ * the feature is enabled and extra properties to better categorize the feature
  * </p>
  *
  * <p>
@@ -59,8 +59,8 @@ public class FeatureDTO {
     public boolean isEnabled;
 
     /**
-     * The extra tags to categorize the feature
+     * The extra properties to categorize the feature
      */
-    public Map<String, String> tags;
+    public Map<String, String> properties;
 
 }

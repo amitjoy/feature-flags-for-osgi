@@ -281,7 +281,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         feature.name = f.name;
         feature.description = f.description;
         feature.isEnabled = f.isEnabled;
-        feature.tags = f.tags;
+        feature.properties = f.properties;
         return feature;
     }
 
@@ -297,7 +297,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         public String name;
         public String description;
         public boolean isEnabled;
-        public Map<String, String> tags;
+        public Map<String, String> properties;
     }
 
 }
