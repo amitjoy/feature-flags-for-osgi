@@ -15,7 +15,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
-@Component(name = "ExampleFeatureFlagOSGiR4WithXML", immediate = true, configurationPid = "ExampleFeatureFlagOSGiR4WithXML")
+@Component(name = "ExampleFeatureFlagOSGiR4WithXML", immediate = true)
 public final class ExampleFeatureFlagOSGiR4WithXML {
 
     private boolean isFeatureEnabled;
