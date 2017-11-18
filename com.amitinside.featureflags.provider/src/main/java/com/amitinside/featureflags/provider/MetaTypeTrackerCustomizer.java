@@ -12,15 +12,12 @@ package com.amitinside.featureflags.provider;
 import static com.amitinside.featureflags.FeatureManager.FEATURE_ID_PREFIX;
 import static com.amitinside.featureflags.provider.FeatureManagerProvider.extractFeatureID;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toMap;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.osgi.framework.Bundle;
@@ -28,10 +25,12 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeInformation;
 import org.osgi.service.metatype.MetaTypeService;
+import org.osgi.service.metatype.ObjectClassDefinition;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 
 import com.amitinside.featureflags.provider.FeatureManagerProvider.Feature;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 /**
@@ -44,7 +43,7 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
     /** Metatype Service Instance Reference */
     private final MetaTypeService metaTypeService;
 
-    /** Data container -> Key: Bundle Instance Value: Configuration PID */
+    /** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
     private final Multimap<Bundle, String> bundlePids;
 
     /** Data container -> Key: Configuration PID Value: Feature DTOs */
@@ -72,32 +71,21 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
 
     @Override
     public Object addingBundle(final Bundle bundle, final BundleEvent event) {
-        //@formatter:off
-        //retrieve list of PIDs associated to Metatype in a bundle
-        final List<String> pids = Optional.of(bundle)
-                                          .map(metaTypeService::getMetaTypeInformation)
-                                          .filter(Objects::nonNull)
-                                          .map(MetaTypeInformation::getPids)
-                                          .map(Arrays::stream)
-                                          .map(s -> s.collect(toList()))
-                                          .orElse(ImmutableList.of());
-
-        pids.stream().forEach(pid -> bundlePids.put(bundle, pid));
-
-        //retrieve list of specified attribute definitions
-        for (final String pid : pids) {
-            final List<AttributeDefinition> attributeDefinitions = getAttributeDefinitions(bundle, pid);
-            attributeDefinitions.stream()
-                                .filter(ad -> ad.getID().startsWith(FEATURE_ID_PREFIX))
-                                .map(ad -> toFeature(ad.getID(),
-                                                     ad.getName(),
-                                                     ad.getDescription(),
-                                                     getDefaultValue(ad),
-                                                     ad.getOptionLabels(),
-                                                     ad.getOptionValues()))
-                                .forEach(f -> allFeatures.put(pid, f));
+        for (final String pid : getPIDs(bundle)) {
+            bundlePids.put(bundle, pid);
+            for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid)) {
+                if (ad.getID().startsWith(FEATURE_ID_PREFIX)) {
+                    //@formatter:off
+                    allFeatures.put(pid, toFeature(ad.getID(),
+                                                   ad.getName(),
+                                                   ad.getDescription(),
+                                                   ad.getDefaultValue(),
+                                                   ad.getOptionLabels(),
+                                                   ad.getOptionValues()));
+                    //@formatter:on
+                }
+            }
         }
-        //@formatter:on
         return bundle;
     }
 
@@ -111,31 +99,31 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
         if (bundlePids.containsKey(bundle)) {
             final Collection<String> pids = bundlePids.get(bundle);
             bundlePids.removeAll(bundle);
-            pids.forEach(allFeatures::removeAll);
+            for (final String pid : pids) {
+                allFeatures.removeAll(pid);
+            }
         }
     }
 
+    private List<String> getPIDs(final Bundle bundle) {
+        final MetaTypeInformation metatypeInfo = metaTypeService.getMetaTypeInformation(bundle);
+        return Lists.newArrayList(metatypeInfo.getPids());
+    }
+
     private List<AttributeDefinition> getAttributeDefinitions(final Bundle bundle, final String pid) {
-        //@formatter:off
-        return Optional.ofNullable(bundle)
-                       .map(metaTypeService::getMetaTypeInformation)
-                       .filter(Objects::nonNull)
-                       .map(m -> m.getObjectClassDefinition(pid, null))
-                       .map(o -> o.getAttributeDefinitions(ALL))
-                       .filter(Objects::nonNull)
-                       .map(Arrays::stream)
-                       .map(s -> s.collect(toList()))
-                       .orElse(ImmutableList.of());
-        //@formatter:on
+        final MetaTypeInformation metaTypeInformation = metaTypeService.getMetaTypeInformation(bundle);
+        final ObjectClassDefinition ocd = metaTypeInformation.getObjectClassDefinition(pid, null);
+        final AttributeDefinition[] ads = ocd.getAttributeDefinitions(ALL);
+        return ads == null ? ImmutableList.of() : Lists.newArrayList(ads);
     }
 
     private static Feature toFeature(final String id, final String name, final String description,
-            final boolean isEnabled, final String[] labels, final String[] values) {
+            final String[] defaultValues, final String[] labels, final String[] values) {
         final Feature feature = new Feature();
         feature.id = extractFeatureID(id);
         feature.name = name;
         feature.description = description;
-        feature.isEnabled = isEnabled;
+        feature.isEnabled = defaultValues == null ? false : Boolean.valueOf(defaultValues[0]);
         feature.tags = combineArrays(labels, values);
         return feature;
     }
@@ -149,11 +137,6 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
                         .boxed()
                         .collect(toMap(i -> labels[i], i -> values[i]));
         //@formatter:on
-    }
-
-    private static boolean getDefaultValue(final AttributeDefinition ad) {
-        final String[] values = ad.getDefaultValue();
-        return values == null ? false : Boolean.valueOf(values[0]);
     }
 
 }
