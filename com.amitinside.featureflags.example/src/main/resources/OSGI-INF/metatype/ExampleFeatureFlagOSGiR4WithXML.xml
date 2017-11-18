@@ -21,12 +21,10 @@
             cardinality="0"
             required="true"
             default="true">
-            <Option label="Label 1"
-                    value="Value 1"/>
+            <Option label="MyPropertyName"
+                    value="MyPropertyValue"/>
             <Option label="developer"
                     value="amit"/>
-            <Option label="team"
-                    value="runtime"/>
         </AD>
 
     </OCD>
