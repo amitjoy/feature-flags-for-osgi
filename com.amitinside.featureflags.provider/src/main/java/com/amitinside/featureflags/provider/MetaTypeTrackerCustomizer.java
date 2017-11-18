@@ -27,6 +27,8 @@ import org.osgi.service.metatype.MetaTypeInformation;
 import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.service.metatype.ObjectClassDefinition;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.provider.FeatureManagerProvider.Feature;
 import com.google.common.collect.ImmutableList;
@@ -39,6 +41,9 @@ import com.google.common.collect.Multimap;
  * information does specify any feature.
  */
 public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer {
+
+    /** Logger Instance */
+    private final Logger logger = LoggerFactory.getLogger(MetaTypeTrackerCustomizer.class);
 
     /** Metatype Service Instance Reference */
     private final MetaTypeService metaTypeService;
@@ -71,6 +76,8 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
 
     @Override
     public Object addingBundle(final Bundle bundle, final BundleEvent event) {
+        logger.trace("Adding bundle [{}] to the Metatype Tracker", bundle.getSymbolicName());
+
         for (final String pid : getPIDs(bundle)) {
             bundlePids.put(bundle, pid);
             for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid)) {
@@ -96,6 +103,8 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
 
     @Override
     public void removedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
+        logger.trace("Removing bundle [{}] from the Metatype Tracker", bundle.getSymbolicName());
+
         if (bundlePids.containsKey(bundle)) {
             final Collection<String> pids = bundlePids.get(bundle);
             bundlePids.removeAll(bundle);
@@ -124,7 +133,7 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
         feature.name = name;
         feature.description = description;
         feature.isEnabled = defaultValues == null ? false : Boolean.valueOf(defaultValues[0]);
-        feature.tags = combineArrays(labels, values);
+        feature.properties = combineArrays(labels, values);
         return feature;
     }
 
