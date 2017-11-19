@@ -100,10 +100,7 @@ or provide a metatype XML with the required configuration in your bundle's `OSGI
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="en_us"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.1.0 http://www.osgi.org/xmlns/metatype/v1.1.0">
-          
+<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="en_us">
     <OCD id="ExampleFeatureFlagOSGiR4WithXML" 
          name="My Feature Configuration">
 
@@ -114,12 +111,10 @@ or provide a metatype XML with the required configuration in your bundle's `OSGI
             cardinality="0"
             required="true"
             default="true">
-            <Option label="Label 1"
-                    value="Value 1"/>
+            <Option label="MyPropertyName"
+                    value="MyPropertyValue"/>
             <Option label="developer"
                     value="amit"/>
-            <Option label="team"
-                    value="runtime"/>
         </AD>
 
     </OCD>
