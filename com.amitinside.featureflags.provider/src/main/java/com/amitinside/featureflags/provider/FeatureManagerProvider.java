@@ -9,24 +9,21 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
+import static com.amitinside.featureflags.provider.ManagerHelper.*;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toMap;
 import static org.osgi.framework.Bundle.ACTIVE;
-import static org.osgi.service.cm.ConfigurationEvent.*;
+import static org.osgi.service.cm.ConfigurationEvent.CM_UPDATED;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
@@ -48,9 +45,10 @@ import org.slf4j.LoggerFactory;
 import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
+import com.amitinside.featureflags.provider.ManagerHelper.Feature;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -126,16 +124,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         this.metaTypeService = null;
     }
 
-    public List<ConfigurationDTO> getConfigs() {
-        //@formatter:off
-        return allFeatures.keys()
-                          .stream()
-                          .map(this::toConfigurationDTO)
-                          .filter(Objects::nonNull)
-                          .collect(toList());
-        //@formatter:on
-    }
-
     @Override
     public Stream<ConfigurationDTO> getConfigurations() {
         //@formatter:off
@@ -154,7 +142,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         //@formatter:off
         return allFeatures.get(configurationPID)
                           .stream()
-                          .map(FeatureManagerProvider::toFeatureDTO);
+                          .map(ManagerHelper::toFeatureDTO);
         //@formatter:on
     }
 
@@ -167,31 +155,31 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     }
 
     @Override
-    public Optional<FeatureDTO> getFeature(final String configurationPID, final String featureName) {
+    public Optional<FeatureDTO> getFeature(final String configurationPID, final String featureID) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
-        requireNonNull(featureName, "Feature Name cannot be null");
+        requireNonNull(featureID, "Feature ID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
-        checkArgument(!featureName.isEmpty(), "Feature Name cannot be empty");
+        checkArgument(!featureID.isEmpty(), "Feature ID cannot be empty");
 
         //@formatter:off
         return allFeatures.get(configurationPID)
                           .stream()
-                          .filter(f -> f.name.equalsIgnoreCase(featureName))
+                          .filter(f -> f.id.equalsIgnoreCase(featureID))
                           .findAny()
-                          .map(FeatureManagerProvider::toFeatureDTO);
+                          .map(ManagerHelper::toFeatureDTO);
         //@formatter:on
     }
 
     @Override
-    public CompletableFuture<Void> updateFeature(final String configurationPID, final String featureName,
+    public CompletableFuture<Void> updateFeature(final String configurationPID, final String featureID,
             final boolean isEnabled) {
         requireNonNull(configurationPID, "Configuration PID cannot be null");
-        requireNonNull(featureName, "Feature Name cannot be null");
+        requireNonNull(featureID, "Feature ID cannot be null");
         checkArgument(!configurationPID.isEmpty(), "Configuration PID cannot be empty");
-        checkArgument(!featureName.isEmpty(), "Feature Name cannot be empty");
+        checkArgument(!featureID.isEmpty(), "Feature ID cannot be empty");
 
         final Map<String, Object> props = Maps.newHashMap();
-        props.put(FEATURE_ID_PREFIX + featureName, isEnabled);
+        props.put(FEATURE_ID_PREFIX + featureID, isEnabled);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         return CompletableFuture.runAsync(() -> {
             try {
@@ -199,9 +187,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 if (configuration != null) {
                     configuration.update(new Hashtable<>(filteredProps));
                 }
-            } catch (final IOException e) {
-                throw new RuntimeException(
-                        String.format("Cannot update feature [%s] with PID [%s]", featureName, configurationPID));
+            } catch (final Exception e) {
+                Throwables.propagate(e);
             }
         });
     }
@@ -211,7 +198,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         final int type = event.getType();
         final String pid = event.getPid();
         final Map<String, Boolean> configuredFeatures = getConfiguredFeatures(pid);
-        if (!configuredFeatures.isEmpty() && type == CM_UPDATED) {
+        if (type == CM_UPDATED) {
             for (final Entry<String, Boolean> entry : configuredFeatures.entrySet()) {
                 final String featureID = entry.getKey();
                 final boolean isEnabled = entry.getValue();
@@ -222,8 +209,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                         .forEach(f -> f.isEnabled = isEnabled);
                 //@formatter:on
             }
-        }
-        if (type == CM_DELETED) {
+        } else {
             allFeatures.removeAll(pid);
         }
     }
@@ -231,25 +217,15 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     private Map<String, Boolean> getConfiguredFeatures(final String configurationPID) {
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
-            if (configuration != null) {
-                @SuppressWarnings("unchecked")
-                final Dictionary<String, Object> properties = configuration.getProperties();
-                final Iterator<String> keysIterator = Iterators.forEnumeration(properties.keys());
-                final Map<String, Object> props = Maps.toMap(keysIterator, properties::get);
-                final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-
-                final Function<? super Entry<String, Object>, ? extends String> keyMapper = e -> extractFeatureID(
-                        e.getKey());
-                final Function<? super Entry<String, Object>, ? extends Boolean> valueMapper = e -> (Boolean) e
-                        .getValue();
-
-                //@formatter:off
-                return filteredProps.entrySet().stream()
-                                               .filter(e -> e.getKey().startsWith(FEATURE_ID_PREFIX))
-                                               .filter(e -> e.getValue() instanceof Boolean)
-                                               .collect(toMap(keyMapper, valueMapper));
-                //@formatter:on
-            }
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> properties = asMap(configuration.getProperties());
+            //@formatter:off
+            return properties.entrySet().stream()
+                                        .filter(e -> e.getKey().startsWith(FEATURE_ID_PREFIX))
+                                        .filter(e -> e.getValue() instanceof Boolean)
+                                        .collect(toMap(e -> extractFeatureID(e.getKey()),
+                                                       e -> (Boolean) e.getValue()));
+            //@formatter:on
         } catch (final IOException e) {
             logger.error("Cannot retrieve configuration for {}", configurationPID, e);
         }
@@ -261,43 +237,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         if (features.isEmpty()) {
             return null;
         }
-        return toConfigurationDTO(configurationPID, Lists.newArrayList(features));
-    }
-
-    private static ConfigurationDTO toConfigurationDTO(final String pid, final List<Feature> features) {
-        final ConfigurationDTO config = new ConfigurationDTO();
-        config.pid = pid;
-        //@formatter:off
-        config.features = features.stream()
-                                  .map(FeatureManagerProvider::toFeatureDTO)
-                                  .collect(toList());
-        //@formatter:on
-        return config;
-    }
-
-    private static FeatureDTO toFeatureDTO(final Feature f) {
-        final FeatureDTO feature = new FeatureDTO();
-        feature.id = f.id;
-        feature.name = f.name;
-        feature.description = f.description;
-        feature.isEnabled = f.isEnabled;
-        feature.properties = f.properties;
-        return feature;
-    }
-
-    static String extractFeatureID(final String id) {
-        return id.substring(FEATURE_ID_PREFIX.length(), id.length());
-    }
-
-    /**
-     * Placeholder for Feature DTO. Used for internal purposes.
-     */
-    static class Feature {
-        public String id;
-        public String name;
-        public String description;
-        public boolean isEnabled;
-        public Map<String, String> properties;
+        return ManagerHelper.toConfigurationDTO(configurationPID, Lists.newArrayList(features));
     }
 
 }
