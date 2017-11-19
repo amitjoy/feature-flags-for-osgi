@@ -179,7 +179,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         checkArgument(!featureID.isEmpty(), "Feature ID cannot be empty");
 
         final Map<String, Object> props = Maps.newHashMap();
-        props.put(FEATURE_ID_PREFIX + featureID, isEnabled);
+        props.put(METATYPE_FEATURE_ID_PREFIX + featureID, isEnabled);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
         return CompletableFuture.runAsync(() -> {
             try {
@@ -221,7 +221,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
             final Map<String, Object> properties = asMap(configuration.getProperties());
             //@formatter:off
             return properties.entrySet().stream()
-                                        .filter(e -> e.getKey().startsWith(FEATURE_ID_PREFIX))
+                                        .filter(e -> e.getKey().startsWith(METATYPE_FEATURE_ID_PREFIX))
                                         .filter(e -> e.getValue() instanceof Boolean)
                                         .collect(toMap(e -> extractFeatureID(e.getKey()),
                                                        e -> (Boolean) e.getValue()));

@@ -9,7 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.FeatureManager.FEATURE_ID_PREFIX;
+import static com.amitinside.featureflags.FeatureManager.METATYPE_FEATURE_ID_PREFIX;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.*;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
@@ -56,7 +56,7 @@ public final class ManagerHelper {
 
     public static String extractFeatureID(final String id) {
         requireNonNull(id, "Feature ID cannot be null");
-        return id.substring(FEATURE_ID_PREFIX.length(), id.length());
+        return id.substring(METATYPE_FEATURE_ID_PREFIX.length(), id.length());
     }
 
     public static FeatureDTO toFeatureDTO(final Feature f) {

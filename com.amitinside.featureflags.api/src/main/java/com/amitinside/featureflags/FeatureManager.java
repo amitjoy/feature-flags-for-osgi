@@ -49,10 +49,10 @@ public interface FeatureManager {
 
     /**
      * The prefix of the feature identifier pattern. This prefix should be used
-     * with the feature id in OSGi Configuration to identify unique features
-     * in an OSGi configuration.
+     * with the feature id in OSGi Metatype XML Configuration to identify unique
+     * features in an OSGi configuration.
      */
-    public static final String FEATURE_ID_PREFIX = "osgi.feature.";
+    String METATYPE_FEATURE_ID_PREFIX = "osgi.feature.";
 
     /**
      * Retrieve all (known) {@link ConfigurationDTO} instances

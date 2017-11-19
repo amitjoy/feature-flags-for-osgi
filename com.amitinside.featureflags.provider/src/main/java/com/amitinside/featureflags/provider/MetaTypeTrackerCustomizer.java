@@ -9,7 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.FeatureManager.FEATURE_ID_PREFIX;
+import static com.amitinside.featureflags.FeatureManager.METATYPE_FEATURE_ID_PREFIX;
 import static com.amitinside.featureflags.provider.ManagerHelper.*;
 import static java.util.Objects.requireNonNull;
 
@@ -68,7 +68,7 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
         for (final String pid : getPIDs(bundle, metaTypeService)) {
             bundlePids.put(bundle, pid);
             for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {
-                if (ad.getID().startsWith(FEATURE_ID_PREFIX)) {
+                if (ad.getID().startsWith(METATYPE_FEATURE_ID_PREFIX)) {
                     logger.trace("Found bundle [{}] with feature(s)", bundle.getSymbolicName());
                     //@formatter:off
                     allFeatures.put(pid, toFeature(ad.getID(),
