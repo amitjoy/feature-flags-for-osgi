@@ -182,13 +182,10 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<_include>META-INF/MANIFEST.MF</_include>
-						<_removeheaders>
-							Require-Capability, Provide-Capability, Private-Package, Include-Resource,
-							Tool, Created-By,
-							Built-By, Bnd-LastModified
-						</_removeheaders>
-						<_donotcopy>Test$, Mock$</_donotcopy>
+						<Bundle-Copyright>Copyright (c) 2017 Amit Kumar Mondal</Bundle-Copyright>
+						<Bundle-SCM>https://github.com/amitjoy/feature-flags-osgi</Bundle-SCM>
+						<Bundle-DocURL>https://github.com/amitjoy/feature-flags-osgi</Bundle-DocURL>
+						<Bundle-Icon>logo.png</Bundle-Icon>
 					</instructions>
 				</configuration>
 			</plugin>
