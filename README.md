@@ -34,16 +34,16 @@ This project comprises four bundles -
 
 The implementation provider bundle does require the following open source libraries:
 
-1. Google Guava 15+ (Apache 2.0)
-2. [OSGi DTO](http://search.maven.org/#artifactdetails%7Corg.osgi%7Corg.osgi.dto%7C1.0.0%7Cjar) (Apache 2.0) (**Required** if and only if **OSGi Version prior to R5**)
-3. [Felix Utilities](http://search.maven.org/#artifactdetails%7Corg.everit.osgi.bundles%7Corg.everit.osgi.bundles.org.apache.felix.utils%7C1.6.0%7Cjar) (Apache 2.0)
+1. Google Guava 15+
+2. [OSGi DTO](http://search.maven.org/#artifactdetails%7Corg.osgi%7Corg.osgi.dto%7C1.0.0%7Cjar) (**Required** if and only if **OSGi Version prior to R6**)
+3. [Apache Felix Utilities](http://search.maven.org/#artifactdetails%7Corg.everit.osgi.bundles%7Corg.everit.osgi.bundles.org.apache.felix.utils%7C1.6.0%7Cjar)
 
 As test dependencies, the following test libraries are used:
 
-1. JUnit 4.12 (EPL 1.0)
-3. Mockito Core 2.10 (MIT)
+1. JUnit 4.12
+3. Mockito Core 2.10
 
-The REST bundle requires [OSGi JAX-RS Connector](https://github.com/hstaudacher/osgi-jax-rs-connector)
+The REST bundle requires [OSGi JAX-RS Connector](https://github.com/hstaudacher/osgi-jax-rs-connector).
 
 ----------------------------------------------------------------
 
