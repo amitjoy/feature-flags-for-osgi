@@ -14,6 +14,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 import static org.osgi.service.cm.ConfigurationEvent.CM_UPDATED;
+import static org.osgi.service.log.LogService.LOG_ERROR;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.apache.felix.utils.collections.DictionaryAsMap;
+import org.apache.felix.utils.log.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.Configuration;
@@ -37,8 +39,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.metatype.MetaTypeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.dto.ConfigurationDTO;
@@ -57,9 +57,6 @@ import com.google.common.collect.Multimap;
 @Component(name = "FeatureManager", immediate = true)
 public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
 
-    /** Logger Instance */
-    private final Logger logger = LoggerFactory.getLogger(FeatureManagerProvider.class);
-
     /** Data container -> Key: Configuration PID Value: Feature DTOs */
     private final Multimap<String, Feature> allFeatures = ArrayListMultimap.create();
 
@@ -75,9 +72,13 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     /** Metatype Extender Instance Reference */
     private MetaTypeExtender extender;
 
+    /** Logger Instance */
+    private Logger logger;
+
     @Activate
     protected void activate(final BundleContext bundleContext) throws Exception {
-        extender = new MetaTypeExtender(metaTypeService, bundlePids, allFeatures);
+        logger = new Logger(bundleContext);
+        extender = new MetaTypeExtender(metaTypeService, logger, bundlePids, allFeatures);
         extender.start(bundleContext);
     }
 
@@ -219,7 +220,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                                                        e -> (Boolean) e.getValue()));
             //@formatter:on
         } catch (final IOException e) {
-            logger.error("Cannot retrieve configuration for {}", configurationPID, e);
+            logger.log(LOG_ERROR, String.format("Cannot retrieve configuration for %s", configurationPID), e);
         }
         return ImmutableMap.of();
     }

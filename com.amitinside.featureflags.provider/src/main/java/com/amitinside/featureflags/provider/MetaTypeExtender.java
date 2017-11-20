@@ -12,17 +12,17 @@ package com.amitinside.featureflags.provider;
 import static com.amitinside.featureflags.FeatureManager.METATYPE_FEATURE_ID_PREFIX;
 import static com.amitinside.featureflags.provider.ManagerHelper.*;
 import static java.util.Objects.requireNonNull;
+import static org.osgi.service.log.LogService.*;
 
 import java.util.Collection;
 
 import org.apache.felix.utils.extender.AbstractExtender;
 import org.apache.felix.utils.extender.Extension;
 import org.apache.felix.utils.extender.SimpleExtension;
+import org.apache.felix.utils.log.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.amitinside.featureflags.provider.ManagerHelper.Feature;
 import com.google.common.collect.Multimap;
@@ -41,7 +41,7 @@ import com.google.common.collect.Multimap;
 public final class MetaTypeExtender extends AbstractExtender {
 
     /** Logger Instance */
-    private final Logger logger = LoggerFactory.getLogger(MetaTypeExtender.class);
+    private final Logger logger;
 
     /** Metatype Service Instance Reference */
     private final MetaTypeService metaTypeService;
@@ -61,8 +61,9 @@ public final class MetaTypeExtender extends AbstractExtender {
      *
      * @throws NullPointerException if any of the specified arguments is {@code null}
      */
-    public MetaTypeExtender(final MetaTypeService metaTypeService, final Multimap<Bundle, String> bundlePids,
-            final Multimap<String, Feature> allFeatures) {
+    public MetaTypeExtender(final MetaTypeService metaTypeService, final Logger logger,
+            final Multimap<Bundle, String> bundlePids, final Multimap<String, Feature> allFeatures) {
+        this.logger = requireNonNull(logger, "Logger instance cannot be null");
         this.metaTypeService = requireNonNull(metaTypeService, "MetaTypeService instance cannot be null");
         this.bundlePids = requireNonNull(bundlePids, "Multimap instance cannot be null");
         this.allFeatures = requireNonNull(allFeatures, "Multimap instance cannot be null");
@@ -75,17 +76,17 @@ public final class MetaTypeExtender extends AbstractExtender {
 
     @Override
     protected void debug(final Bundle bundle, final String msg) {
-        logger.debug(msg);
+        logger.log(LOG_DEBUG, msg);
     }
 
     @Override
     protected void warn(final Bundle bundle, final String msg, final Throwable t) {
-        logger.warn(msg);
+        logger.log(LOG_WARNING, msg);
     }
 
     @Override
     protected void error(final String msg, final Throwable t) {
-        logger.error(msg, t);
+        logger.log(LOG_ERROR, msg, t);
     }
 
     private class MetatypeExtension extends SimpleExtension {
