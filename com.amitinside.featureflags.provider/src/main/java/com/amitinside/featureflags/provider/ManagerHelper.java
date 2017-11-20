@@ -14,14 +14,11 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.*;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
-import java.util.Dictionary;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
+import org.apache.felix.utils.collections.DictionaryAsMap;
 import org.apache.felix.utils.manifest.Clause;
-import org.apache.felix.utils.manifest.Directive;
 import org.apache.felix.utils.manifest.Parser;
 import org.osgi.framework.Bundle;
 import org.osgi.service.metatype.AttributeDefinition;
@@ -33,8 +30,6 @@ import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Maps;
 
 /**
  * Feature Manager Helper class
@@ -133,40 +128,27 @@ public final class ManagerHelper {
         return elements == null ? ImmutableList.of() : ImmutableList.copyOf(elements);
     }
 
-    public static <K, V> Map<K, V> asMap(final Dictionary<K, V> properties) {
-        requireNonNull(properties, "Dictionary Instance cannot be null");
-
-        final Iterator<K> keysIterator = Iterators.forEnumeration(properties.keys());
-        final Map<K, V> props = Maps.toMap(keysIterator, properties::get);
-        return Maps.filterValues(props, Objects::nonNull);
-    }
-
-    public static boolean hasFeatureRequirementCapability(final Bundle bundle) {
+    public static boolean hasFeatureCapability(final Bundle bundle) {
         requireNonNull(bundle, "Bundle Instance cannot be null");
 
         final String extenderNamespace = "osgi.extender";
         final String capabilityToMatch = "(" + extenderNamespace + "=" + FEATURE_CAPABILITY_NAME + ")";
 
         @SuppressWarnings("unchecked")
-        final Map<String, String> headers = asMap(bundle.getHeaders());
+        final Map<String, String> headers = new DictionaryAsMap<>(bundle.getHeaders());
         final String header = headers.get("Require-Capability");
 
-        boolean isFeatureCapabilityFound = false;
-        if (header != null) {
-            final Clause[] clauses = Parser.parseHeader(header);
-            for (final Clause clause : clauses) {
-                final String nameSpace = clause.getName();
-                if (extenderNamespace.equals(nameSpace)) {
-                    final Directive[] directives = clause.getDirectives();
-                    for (final Directive directive : directives) {
-                        if ("filter".equals(directive.getName())) {
-                            isFeatureCapabilityFound = capabilityToMatch.contains(directive.getValue());
-                        }
-                    }
+        final Clause[] clauses = Parser.parseHeader(header);
+        for (final Clause clause : clauses) {
+            final String nameSpace = clause.getName();
+            if (extenderNamespace.equals(nameSpace)) {
+                final String directive = clause.getDirective("filter");
+                if (capabilityToMatch.contains(directive)) {
+                    return true;
                 }
             }
         }
-        return isFeatureCapabilityFound;
+        return false;
     }
 
 }

@@ -9,11 +9,10 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.provider.ManagerHelper.*;
+import static com.amitinside.featureflags.provider.ManagerHelper.extractFeatureID;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
-import static org.osgi.framework.Bundle.ACTIVE;
 import static org.osgi.service.cm.ConfigurationEvent.CM_UPDATED;
 
 import java.io.IOException;
@@ -26,6 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import org.apache.felix.utils.collections.DictionaryAsMap;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.Configuration;
@@ -37,8 +37,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.metatype.MetaTypeService;
-import org.osgi.util.tracker.BundleTracker;
-import org.osgi.util.tracker.BundleTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,24 +72,18 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     /** Metatype Service Instance Reference */
     private MetaTypeService metaTypeService;
 
-    /** Bundle Tracker Instance Reference */
-    private BundleTracker bundleTracker;
+    /** Metatype Extender Instance Reference */
+    private MetaTypeExtender extender;
 
     @Activate
-    protected void activate(final BundleContext bundleContext) {
-        // track all bundles for existing features in metatype
-        final BundleTrackerCustomizer customizer = new MetaTypeTrackerCustomizer(metaTypeService, bundlePids,
-                allFeatures);
-        bundleTracker = new BundleTracker(bundleContext, ACTIVE, customizer);
-        bundleTracker.open();
+    protected void activate(final BundleContext bundleContext) throws Exception {
+        extender = new MetaTypeExtender(metaTypeService, bundlePids, allFeatures);
+        extender.start(bundleContext);
     }
 
     @Deactivate
-    protected void deactivate() {
-        if (bundleTracker != null) {
-            bundleTracker.close();
-            bundleTracker = null;
-        }
+    protected void deactivate(final BundleContext bundleContext) throws Exception {
+        extender.stop(bundleContext);
     }
 
     /**
@@ -218,7 +210,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         try {
             final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             @SuppressWarnings("unchecked")
-            final Map<String, Object> properties = asMap(configuration.getProperties());
+            final Map<String, Object> properties = new DictionaryAsMap<>(configuration.getProperties());
             //@formatter:off
             return properties.entrySet().stream()
                                         .filter(e -> e.getKey().startsWith(METATYPE_FEATURE_ID_PREFIX))
