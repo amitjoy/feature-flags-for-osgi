@@ -110,7 +110,7 @@ public final class ManagerHelper {
 
         final MetaTypeInformation metaTypeInformation = metaTypeService.getMetaTypeInformation(bundle);
         final ObjectClassDefinition ocd = metaTypeInformation.getObjectClassDefinition(pid, null);
-        return ManagerHelper.asList(ocd.getAttributeDefinitions(ALL));
+        return asList(ocd.getAttributeDefinitions(ALL));
     }
 
     public static <K, V> Map<K, V> mergeAsMap(final K[] labels, final V[] values) {

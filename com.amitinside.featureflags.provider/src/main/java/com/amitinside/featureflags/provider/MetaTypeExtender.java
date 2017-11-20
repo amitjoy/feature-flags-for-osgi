@@ -76,12 +76,12 @@ public final class MetaTypeExtender extends AbstractExtender {
 
     @Override
     protected void debug(final Bundle bundle, final String msg) {
-        logger.log(LOG_DEBUG, msg);
+        logger.log(LOG_DEBUG, " [" + bundle.getSymbolicName() + "] " + msg);
     }
 
     @Override
     protected void warn(final Bundle bundle, final String msg, final Throwable t) {
-        logger.log(LOG_WARNING, msg);
+        logger.log(LOG_WARNING, " [" + bundle.getSymbolicName() + "] " + msg);
     }
 
     @Override
@@ -101,18 +101,7 @@ public final class MetaTypeExtender extends AbstractExtender {
         protected void doStart() throws Exception {
             for (final String pid : getPIDs(bundle, metaTypeService)) {
                 bundlePids.put(bundle, pid);
-                for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {
-                    if (ad.getID().startsWith(METATYPE_FEATURE_ID_PREFIX)) {
-                        //@formatter:off
-                        allFeatures.put(pid, toFeature(ad.getID(),
-                                                       ad.getName(),
-                                                       ad.getDescription(),
-                                                       ad.getDefaultValue(),
-                                                       ad.getOptionLabels(),
-                                                       ad.getOptionValues()));
-                        //@formatter:on
-                    }
-                }
+                extractFeatureFromADs(pid);
             }
         }
 
@@ -123,6 +112,21 @@ public final class MetaTypeExtender extends AbstractExtender {
                 allFeatures.removeAll(pid);
             }
             bundlePids.removeAll(bundle);
+        }
+
+        private void extractFeatureFromADs(final String pid) {
+            for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {
+                if (ad.getID().startsWith(METATYPE_FEATURE_ID_PREFIX)) {
+                    //@formatter:off
+                    allFeatures.put(pid, toFeature(ad.getID(),
+                                                   ad.getName(),
+                                                   ad.getDescription(),
+                                                   ad.getDefaultValue(),
+                                                   ad.getOptionLabels(),
+                                                   ad.getOptionValues()));
+                    //@formatter:on
+                }
+            }
         }
     }
 

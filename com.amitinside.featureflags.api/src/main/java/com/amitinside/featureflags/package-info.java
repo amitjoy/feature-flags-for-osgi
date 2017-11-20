@@ -8,7 +8,7 @@
  *
  *******************************************************************************/
 /**
- * Provides API for managing feature instances
+ * Provides API for managing feature flags instances
  *
  * <p>
  * Bundles wishing to use this package must list the package in the
