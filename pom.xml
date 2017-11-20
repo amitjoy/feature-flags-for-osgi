@@ -63,7 +63,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<felix.core.version>1.4.0</felix.core.version>
 		<felix.compendium.version>1.4.0</felix.compendium.version>
-		<felix.compendium.version>1.4.0</felix.compendium.version>
+		<felix.utils.version>1.6.0</felix.utils.version>
 		<osgi.dto.version>1.0.0</osgi.dto.version>
 		<guava.version>15.0</guava.version>
 		<slf4j.version>1.7.5</slf4j.version>
@@ -125,6 +125,11 @@
 			<artifactId>org.osgi.service.metatype.annotations</artifactId>
 			<version>${osgi.annotation.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.everit.osgi.bundles</groupId>
+			<artifactId>org.everit.osgi.bundles.org.apache.felix.utils</artifactId>
+			<version>${felix.utils.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

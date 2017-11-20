@@ -65,6 +65,9 @@ public final class MetaTypeTrackerCustomizer implements BundleTrackerCustomizer 
     public Object addingBundle(final Bundle bundle, final BundleEvent event) {
         logger.trace("Adding bundle [{}] to the Metatype Tracker", bundle.getSymbolicName());
 
+        if (!hasFeatureRequirementCapability(bundle)) {
+            return null;
+        }
         for (final String pid : getPIDs(bundle, metaTypeService)) {
             bundlePids.put(bundle, pid);
             for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {

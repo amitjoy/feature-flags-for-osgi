@@ -55,6 +55,21 @@ public interface FeatureManager {
     String METATYPE_FEATURE_ID_PREFIX = "osgi.feature.";
 
     /**
+     * Capability name for feature
+     *
+     * <p>
+     * Used in {@code Provide-Capability} and {@code Require-Capability}
+     * manifest headers with the {@code osgi.extender} namespace. For example:
+     * </p>
+     *
+     * <pre>
+     * Require-Capability: osgi.extender;
+     *  filter:="(&amp;(osgi.extender=osgi.feature)(version&gt;=1.0)(!(version&gt;=2.0)))"
+     * </pre>
+     */
+    String FEATURE_CAPABILITY_NAME = "osgi.feature";
+
+    /**
      * Retrieve all (known) {@link ConfigurationDTO} instances
      * <p>
      * {@link ConfigurationDTO}s are known if they comprise features

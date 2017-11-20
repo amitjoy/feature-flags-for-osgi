@@ -9,7 +9,7 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.FeatureManager.METATYPE_FEATURE_ID_PREFIX;
+import static com.amitinside.featureflags.FeatureManager.*;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.*;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.felix.utils.manifest.Clause;
+import org.apache.felix.utils.manifest.Directive;
+import org.apache.felix.utils.manifest.Parser;
 import org.osgi.framework.Bundle;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeInformation;
@@ -136,6 +139,34 @@ public final class ManagerHelper {
         final Iterator<K> keysIterator = Iterators.forEnumeration(properties.keys());
         final Map<K, V> props = Maps.toMap(keysIterator, properties::get);
         return Maps.filterValues(props, Objects::nonNull);
+    }
+
+    public static boolean hasFeatureRequirementCapability(final Bundle bundle) {
+        requireNonNull(bundle, "Bundle Instance cannot be null");
+
+        final String extenderNamespace = "osgi.extender";
+        final String capabilityToMatch = "(" + extenderNamespace + "=" + FEATURE_CAPABILITY_NAME + ")";
+
+        @SuppressWarnings("unchecked")
+        final Map<String, String> headers = asMap(bundle.getHeaders());
+        final String header = headers.get("Require-Capability");
+
+        boolean isFeatureCapabilityFound = false;
+        if (header != null) {
+            final Clause[] clauses = Parser.parseHeader(header);
+            for (final Clause clause : clauses) {
+                final String nameSpace = clause.getName();
+                if (extenderNamespace.equals(nameSpace)) {
+                    final Directive[] directives = clause.getDirectives();
+                    for (final Directive directive : directives) {
+                        if ("filter".equals(directive.getName())) {
+                            isFeatureCapabilityFound = capabilityToMatch.contains(directive.getValue());
+                        }
+                    }
+                }
+            }
+        }
+        return isFeatureCapabilityFound;
     }
 
 }

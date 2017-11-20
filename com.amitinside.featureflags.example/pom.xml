@@ -45,6 +45,21 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>${maven-bundle-plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-Copyright>Copyright (c) 2017 Amit Kumar Mondal</Bundle-Copyright>
+						<Bundle-SCM>https://github.com/amitjoy/feature-flags-osgi</Bundle-SCM>
+						<Bundle-DocURL>https://github.com/amitjoy/feature-flags-osgi</Bundle-DocURL>
+						<Bundle-Icon>logo.png</Bundle-Icon>
+						<Require-Capability>osgi.extender;filter:="(osgi.extender=osgi.feature)"</Require-Capability>
+					</instructions>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
