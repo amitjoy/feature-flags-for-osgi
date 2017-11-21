@@ -34,7 +34,7 @@ This project comprises four bundles -
 
 The implementation provider bundle does require the following open source libraries:
 
-1. Google Guava 15+
+1. [Google Guava 15+](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.google.guava%22%20AND%20a%3A%22guava%22)
 2. [OSGi DTO](http://search.maven.org/#artifactdetails%7Corg.osgi%7Corg.osgi.dto%7C1.0.0%7Cjar) (**Required** if and only if **OSGi Version prior to R6**)
 3. [Apache Felix Utilities](http://search.maven.org/#artifactdetails%7Corg.everit.osgi.bundles%7Corg.everit.osgi.bundles.org.apache.felix.utils%7C1.6.0%7Cjar)
 
@@ -132,7 +132,7 @@ Require-Capability: osgi.extender;filter:="(osgi.extender=osgi.feature)"
 
 4. The primary contract of using feature flags in your codebase is to introduce boolean attribute definitions to existing or new object class definitions in metatype. The IDs of the attribute definitions must be **osgi.feature.X** where X is the name of your feature. And don't forget to add the aforementioned requirement capability to your manifest.
 
-5. Even though OSGi Capability Model is only available since OSGi R4.3, this is required for older versions too to tag bundles using feature flags. The benefit of this requirement is that as soon as the user starts using OSGi R4.3 and later, all the benefits of OSGi Capability Model will be in effect. And that's why it is required.
+5. Even though OSGi Capability Model is only available since OSGi R4.3, this is required for older versions as well to tag bundles that want to use feature flags. The benefit of this requirement is that as soon as the user starts using OSGi R4.3 and later, all the benefits of OSGi Capability Model will be in effect. And that's why it is required.
 
 #### The primary benefit of this approach is that developers can use feature flags without having any dependency to any external API.
 
