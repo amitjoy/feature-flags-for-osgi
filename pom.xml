@@ -39,6 +39,10 @@
 		<url>git@github.com:amitjoy/feature-flags-osgi.git</url>
 	</scm>
 
+	<ciManagement>
+		<url>https://travis-ci.org/amitjoy/feature-flags-for-osgi</url>
+	</ciManagement>
+
 	<distributionManagement>
 		<repository>
 			<id>oss.sonatype.org</id>
