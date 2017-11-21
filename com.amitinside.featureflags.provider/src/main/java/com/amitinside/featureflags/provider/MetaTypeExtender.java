@@ -9,7 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.FeatureManager.METATYPE_FEATURE_ID_PREFIX;
 import static com.amitinside.featureflags.provider.ManagerHelper.*;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.service.log.LogService.*;
@@ -21,7 +20,6 @@ import org.apache.felix.utils.extender.Extension;
 import org.apache.felix.utils.extender.SimpleExtension;
 import org.apache.felix.utils.log.Logger;
 import org.osgi.framework.Bundle;
-import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeService;
 
 import com.amitinside.featureflags.provider.ManagerHelper.Feature;
@@ -100,8 +98,9 @@ public final class MetaTypeExtender extends AbstractExtender {
         @Override
         protected void doStart() throws Exception {
             for (final String pid : getPIDs(bundle, metaTypeService)) {
-                bundlePids.put(bundle, pid);
-                extractFeatureFromADs(pid);
+                if (allFeatures.putAll(getFeaturesFromAttributeDefinitions(bundle, pid, metaTypeService))) {
+                    bundlePids.put(bundle, pid);
+                }
             }
         }
 
@@ -114,20 +113,6 @@ public final class MetaTypeExtender extends AbstractExtender {
             bundlePids.removeAll(bundle);
         }
 
-        private void extractFeatureFromADs(final String pid) {
-            for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {
-                if (ad.getID().startsWith(METATYPE_FEATURE_ID_PREFIX)) {
-                    //@formatter:off
-                    allFeatures.put(pid, toFeature(ad.getID(),
-                                                   ad.getName(),
-                                                   ad.getDescription(),
-                                                   ad.getDefaultValue(),
-                                                   ad.getOptionLabels(),
-                                                   ad.getOptionValues()));
-                    //@formatter:on
-                }
-            }
-        }
     }
 
 }

@@ -28,8 +28,10 @@ import org.osgi.service.metatype.ObjectClassDefinition;
 
 import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 
 /**
  * Feature Manager Helper class
@@ -111,6 +113,28 @@ public final class ManagerHelper {
         final MetaTypeInformation metaTypeInformation = metaTypeService.getMetaTypeInformation(bundle);
         final ObjectClassDefinition ocd = metaTypeInformation.getObjectClassDefinition(pid, null);
         return asList(ocd.getAttributeDefinitions(ALL));
+    }
+
+    public static Multimap<String, Feature> getFeaturesFromAttributeDefinitions(final Bundle bundle,
+            final String pid, final MetaTypeService metaTypeService) {
+        requireNonNull(bundle, "Bundle Instance cannot be null");
+        requireNonNull(pid, "Configuration PID cannot be null");
+        requireNonNull(metaTypeService, "Metatype Service Instance cannot be null");
+
+        final Multimap<String, Feature> allFeatures = ArrayListMultimap.create();
+        for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {
+            if (ad.getID().startsWith(METATYPE_FEATURE_ID_PREFIX)) {
+                //@formatter:off
+                allFeatures.put(pid, toFeature(ad.getID(),
+                                               ad.getName(),
+                                               ad.getDescription(),
+                                               ad.getDefaultValue(),
+                                               ad.getOptionLabels(),
+                                               ad.getOptionValues()));
+                //@formatter:on
+            }
+        }
+        return allFeatures;
     }
 
     public static <K, V> Map<K, V> mergeAsMap(final K[] labels, final V[] values) {
