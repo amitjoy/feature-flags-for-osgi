@@ -54,6 +54,7 @@ import com.google.common.collect.Multimap;
 /**
  * This implements the {@link FeatureManager}.
  */
+@ProvideFeatureCapability
 @Component(name = "FeatureManager", immediate = true)
 public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
 
