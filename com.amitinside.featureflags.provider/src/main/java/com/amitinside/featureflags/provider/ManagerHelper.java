@@ -108,18 +108,18 @@ public final class ManagerHelper {
             final MetaTypeService metaTypeService) {
         requireNonNull(bundle, "Bundle Instance cannot be null");
         requireNonNull(pid, "Configuration PID cannot be null");
-        requireNonNull(metaTypeService, "Metatype Service Instance cannot be null");
+        requireNonNull(metaTypeService, "MetaType Service Instance cannot be null");
 
         final MetaTypeInformation metaTypeInformation = metaTypeService.getMetaTypeInformation(bundle);
         final ObjectClassDefinition ocd = metaTypeInformation.getObjectClassDefinition(pid, null);
         return asList(ocd.getAttributeDefinitions(ALL));
     }
 
-    public static Multimap<String, Feature> getFeaturesFromAttributeDefinitions(final Bundle bundle,
-            final String pid, final MetaTypeService metaTypeService) {
+    public static Multimap<String, Feature> getFeaturesFromAttributeDefinitions(final Bundle bundle, final String pid,
+            final MetaTypeService metaTypeService) {
         requireNonNull(bundle, "Bundle Instance cannot be null");
         requireNonNull(pid, "Configuration PID cannot be null");
-        requireNonNull(metaTypeService, "Metatype Service Instance cannot be null");
+        requireNonNull(metaTypeService, "MetaType Service Instance cannot be null");
 
         final Multimap<String, Feature> allFeatures = ArrayListMultimap.create();
         for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {

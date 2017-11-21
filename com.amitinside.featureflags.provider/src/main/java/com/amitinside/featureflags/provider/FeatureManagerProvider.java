@@ -118,6 +118,10 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         this.metaTypeService = null;
     }
 
+    protected MetaTypeExtender getExtender() {
+        return extender;
+    }
+
     @Override
     public Stream<ConfigurationDTO> getConfigurations() {
         //@formatter:off

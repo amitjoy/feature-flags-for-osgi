@@ -112,7 +112,6 @@ public final class MetaTypeExtender extends AbstractExtender {
             }
             bundlePids.removeAll(bundle);
         }
-
     }
 
 }
