@@ -68,7 +68,7 @@ public final class ManagerHelper {
         requireNonNull(id, "Feature ID cannot be null");
         final Feature feature = new Feature();
         feature.id = extractFeatureID(id);
-        feature.name = name;
+        feature.name = name != null ? name : feature.id;
         feature.description = description;
         feature.isEnabled = defaultValues == null ? false : Boolean.valueOf(defaultValues[0]);
         feature.bundleId = bundleId;
