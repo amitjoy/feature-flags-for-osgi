@@ -9,17 +9,17 @@
  *******************************************************************************/
 package com.amitinside.featureflags.rest;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -34,8 +34,9 @@ import com.amitinside.featureflags.dto.FeatureDTO;
  * <ul>
  * <li>GET: /featureflags/features</li>
  * <li>GET: /featureflags/features/{featureID}</li>
- * <li>PUT: /featureflags/features/{featureID}?isEnabled=true</li>
+ * <li>PUT: /featureflags/features/{featureID}</li>
  * </ul>
+ * PUT Request Body: boolean value
  * </p>
  */
 @Path("featureflags")
@@ -60,8 +61,8 @@ public final class FeatureFlagsRESTResource {
 
     @PUT
     @Path("/features/{featureID}")
-    public void updateFeature(@PathParam("featureID") final String featureID,
-            @QueryParam("isEnabled") final boolean isEnabled) {
+    @Consumes(TEXT_PLAIN)
+    public void updateFeature(@PathParam("featureID") final String featureID, final boolean isEnabled) {
         featureManager.updateFeature(featureID, isEnabled);
     }
 
