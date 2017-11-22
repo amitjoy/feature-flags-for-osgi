@@ -395,7 +395,7 @@ public final class FeatureManagerProviderTest {
     }
 
     @Test
-    public void testUpdateFeature() throws Exception {
+    public void testUpdateFeature1() throws Exception {
         final FeatureManagerProvider manager = new FeatureManagerProvider();
 
         manager.setConfigurationAdmin(configurationAdmin);
@@ -436,7 +436,117 @@ public final class FeatureManagerProviderTest {
         assertEquals(FEATURE_DESC, feature.description);
         assertTrue(feature.isEnabled);
 
-        manager.updateFeature(FEATURE_ID, false);
+        try {
+            manager.updateFeature(FEATURE_ID, false);
+        } catch (final Exception e) {
+            assertFalse(true);
+        }
+
+        manager.unsetConfigurationAdmin(configurationAdmin);
+        manager.unsetMetaTypeService(metaTypeService);
+        manager.deactivate(bundleContext1);
+    }
+
+    @Test
+    public void testUpdateFeature2() throws Exception {
+        final FeatureManagerProvider manager = new FeatureManagerProvider();
+
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.setMetaTypeService(metaTypeService);
+        manager.activate(bundleContext1);
+
+        final MetaTypeExtender extender = manager.getExtender();
+        final String[] pids = new String[] { "a" };
+        final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
+
+        when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
+        when(metaTypeInfo.getPids()).thenReturn(pids);
+        when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
+        when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
+        mockADWithDefaultValue();
+        when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
+        when(bundle.getState()).thenReturn(ACTIVE);
+        when(bundle.getBundleContext()).thenReturn(bundleContext1);
+        when(configurationAdmin.getConfiguration("a", "?")).thenReturn(null);
+
+        extender.addingBundle(bundle, bundleEvent);
+
+        Thread.sleep(1000);
+        FeatureDTO feature = manager.getFeatures().collect(Collectors.toList()).get(0);
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
+
+        feature = manager.getFeatures(FEATURE_ID).findFirst().get();
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
+
+        feature = manager.getFeatures(FEATURE_ID).findAny().get();
+
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
+
+        try {
+            manager.updateFeature(FEATURE_ID, false);
+        } catch (final Exception e) {
+            assertFalse(true);
+        }
+
+        manager.unsetConfigurationAdmin(configurationAdmin);
+        manager.unsetMetaTypeService(metaTypeService);
+        manager.deactivate(bundleContext1);
+    }
+
+    @Test
+    public void testUpdateFeature3() throws Exception {
+        final FeatureManagerProvider manager = new FeatureManagerProvider();
+
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.setMetaTypeService(metaTypeService);
+        manager.activate(bundleContext1);
+
+        final MetaTypeExtender extender = manager.getExtender();
+        final String[] pids = new String[] { "a" };
+        final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
+
+        when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
+        when(metaTypeInfo.getPids()).thenReturn(pids);
+        when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
+        when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
+        mockADWithDefaultValue();
+        when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
+        when(bundle.getState()).thenReturn(ACTIVE);
+        when(bundle.getBundleContext()).thenReturn(bundleContext1);
+        when(configurationAdmin.getConfiguration("a", "?")).thenThrow(IOException.class);
+
+        extender.addingBundle(bundle, bundleEvent);
+
+        Thread.sleep(1000);
+        FeatureDTO feature = manager.getFeatures().collect(Collectors.toList()).get(0);
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
+
+        feature = manager.getFeatures(FEATURE_ID).findFirst().get();
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
+
+        feature = manager.getFeatures(FEATURE_ID).findAny().get();
+
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
+
+        try {
+            manager.updateFeature(FEATURE_ID, false);
+        } catch (final Exception e) {
+            assertFalse(true);
+        }
 
         manager.unsetConfigurationAdmin(configurationAdmin);
         manager.unsetMetaTypeService(metaTypeService);
