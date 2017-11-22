@@ -18,11 +18,12 @@ import com.amitinside.featureflags.FeatureManager;
  *
  * <p>
  * A feature is defined by its identifier, name, description, flag denoting whether
- * the feature is enabled and the bundle identifier that comprises the feature
+ * the feature is enabled and the bundle identifier in which the feature is
+ * specified.
  * </p>
  *
  * <p>
- * A feature is specified in OSGi configuration with a id format of
+ * A feature is specified in OSGi configuration with an identifier format of
  * {@code osgi.feature.X} where X is the id of your feature and {@code osgi.feature.}
  * ({@link FeatureManager#METATYPE_FEATURE_ID_PREFIX}) is a standard prefix to specify the
  * features.

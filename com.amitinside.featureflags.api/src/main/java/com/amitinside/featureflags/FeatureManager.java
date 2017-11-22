@@ -17,21 +17,15 @@ import com.amitinside.featureflags.dto.FeatureDTO;
 
 /**
  * The {@link FeatureManager} service is the application access point to the feature
- * flags functionality. It can be used to query the available features, configurations
- * that contain these features. It is also used to manage these instances pretty easily.
- * Therefore {@link FeatureManager} service allows introspection of the features and the
- * configuration instances available in runtime.
+ * flags functionality. It can be used to query the available features. It is also used
+ * to manage these instances pretty easily. Therefore {@link FeatureManager} service
+ * allows introspection of the feature instances available in runtime.
  *
  * <p>
- * This service differentiates between {@link FeatureDTO} and {@link ConfigurationDTO}.
- * A {@link FeatureDTO} instance is a representation of a feature whereas a
- * {@link ConfigurationDTO} instance is a representation of an OSGi Configuration in
- * which the features are specified.
- * <p>
- *
  * Access to this service requires the {@code ServicePermission[FeatureManager, GET]}
  * permission. It is intended that only administrative bundles should be granted this
  * permission to limit access to the potentially intrusive methods provided by this service.
+ * </p>
  *
  * @noimplement This interface is not intended to be implemented by consumers.
  * @noextend This interface is not intended to be extended by consumers.
@@ -72,8 +66,6 @@ public interface FeatureManager {
      * </p>
      *
      * @return The known {@link FeatureDTO} instances
-     * @throws NullPointerException if the specified argument is {@code null}
-     * @throws IllegalArgumentException if the specified string argument is empty
      */
     Stream<FeatureDTO> getFeatures();
 
@@ -86,19 +78,20 @@ public interface FeatureManager {
      *
      * @param featureID The feature ID
      * @return The known {@link FeatureDTO} instances
-     * @throws NullPointerException if the specified argument is {@code null}
-     * @throws IllegalArgumentException if the specified argument is empty
+     * @throws NullPointerException if {@code featureID} is {@code null}
+     * @throws IllegalArgumentException if {@code featureID} is empty
      */
     Stream<FeatureDTO> getFeatures(String featureID);
 
     /**
-     * Updates the specified feature registered under the specified configuration PID
+     * Updates the specified feature. If there exists multiple features with the same
+     * identifier, all feature instances will therefore be updated to teh specified
+     * enablement flag.
      *
-     * @param configurationPID The configuration PID
      * @param featureID The feature ID
      * @param isEnabled the value for the enablement of the feature
-     * @throws NullPointerException if any of the specified arguments is {@code null}
-     * @throws IllegalArgumentException if any of the specified string arguments is empty
+     * @throws NullPointerException if {@code featureID} is {@code null}
+     * @throws IllegalArgumentException if {@code featureID} is empty
      */
     void updateFeature(String featureID, boolean isEnabled);
 }
