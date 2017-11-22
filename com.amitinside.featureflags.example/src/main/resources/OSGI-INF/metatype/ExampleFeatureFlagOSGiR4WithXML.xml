@@ -18,10 +18,6 @@
             cardinality="0"
             required="true"
             default="true">
-            <Option label="MyPropertyName"
-                    value="MyPropertyValue"/>
-            <Option label="developer"
-                    value="amit"/>
         </AD>
 
     </OCD>

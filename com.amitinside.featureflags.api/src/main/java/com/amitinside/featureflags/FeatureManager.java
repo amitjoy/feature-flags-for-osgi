@@ -9,13 +9,10 @@
  *******************************************************************************/
 package com.amitinside.featureflags;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.osgi.annotation.versioning.ProviderType;
 
-import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
 
 /**
@@ -40,7 +37,6 @@ import com.amitinside.featureflags.dto.FeatureDTO;
  * @noextend This interface is not intended to be extended by consumers.
  *
  * @see FeatureDTO
- * @see ConfigurationDTO
  *
  * @ThreadSafe
  */
@@ -70,59 +66,30 @@ public interface FeatureManager {
     String FEATURE_CAPABILITY_NAME = "osgi.feature";
 
     /**
-     * Retrieve all (known) {@link ConfigurationDTO} instances
-     * <p>
-     * {@link ConfigurationDTO}s are known if they comprise features
-     * </p>
-     *
-     * @return The known {@link ConfigurationDTO} instances
-     */
-    Stream<ConfigurationDTO> getConfigurations();
-
-    /**
-     * Retrieve all (known) {@link FeatureDTO} instances registered under the provided
-     * configuration PID
+     * Retrieve all (known) {@link FeatureDTO} instances registered in the runtime
      * <p>
      * {@link FeatureDTO}s are known if they are configured with OSGi configuration
-     * under the specified configuration PID
      * </p>
      *
-     * @param configurationPID The configuration PID
      * @return The known {@link FeatureDTO} instances
      * @throws NullPointerException if the specified argument is {@code null}
      * @throws IllegalArgumentException if the specified string argument is empty
      */
-    Stream<FeatureDTO> getFeatures(String configurationPID);
+    Stream<FeatureDTO> getFeatures();
 
     /**
-     * Returns the known {@link ConfigurationDTO} instance
-     * <p>
-     * {@link ConfigurationDTO} instances are known if they comprise features
-     * </p>
-     *
-     * @param configurationPID The configuration PID
-     * @return The {@link ConfigurationDTO} wrapped in {@link Optional} or empty {@link Optional}
-     *         instance if not known or the {@code configurationPID} is an empty string or {@code null}
-     * @throws NullPointerException if the specified argument is {@code null}
-     * @throws IllegalArgumentException if the specified string argument is empty
-     */
-    Optional<ConfigurationDTO> getConfiguration(String configurationPID);
-
-    /**
-     * Returns the feature registered under the specified configuration PID with the specified
+     * Returns all (known) {@link FeatureDTO} instances registered with the specified
      * feature ID
      * <p>
      * {@link FeatureDTO} instances are known if they are registered with OSGi configuration.
      * </p>
      *
-     * @param configurationPID The configuration PID
      * @param featureID The feature ID
-     * @return The {@link FeatureDTO} wrapped in {@link Optional} or empty {@link Optional}
-     *         instance if not known or the {@code featureID} is an empty string or {@code null}
-     * @throws NullPointerException if any of the specified arguments is {@code null}
-     * @throws IllegalArgumentException if any of the specified string arguments is empty
+     * @return The known {@link FeatureDTO} instances
+     * @throws NullPointerException if the specified argument is {@code null}
+     * @throws IllegalArgumentException if the specified argument is empty
      */
-    Optional<FeatureDTO> getFeature(String configurationPID, String featureID);
+    Stream<FeatureDTO> getFeatures(String featureID);
 
     /**
      * Updates the specified feature registered under the specified configuration PID
@@ -130,11 +97,8 @@ public interface FeatureManager {
      * @param configurationPID The configuration PID
      * @param featureID The feature ID
      * @param isEnabled the value for the enablement of the feature
-     * @return A promise that will be resolved if the feature is known and updated by
-     *         this operation. It is also returned if the feature is not known or the
-     *         operation failed to update the feature.
      * @throws NullPointerException if any of the specified arguments is {@code null}
      * @throws IllegalArgumentException if any of the specified string arguments is empty
      */
-    CompletableFuture<Void> updateFeature(String configurationPID, String featureID, boolean isEnabled);
+    void updateFeature(String featureID, boolean isEnabled);
 }

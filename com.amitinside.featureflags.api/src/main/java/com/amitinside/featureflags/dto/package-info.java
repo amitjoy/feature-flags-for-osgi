@@ -8,7 +8,7 @@
  *
  *******************************************************************************/
 /**
- * Provides data transfer objects for feature flags instances
+ * Provides data transfer object for feature instance
  *
  * <p>
  * Bundles wishing to use this package must list the package in the

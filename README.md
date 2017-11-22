@@ -111,10 +111,6 @@ or provide a metatype XML with the required configuration in your bundle's `OSGI
             cardinality="0"
             required="true"
             default="true">
-            <Option label="MyPropertyName"
-                    value="MyPropertyValue"/>
-            <Option label="developer"
-                    value="amit"/>
         </AD>
 
     </OCD>
@@ -125,14 +121,7 @@ or provide a metatype XML with the required configuration in your bundle's `OSGI
 </MetaData>
 ```
 
-3. Add the following to your manifest:
-```
-Require-Capability: osgi.extender;filter:="(osgi.extender=osgi.feature)"
-```
-
-4. The primary contract of using feature flags in your codebase is to introduce boolean attribute definitions to existing or new object class definitions in metatype. The IDs of the attribute definitions must be **osgi.feature.X** where X is the name of your feature. And don't forget to add the aforementioned requirement capability to your manifest.
-
-5. Even though OSGi Capability Model is only available since OSGi R4.3, this is required for older versions as well to tag bundles that want to use feature flags. The benefit of this requirement is that as soon as the user starts using OSGi R4.3 and later, all the benefits of OSGi Capability Model will be in effect. And that's why it is required.
+3. The primary contract of using feature flags in your codebase is to introduce boolean attribute definitions to existing or new object class definitions in metatype. The IDs of the attribute definitions must be **osgi.feature.X** where X is the name of your feature. And don't forget to add the aforementioned requirement capability to your manifest.
 
 #### The primary benefit of this approach is that developers can use feature flags without having any dependency to any external API.
 

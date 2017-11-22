@@ -10,16 +10,13 @@
 package com.amitinside.featureflags.provider;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.osgi.framework.Bundle.ACTIVE;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.apache.felix.utils.collections.MapToDictionary;
@@ -40,7 +37,6 @@ import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.service.metatype.ObjectClassDefinition;
 
 import com.amitinside.featureflags.FeatureManager;
-import com.amitinside.featureflags.dto.ConfigurationDTO;
 import com.amitinside.featureflags.dto.FeatureDTO;
 import com.google.common.collect.ImmutableMap;
 
@@ -84,15 +80,12 @@ public final class FeatureManagerProviderTest {
         final MetaTypeExtender extender = manager.getExtender();
         final String[] pids = new String[] { "a" };
         final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender;filter:=\"(osgi.extender=osgi.feature)\"").build();
 
         when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
         when(metaTypeInfo.getPids()).thenReturn(pids);
         when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
         when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
         mockADWithoutDefaultValue();
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
         when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
         when(bundle.getState()).thenReturn(ACTIVE);
         when(bundle.getBundleContext()).thenReturn(bundleContext1);
@@ -100,21 +93,19 @@ public final class FeatureManagerProviderTest {
         extender.addingBundle(bundle, bundleEvent);
 
         Thread.sleep(1000);
-        final ConfigurationDTO config = manager.getConfigurations().collect(Collectors.toList()).get(0);
-        FeatureDTO feature = config.features.get(0);
-
-        assertEquals("a", config.pid);
-        assertEquals(FEATURE_ID, feature.id);
-        assertEquals(FEATURE_DESC, feature.description);
-        assertFalse(feature.isEnabled);
-
-        feature = manager.getFeatures("a").findFirst().get();
+        FeatureDTO feature = manager.getFeatures().collect(Collectors.toList()).get(0);
 
         assertEquals(FEATURE_ID, feature.id);
         assertEquals(FEATURE_DESC, feature.description);
         assertFalse(feature.isEnabled);
 
-        feature = manager.getFeature("a", FEATURE_ID).get();
+        feature = manager.getFeatures(FEATURE_ID).findFirst().get();
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertFalse(feature.isEnabled);
+
+        feature = manager.getFeatures("myfeature").findAny().get();
 
         assertEquals(FEATURE_DESC, feature.description);
         assertFalse(feature.isEnabled);
@@ -133,15 +124,12 @@ public final class FeatureManagerProviderTest {
         final MetaTypeExtender extender = manager.getExtender();
         final String[] pids = new String[] { "a" };
         final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender;filter:=\"(osgi.extender=osgi.feature)\"").build();
 
         when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
         when(metaTypeInfo.getPids()).thenReturn(pids);
         when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
         when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
         mockADWithDefaultValue();
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
         when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
         when(bundle.getState()).thenReturn(ACTIVE);
         when(bundle.getBundleContext()).thenReturn(bundleContext1);
@@ -149,73 +137,19 @@ public final class FeatureManagerProviderTest {
         extender.addingBundle(bundle, bundleEvent);
 
         Thread.sleep(1000);
-        final ConfigurationDTO config = manager.getConfigurations().findAny().get();
-        FeatureDTO feature = config.features.get(0);
-
-        assertEquals("a", config.pid);
-        assertEquals(FEATURE_ID, feature.id);
-        assertEquals(FEATURE_DESC, feature.description);
-        assertTrue(feature.isEnabled);
-
-        feature = manager.getFeatures("a").findFirst().get();
+        FeatureDTO feature = manager.getFeatures().collect(Collectors.toList()).get(0);
 
         assertEquals(FEATURE_ID, feature.id);
         assertEquals(FEATURE_DESC, feature.description);
         assertTrue(feature.isEnabled);
 
-        feature = manager.getFeature("a", FEATURE_ID).get();
-
-        assertEquals(FEATURE_DESC, feature.description);
-        assertTrue(feature.isEnabled);
-
-        manager.unsetConfigurationAdmin(configurationAdmin);
-        manager.unsetMetaTypeService(metaTypeService);
-        manager.deactivate(bundleContext1);
-    }
-
-    @Test
-    public void testGetFeaturesFromMetatypeXMLDescriptorWithDefaultValueButOnlyValueProperties() throws Exception {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-
-        manager.setConfigurationAdmin(configurationAdmin);
-        manager.setMetaTypeService(metaTypeService);
-        manager.activate(bundleContext1);
-
-        final MetaTypeExtender extender = manager.getExtender();
-        final String[] pids = new String[] { "a" };
-        final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender;filter:=\"(osgi.extender=osgi.feature)\"").build();
-
-        when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
-        when(metaTypeInfo.getPids()).thenReturn(pids);
-        when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
-        when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
-        mockADWithDefaultValueButOnlyValueProperties();
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
-        when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
-        when(bundle.getState()).thenReturn(ACTIVE);
-        when(bundle.getBundleContext()).thenReturn(bundleContext1);
-
-        extender.addingBundle(bundle, bundleEvent);
-
-        Thread.sleep(1000);
-        final ConfigurationDTO config = manager.getConfigurations().findAny().get();
-        FeatureDTO feature = config.features.get(0);
-
-        assertEquals("a", config.pid);
-        assertEquals(FEATURE_ID, feature.id);
-        assertEquals(FEATURE_DESC, feature.description);
-        assertTrue(feature.isEnabled);
-        assertEquals(null, feature.properties);
-
-        feature = manager.getFeatures("a").findFirst().get();
+        feature = manager.getFeatures(FEATURE_ID).findFirst().get();
 
         assertEquals(FEATURE_ID, feature.id);
         assertEquals(FEATURE_DESC, feature.description);
         assertTrue(feature.isEnabled);
 
-        feature = manager.getFeature("a", FEATURE_ID).get();
+        feature = manager.getFeatures(FEATURE_ID).findAny().get();
 
         assertEquals(FEATURE_DESC, feature.description);
         assertTrue(feature.isEnabled);
@@ -236,15 +170,12 @@ public final class FeatureManagerProviderTest {
         final MetaTypeExtender extender = manager.getExtender();
         final String[] pids = new String[] { "a" };
         final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender;filter:=\"(osgi.extender=osgi.feature)\"").build();
 
         when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
         when(metaTypeInfo.getPids()).thenReturn(pids);
         when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
         when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
         mockADWithDefaultValueAndProperties();
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
         when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
         when(bundle.getState()).thenReturn(ACTIVE);
         when(bundle.getBundleContext()).thenReturn(bundleContext1);
@@ -252,109 +183,22 @@ public final class FeatureManagerProviderTest {
         extender.addingBundle(bundle, bundleEvent);
 
         Thread.sleep(1000);
-        final ConfigurationDTO config = manager.getConfiguration("a").get();
-        FeatureDTO feature = config.features.get(0);
-
-        assertEquals("a", config.pid);
-        assertEquals(FEATURE_ID, feature.id);
-        assertEquals(FEATURE_DESC, feature.description);
-        assertTrue(feature.isEnabled);
-        assertEquals("{property=value}", feature.properties.toString());
-
-        feature = manager.getFeatures("a").findFirst().get();
+        FeatureDTO feature = manager.getFeatures().collect(Collectors.toList()).get(0);
 
         assertEquals(FEATURE_ID, feature.id);
         assertEquals(FEATURE_DESC, feature.description);
         assertTrue(feature.isEnabled);
 
-        feature = manager.getFeature("a", FEATURE_ID).get();
+        feature = manager.getFeatures(FEATURE_ID).findFirst().get();
 
+        assertEquals(FEATURE_ID, feature.id);
         assertEquals(FEATURE_DESC, feature.description);
         assertTrue(feature.isEnabled);
 
-        manager.unsetConfigurationAdmin(configurationAdmin);
-        manager.unsetMetaTypeService(metaTypeService);
-        manager.deactivate(bundleContext1);
-    }
+        feature = manager.getFeatures(FEATURE_ID).findAny().get();
 
-    @Test
-    public void testGetFeaturesFromMetatypeXMLDescriptorWithoutCapability() throws Exception {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-
-        manager.setConfigurationAdmin(configurationAdmin);
-        manager.setMetaTypeService(metaTypeService);
-        manager.activate(bundleContext1);
-
-        final MetaTypeExtender extender = manager.getExtender();
-        final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-
-        when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
-        when(bundle.getState()).thenReturn(ACTIVE);
-        when(bundle.getBundleContext()).thenReturn(bundleContext1);
-
-        extender.addingBundle(bundle, bundleEvent);
-
-        Thread.sleep(1000);
-        final List<ConfigurationDTO> configs = manager.getConfigurations().collect(Collectors.toList());
-        assertTrue(configs.isEmpty());
-
-        manager.unsetConfigurationAdmin(configurationAdmin);
-        manager.unsetMetaTypeService(metaTypeService);
-        manager.deactivate(bundleContext1);
-    }
-
-    @Test
-    public void testGetFeaturesFromMetatypeXMLDescriptorWithCapabilityButWrongNamespace() throws Exception {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-
-        manager.setConfigurationAdmin(configurationAdmin);
-        manager.setMetaTypeService(metaTypeService);
-        manager.activate(bundleContext1);
-
-        final MetaTypeExtender extender = manager.getExtender();
-        final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender1;filter:=\"(osgi.extender=osgi.feature)\"").build();
-
-        when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
-        when(bundle.getState()).thenReturn(ACTIVE);
-        when(bundle.getBundleContext()).thenReturn(bundleContext1);
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
-
-        extender.addingBundle(bundle, bundleEvent);
-
-        Thread.sleep(1000);
-        final List<ConfigurationDTO> configs = manager.getConfigurations().collect(Collectors.toList());
-        assertTrue(configs.isEmpty());
-
-        manager.unsetConfigurationAdmin(configurationAdmin);
-        manager.unsetMetaTypeService(metaTypeService);
-        manager.deactivate(bundleContext1);
-    }
-
-    @Test
-    public void testGetFeaturesFromMetatypeXMLDescriptorWithCapabilityButWrongFilter() throws Exception {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-
-        manager.setConfigurationAdmin(configurationAdmin);
-        manager.setMetaTypeService(metaTypeService);
-        manager.activate(bundleContext1);
-
-        final MetaTypeExtender extender = manager.getExtender();
-        final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender;filter:=\"(osgi.extender=osgi.feature1)\"").build();
-
-        when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
-        when(bundle.getState()).thenReturn(ACTIVE);
-        when(bundle.getBundleContext()).thenReturn(bundleContext1);
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
-
-        extender.addingBundle(bundle, bundleEvent);
-
-        Thread.sleep(1000);
-        final List<ConfigurationDTO> configs = manager.getConfigurations().collect(Collectors.toList());
-        assertEquals(true, configs.isEmpty());
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
 
         manager.unsetConfigurationAdmin(configurationAdmin);
         manager.unsetMetaTypeService(metaTypeService);
@@ -372,15 +216,12 @@ public final class FeatureManagerProviderTest {
         final MetaTypeExtender extender = manager.getExtender();
         final String[] pids = new String[] { "a" };
         final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender;filter:=\"(osgi.extender=osgi.feature)\"").build();
 
         when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
         when(metaTypeInfo.getPids()).thenReturn(pids);
         when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
         when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
         mockADWithDefaultValue();
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
         when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
         when(bundle.getState()).thenReturn(ACTIVE);
         when(bundle.getBundleContext()).thenReturn(bundleContext1);
@@ -388,7 +229,7 @@ public final class FeatureManagerProviderTest {
 
         extender.addingBundle(bundle, bundleEvent);
 
-        final List<ConfigurationDTO> list = manager.getConfigurations().collect(Collectors.toList());
+        final List<FeatureDTO> list = manager.getFeatures().collect(Collectors.toList());
         assertTrue(list.isEmpty());
     }
 
@@ -403,15 +244,12 @@ public final class FeatureManagerProviderTest {
         final MetaTypeExtender extender = manager.getExtender();
         final String[] pids = new String[] { "a" };
         final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender;filter:=\"(osgi.extender=osgi.feature)\"").build();
 
         when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
         when(metaTypeInfo.getPids()).thenReturn(pids);
         when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
         when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
         mockADWithoutDefaultValue();
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
         when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
         when(bundle.getState()).thenReturn(ACTIVE);
         when(bundle.getBundleContext()).thenReturn(bundleContext1);
@@ -419,21 +257,19 @@ public final class FeatureManagerProviderTest {
         extender.addingBundle(bundle, bundleEvent);
 
         Thread.sleep(1000);
-        final ConfigurationDTO config = manager.getConfigurations().collect(Collectors.toList()).get(0);
-        FeatureDTO feature = config.features.get(0);
-
-        assertEquals("a", config.pid);
-        assertEquals(FEATURE_ID, feature.id);
-        assertEquals(FEATURE_DESC, feature.description);
-        assertFalse(feature.isEnabled);
-
-        feature = manager.getFeatures("a").findFirst().get();
+        FeatureDTO feature = manager.getFeatures().collect(Collectors.toList()).get(0);
 
         assertEquals(FEATURE_ID, feature.id);
         assertEquals(FEATURE_DESC, feature.description);
         assertFalse(feature.isEnabled);
 
-        feature = manager.getFeature("a", FEATURE_ID).get();
+        feature = manager.getFeatures(FEATURE_ID).findFirst().get();
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertFalse(feature.isEnabled);
+
+        feature = manager.getFeatures(FEATURE_ID).findAny().get();
 
         assertEquals(FEATURE_DESC, feature.description);
         assertFalse(feature.isEnabled);
@@ -447,8 +283,7 @@ public final class FeatureManagerProviderTest {
         final ConfigurationEvent configEvent = new ConfigurationEvent(reference, 1, null, "a");
         manager.configurationEvent(configEvent);
 
-        final ConfigurationDTO newConfig = manager.getConfigurations().collect(Collectors.toList()).get(0);
-        final FeatureDTO updatedFeature = newConfig.features.get(0);
+        final FeatureDTO updatedFeature = manager.getFeatures(FEATURE_ID).findAny().get();
 
         assertTrue(updatedFeature.isEnabled);
     }
@@ -464,15 +299,12 @@ public final class FeatureManagerProviderTest {
         final MetaTypeExtender extender = manager.getExtender();
         final String[] pids = new String[] { "a" };
         final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender;filter:=\"(osgi.extender=osgi.feature)\"").build();
 
         when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
         when(metaTypeInfo.getPids()).thenReturn(pids);
         when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
         when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
         mockADWithoutDefaultValue();
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
         when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
         when(bundle.getState()).thenReturn(ACTIVE);
         when(bundle.getBundleContext()).thenReturn(bundleContext1);
@@ -480,21 +312,19 @@ public final class FeatureManagerProviderTest {
         extender.addingBundle(bundle, bundleEvent);
 
         Thread.sleep(1000);
-        final ConfigurationDTO config = manager.getConfigurations().collect(Collectors.toList()).get(0);
-        FeatureDTO feature = config.features.get(0);
-
-        assertEquals("a", config.pid);
-        assertEquals(FEATURE_ID, feature.id);
-        assertEquals(FEATURE_DESC, feature.description);
-        assertFalse(feature.isEnabled);
-
-        feature = manager.getFeatures("a").findFirst().get();
+        FeatureDTO feature = manager.getFeatures().collect(Collectors.toList()).get(0);
 
         assertEquals(FEATURE_ID, feature.id);
         assertEquals(FEATURE_DESC, feature.description);
         assertFalse(feature.isEnabled);
 
-        feature = manager.getFeature("a", FEATURE_ID).get();
+        feature = manager.getFeatures(FEATURE_ID).findFirst().get();
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertFalse(feature.isEnabled);
+
+        feature = manager.getFeatures(FEATURE_ID).findAny().get();
 
         assertEquals(FEATURE_DESC, feature.description);
         assertFalse(feature.isEnabled);
@@ -508,9 +338,9 @@ public final class FeatureManagerProviderTest {
         final ConfigurationEvent configEvent = new ConfigurationEvent(reference, 2, null, "a");
         manager.configurationEvent(configEvent);
 
-        final List<ConfigurationDTO> newConfigs = manager.getConfigurations().collect(Collectors.toList());
+        final List<FeatureDTO> newFeatures = manager.getFeatures().collect(Collectors.toList());
 
-        assertTrue(newConfigs.isEmpty());
+        assertTrue(newFeatures.isEmpty());
     }
 
     @Test
@@ -524,15 +354,12 @@ public final class FeatureManagerProviderTest {
         final MetaTypeExtender extender = manager.getExtender();
         final String[] pids = new String[] { "a" };
         final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
-        final Map<String, String> headers = ImmutableMap.<String, String> builder()
-                .put("Require-Capability", "osgi.extender;filter:=\"(osgi.extender=osgi.feature)\"").build();
 
         when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
         when(metaTypeInfo.getPids()).thenReturn(pids);
         when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
         when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
         mockADWithoutDefaultValue();
-        when(bundle.getHeaders()).thenReturn(new MapToDictionary(headers));
         when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
         when(bundle.getState()).thenReturn(ACTIVE);
         when(bundle.getBundleContext()).thenReturn(bundleContext1);
@@ -540,21 +367,19 @@ public final class FeatureManagerProviderTest {
         extender.addingBundle(bundle, bundleEvent);
 
         Thread.sleep(1000);
-        final ConfigurationDTO config = manager.getConfigurations().collect(Collectors.toList()).get(0);
-        FeatureDTO feature = config.features.get(0);
-
-        assertEquals("a", config.pid);
-        assertEquals(FEATURE_ID, feature.id);
-        assertEquals(FEATURE_DESC, feature.description);
-        assertFalse(feature.isEnabled);
-
-        feature = manager.getFeatures("a").findFirst().get();
+        FeatureDTO feature = manager.getFeatures().collect(Collectors.toList()).get(0);
 
         assertEquals(FEATURE_ID, feature.id);
         assertEquals(FEATURE_DESC, feature.description);
         assertFalse(feature.isEnabled);
 
-        feature = manager.getFeature("a", FEATURE_ID).get();
+        feature = manager.getFeatures(FEATURE_ID).findFirst().get();
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertFalse(feature.isEnabled);
+
+        feature = manager.getFeatures(FEATURE_ID).findAny().get();
 
         assertEquals(FEATURE_DESC, feature.description);
         assertFalse(feature.isEnabled);
@@ -564,66 +389,62 @@ public final class FeatureManagerProviderTest {
         final ConfigurationEvent configEvent = new ConfigurationEvent(reference, 1, null, "a");
         manager.configurationEvent(configEvent);
 
-        final ConfigurationDTO newConfig = manager.getConfigurations().collect(Collectors.toList()).get(0);
-        final FeatureDTO updatedFeature = newConfig.features.get(0);
+        final FeatureDTO updatedFeature = manager.getFeatures(FEATURE_ID).findAny().get();
 
         assertFalse(updatedFeature.isEnabled);
     }
 
     @Test
-    public void testUpdateFeatureWithoutException1() throws Exception {
+    public void testUpdateFeature() throws Exception {
         final FeatureManagerProvider manager = new FeatureManagerProvider();
 
         manager.setConfigurationAdmin(configurationAdmin);
         manager.setMetaTypeService(metaTypeService);
         manager.activate(bundleContext1);
 
+        final MetaTypeExtender extender = manager.getExtender();
+        final String[] pids = new String[] { "a" };
+        final BundleEvent bundleEvent = new BundleEvent(BundleEvent.STARTED, bundle);
+
+        when(metaTypeService.getMetaTypeInformation(bundle)).thenReturn(metaTypeInfo);
+        when(metaTypeInfo.getPids()).thenReturn(pids);
+        when(metaTypeInfo.getObjectClassDefinition("a", null)).thenReturn(ocd);
+        when(ocd.getAttributeDefinitions(ALL)).thenReturn(new AttributeDefinition[] { ad });
+        mockADWithDefaultValue();
+        when(bundleContext1.getBundle(0)).thenReturn(systemBundle);
+        when(bundle.getState()).thenReturn(ACTIVE);
+        when(bundle.getBundleContext()).thenReturn(bundleContext1);
         when(configurationAdmin.getConfiguration("a", "?")).thenReturn(configuration);
 
-        final CompletableFuture<Void> future = manager.updateFeature("a", "myfeature", true);
-        assertFalse(future.isCompletedExceptionally());
+        extender.addingBundle(bundle, bundleEvent);
+
+        Thread.sleep(1000);
+        FeatureDTO feature = manager.getFeatures().collect(Collectors.toList()).get(0);
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
+
+        feature = manager.getFeatures(FEATURE_ID).findFirst().get();
+
+        assertEquals(FEATURE_ID, feature.id);
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
+
+        feature = manager.getFeatures(FEATURE_ID).findAny().get();
+
+        assertEquals(FEATURE_DESC, feature.description);
+        assertTrue(feature.isEnabled);
+
+        manager.updateFeature(FEATURE_ID, false);
+
+        manager.unsetConfigurationAdmin(configurationAdmin);
+        manager.unsetMetaTypeService(metaTypeService);
+        manager.deactivate(bundleContext1);
     }
 
     @Test
-    public void testUpdateFeatureWithoutException2() throws Exception {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-
-        manager.setConfigurationAdmin(configurationAdmin);
-        manager.setMetaTypeService(metaTypeService);
-        manager.activate(bundleContext1);
-
-        when(configurationAdmin.getConfiguration("a", "?")).thenReturn(null);
-
-        final CompletableFuture<Void> future = manager.updateFeature("a", "myfeature", true);
-        assertFalse(future.isCompletedExceptionally());
-    }
-
-    @Test
-    public void testUpdateFeatureWithException() throws Exception {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-
-        manager.setConfigurationAdmin(configurationAdmin);
-        manager.setMetaTypeService(metaTypeService);
-        manager.activate(bundleContext1);
-
-        doThrow(new IOException()).when(configurationAdmin).getConfiguration("a", "?");
-
-        final CompletableFuture<Void> future = manager.updateFeature("a", "myfeature", true);
-        assertNotNull(future);
-    }
-
-    @Test
-    public void testToConfigurationDTO() throws NoSuchMethodException, SecurityException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-        final Method method = manager.getClass().getDeclaredMethod("toConfigurationDTO", String.class);
-        method.setAccessible(true);
-        final Object dto = method.invoke(manager, "aaa");
-        assertNull(dto);
-    }
-
-    @Test
-    public void testPreemptiveShutdown() throws Exception {
+    public void testPreemptiveShutdown1() throws Exception {
         final FeatureManagerProvider manager = new FeatureManagerProvider();
 
         manager.setConfigurationAdmin(configurationAdmin);
@@ -634,6 +455,18 @@ public final class FeatureManagerProviderTest {
         extender.error(">>>>ERROR<<<<<", new RuntimeException());
     }
 
+    @Test
+    public void testPreemptiveShutdown2() throws Exception {
+        final FeatureManagerProvider manager = new FeatureManagerProvider();
+
+        manager.setConfigurationAdmin(configurationAdmin);
+        manager.setMetaTypeService(metaTypeService);
+        manager.activate(bundleContext1);
+
+        final MetaTypeExtender extender = manager.getExtender();
+        extender.warn(bundle, ">>>>WARNING<<<<<", new RuntimeException());
+    }
+
     @Test(expected = NullPointerException.class)
     public void testNPEinGetFeatures() {
         final FeatureManagerProvider manager = new FeatureManagerProvider();
@@ -641,21 +474,15 @@ public final class FeatureManagerProviderTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNPEinGetConfiguration() {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-        manager.getConfiguration(null);
-    }
-
-    @Test(expected = NullPointerException.class)
     public void testNPEinGetFeature() {
         final FeatureManagerProvider manager = new FeatureManagerProvider();
-        manager.getFeature(null, null);
+        manager.getFeatures(null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNPEinUpdateFeature() {
         final FeatureManagerProvider manager = new FeatureManagerProvider();
-        manager.updateFeature(null, null, false);
+        manager.updateFeature(null, false);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -665,33 +492,9 @@ public final class FeatureManagerProviderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testIAEinGetConfiguration() {
+    public void testIAEinUpdateFeature() {
         final FeatureManagerProvider manager = new FeatureManagerProvider();
-        manager.getConfiguration("");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIAEinGetFeature1() {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-        manager.getFeature("", "");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIAEinGetFeature2() {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-        manager.getFeature("a", "");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIAEinUpdateFeature1() {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-        manager.updateFeature("", "", false);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIAEinUpdateFeature2() {
-        final FeatureManagerProvider manager = new FeatureManagerProvider();
-        manager.updateFeature("a", "", false);
+        manager.updateFeature("", false);
     }
 
     private void mockADWithoutDefaultValue() {
@@ -712,17 +515,6 @@ public final class FeatureManagerProviderTest {
         when(ad.getDescription()).thenReturn(FEATURE_DESC);
         when(ad.getName()).thenReturn(FEATURE_NAME);
         when(ad.getDefaultValue()).thenReturn(new String[] { "true" });
-        when(ad.getOptionLabels()).thenReturn(new String[] { "property" });
-        when(ad.getOptionValues()).thenReturn(new String[] { "value" });
-    }
-
-    private void mockADWithDefaultValueButOnlyValueProperties() {
-        when(ad.getID()).thenReturn(FeatureManager.METATYPE_FEATURE_ID_PREFIX + FEATURE_ID);
-        when(ad.getDescription()).thenReturn(FEATURE_DESC);
-        when(ad.getName()).thenReturn(FEATURE_NAME);
-        when(ad.getDefaultValue()).thenReturn(new String[] { "true" });
-        when(ad.getOptionLabels()).thenReturn(new String[] { "property1", "property2" });
-        when(ad.getOptionValues()).thenReturn(new String[] { "value" });
     }
 
 }

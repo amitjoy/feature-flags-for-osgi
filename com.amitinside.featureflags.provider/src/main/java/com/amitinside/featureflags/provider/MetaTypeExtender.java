@@ -69,7 +69,7 @@ public final class MetaTypeExtender extends AbstractExtender {
 
     @Override
     protected Extension doCreateExtension(final Bundle bundle) throws Exception {
-        return hasFeatureCapability(bundle) ? new MetatypeExtension(bundle) : null;
+        return new MetatypeExtension(bundle);
     }
 
     @Override

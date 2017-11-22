@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -39,21 +38,6 @@ public final class ManagerHelperTest {
 
         assertNotNull(list2);
         assertEquals("a", list2.get(0));
-    }
-
-    @Test
-    public void testMergeAsMap() {
-        final Map<String, String> map1 = ManagerHelper.mergeAsMap(null, null);
-        assertNull(map1);
-
-        final Map<String, String> map2 = ManagerHelper.mergeAsMap(new String[] { "a", "b" }, new String[] { "c" });
-        assertNull(map2);
-
-        final Map<String, String> map3 = ManagerHelper.mergeAsMap(null, new String[] { "c" });
-        assertNull(map3);
-
-        final Map<String, String> map4 = ManagerHelper.mergeAsMap(new String[] { "a", "b" }, null);
-        assertNull(map4);
     }
 
 }

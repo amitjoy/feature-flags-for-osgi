@@ -9,8 +9,6 @@
  *******************************************************************************/
 package com.amitinside.featureflags.dto;
 
-import java.util.Map;
-
 import org.osgi.dto.DTO;
 
 import com.amitinside.featureflags.FeatureManager;
@@ -20,7 +18,7 @@ import com.amitinside.featureflags.FeatureManager;
  *
  * <p>
  * A feature is defined by its identifier, name, description, flag denoting whether
- * the feature is enabled and extra properties to better categorize the feature
+ * the feature is enabled and the bundle identifier that comprises the feature
  * </p>
  *
  * <p>
@@ -32,7 +30,6 @@ import com.amitinside.featureflags.FeatureManager;
  *
  * @noextend This class is not intended to be extended by consumers.
  *
- * @see ConfigurationDTO
  * @see FeatureManager
  *
  * @NotThreadSafe
@@ -43,6 +40,11 @@ public class FeatureDTO extends DTO {
      * The identifier of the feature
      */
     public String id;
+
+    /**
+     * The bundle identifier containing the feature
+     */
+    public long bundleId;
 
     /**
      * The name of the feature
@@ -59,10 +61,5 @@ public class FeatureDTO extends DTO {
      * is enabled or not
      */
     public boolean isEnabled;
-
-    /**
-     * The extra properties to categorize the feature
-     */
-    public Map<String, String> properties;
 
 }
