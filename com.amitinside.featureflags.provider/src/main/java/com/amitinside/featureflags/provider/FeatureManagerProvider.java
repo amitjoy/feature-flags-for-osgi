@@ -9,14 +9,11 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
-import static com.amitinside.featureflags.provider.ManagerHelper.extractFeatureID;
+import static com.amitinside.featureflags.provider.ManagerHelper.getConfiguredFeatures;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toMap;
 import static org.osgi.service.cm.ConfigurationEvent.CM_UPDATED;
-import static org.osgi.service.log.LogService.LOG_ERROR;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
@@ -26,7 +23,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.felix.utils.collections.DictionaryAsMap;
 import org.apache.felix.utils.log.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -44,7 +40,6 @@ import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.dto.FeatureDTO;
 import com.amitinside.featureflags.provider.ManagerHelper.Feature;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
@@ -177,8 +172,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     public void configurationEvent(final ConfigurationEvent event) {
         final int type = event.getType();
         final String pid = event.getPid();
-        final Map<String, Boolean> configuredFeatures = getConfiguredFeatures(pid);
         if (type == CM_UPDATED) {
+            final Map<String, Boolean> configuredFeatures = getConfiguredFeatures(pid, configurationAdmin);
             for (final Entry<String, Boolean> entry : configuredFeatures.entrySet()) {
                 final String featureID = entry.getKey();
                 final boolean isEnabled = entry.getValue();
@@ -192,24 +187,6 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         } else {
             allFeatures.removeAll(pid);
         }
-    }
-
-    private Map<String, Boolean> getConfiguredFeatures(final String configurationPID) {
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> properties = new DictionaryAsMap<>(configuration.getProperties());
-            //@formatter:off
-            return properties.entrySet().stream()
-                                        .filter(e -> e.getKey().startsWith(METATYPE_FEATURE_ID_PREFIX))
-                                        .filter(e -> e.getValue() instanceof Boolean)
-                                        .collect(toMap(e -> extractFeatureID(e.getKey()),
-                                                       e -> (Boolean) e.getValue()));
-            //@formatter:on
-        } catch (final IOException e) {
-            logger.log(LOG_ERROR, String.format("Cannot retrieve configuration for %s", configurationPID), e);
-        }
-        return ImmutableMap.of();
     }
 
 }

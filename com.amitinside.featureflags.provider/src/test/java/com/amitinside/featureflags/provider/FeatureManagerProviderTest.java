@@ -378,12 +378,6 @@ public final class FeatureManagerProviderTest {
         assertEquals(FEATURE_DESC, feature.description);
         assertFalse(feature.isEnabled);
 
-        final Map<String, Object> properties = ImmutableMap.<String, Object> builder()
-                .put("osgi.feature.myfeature", true).build();
-
-        when(configurationAdmin.getConfiguration("a", "?")).thenReturn(configuration);
-        when(configuration.getProperties()).thenReturn(new MapToDictionary(properties));
-
         final ConfigurationEvent configEvent = new ConfigurationEvent(reference, 2, null, "a");
         manager.configurationEvent(configEvent);
 

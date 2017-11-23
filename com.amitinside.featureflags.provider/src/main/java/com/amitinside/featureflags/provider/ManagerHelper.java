@@ -11,11 +11,16 @@ package com.amitinside.featureflags.provider;
 
 import static com.amitinside.featureflags.FeatureManager.METATYPE_FEATURE_ID_PREFIX;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toMap;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.felix.utils.collections.DictionaryAsMap;
 import org.osgi.framework.Bundle;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeInformation;
 import org.osgi.service.metatype.MetaTypeService;
@@ -24,6 +29,7 @@ import org.osgi.service.metatype.ObjectClassDefinition;
 import com.amitinside.featureflags.dto.FeatureDTO;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 
 /**
@@ -113,6 +119,25 @@ public final class ManagerHelper {
             }
         }
         return allFeatures;
+    }
+
+    public static Map<String, Boolean> getConfiguredFeatures(final String configurationPID,
+            final ConfigurationAdmin configurationAdmin) {
+        try {
+            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> properties = new DictionaryAsMap<>(configuration.getProperties());
+            //@formatter:off
+            return properties.entrySet().stream()
+                                        .filter(e -> e.getKey().startsWith(METATYPE_FEATURE_ID_PREFIX))
+                                        .filter(e -> e.getValue() instanceof Boolean)
+                                        .collect(toMap(e -> extractFeatureID(e.getKey()),
+                                                       e -> (Boolean) e.getValue()));
+            //@formatter:on
+        } catch (final Exception e) {
+            // cannot do anything
+        }
+        return ImmutableMap.of();
     }
 
     public static <T> List<T> asList(final T[] elements) {
