@@ -26,7 +26,7 @@ import com.amitinside.featureflags.FeatureManager;
  * A feature is specified in OSGi configuration with an identifier format of
  * {@code osgi.feature.X} where X is the id of your feature and {@code osgi.feature.}
  * ({@link FeatureManager#METATYPE_FEATURE_ID_PREFIX}) is a standard prefix to specify the
- * features.
+ * features. Note that, a feature identifier is case sensitive as well.
  * </p>
  *
  * @noextend This class is not intended to be extended by consumers.
