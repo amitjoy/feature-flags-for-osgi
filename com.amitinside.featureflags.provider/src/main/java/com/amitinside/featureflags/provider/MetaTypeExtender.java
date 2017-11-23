@@ -69,7 +69,7 @@ public final class MetaTypeExtender extends AbstractExtender {
 
     @Override
     protected Extension doCreateExtension(final Bundle bundle) throws Exception {
-        return new MetatypeExtension(bundle);
+        return new MetaTypeExtension(bundle);
     }
 
     @Override
@@ -87,10 +87,10 @@ public final class MetaTypeExtender extends AbstractExtender {
         logger.log(LOG_ERROR, msg, t);
     }
 
-    private class MetatypeExtension extends SimpleExtension {
+    private class MetaTypeExtension extends SimpleExtension {
         private final Bundle bundle;
 
-        public MetatypeExtension(final Bundle bundle) {
+        public MetaTypeExtension(final Bundle bundle) {
             super(bundle);
             this.bundle = bundle;
         }

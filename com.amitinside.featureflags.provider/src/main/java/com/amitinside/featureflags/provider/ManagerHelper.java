@@ -53,7 +53,7 @@ public final class ManagerHelper {
         public boolean isEnabled;
     }
 
-    public static String extractFeatureID(final String id) {
+    public static String getFeatureID(final String id) {
         requireNonNull(id, "Feature ID cannot be null");
         return id.substring(METATYPE_FEATURE_ID_PREFIX.length(), id.length());
     }
@@ -73,7 +73,7 @@ public final class ManagerHelper {
         requireNonNull(ad, "Attribute Definition cannot be null");
 
         final Feature feature = new Feature();
-        feature.id = extractFeatureID(ad.getID());
+        feature.id = getFeatureID(ad.getID());
 
         final String name = ad.getName();
         feature.name = name != null ? name : feature.id;
@@ -131,7 +131,7 @@ public final class ManagerHelper {
             return properties.entrySet().stream()
                                         .filter(e -> e.getKey().startsWith(METATYPE_FEATURE_ID_PREFIX))
                                         .filter(e -> e.getValue() instanceof Boolean)
-                                        .collect(toMap(e -> extractFeatureID(e.getKey()),
+                                        .collect(toMap(e -> getFeatureID(e.getKey()),
                                                        e -> (Boolean) e.getValue()));
             //@formatter:on
         } catch (final Exception e) {
