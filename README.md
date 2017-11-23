@@ -12,7 +12,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Code Coverage** [![codecov](https://codecov.io/gh/amitjoy/feature-flags-for-osgi/branch/master/graph/badge.svg)](https://codecov.io/gh/amitjoy/feature-flags-for-osgi) [![Coverage Status](https://coveralls.io/repos/github/amitjoy/feature-flags-for-osgi/badge.svg?branch=master)](https://coveralls.io/github/amitjoy/feature-flags-for-osgi?branch=master)
 
-**Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.github.michaelruocco/retriable.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-for-osgi/)
+**Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.tomgibara/github.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-for-osgi/)
 
 -----------------------------------------------------------------
 
@@ -101,7 +101,7 @@ or provide a metatype XML with the required configuration in your bundle's `OSGI
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="en_us">
-    <OCD id="ExampleFeatureFlagOSGiR4WithXML" 
+    <OCD id="ExampleFeatureFlagOCD" 
          name="My Feature Configuration">
 
         <AD id="osgi.feature.myfeature"
@@ -116,7 +116,7 @@ or provide a metatype XML with the required configuration in your bundle's `OSGI
     </OCD>
     
     <Designate pid="ExampleFeatureFlagOSGiR4WithXML">
-        <Object ocdref="ExampleFeatureFlagOSGiR4WithXML"/>
+        <Object ocdref="ExampleFeatureFlagOCD"/>
     </Designate>
 </MetaData>
 ```
