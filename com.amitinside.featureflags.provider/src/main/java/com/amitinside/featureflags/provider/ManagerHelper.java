@@ -63,14 +63,20 @@ public final class ManagerHelper {
         return feature;
     }
 
-    public static Feature toFeature(final String id, final String name, final String description,
-            final String[] defaultValues, final long bundleId) {
-        requireNonNull(id, "Feature ID cannot be null");
+    public static Feature toFeature(final AttributeDefinition ad, final long bundleId) {
+        requireNonNull(ad, "Attribute Definition cannot be null");
+
         final Feature feature = new Feature();
-        feature.id = extractFeatureID(id);
+        feature.id = extractFeatureID(ad.getID());
+
+        final String name = ad.getName();
         feature.name = name != null ? name : feature.id;
-        feature.description = description;
-        feature.isEnabled = defaultValues == null ? false : Boolean.valueOf(defaultValues[0]);
+
+        feature.description = ad.getDescription();
+
+        final String[] defaultValue = ad.getDefaultValue();
+        feature.isEnabled = defaultValue == null ? false : Boolean.valueOf(defaultValue[0]);
+
         feature.bundleId = bundleId;
         return feature;
     }
@@ -103,13 +109,7 @@ public final class ManagerHelper {
         final Multimap<String, Feature> allFeatures = ArrayListMultimap.create();
         for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {
             if (ad.getID().startsWith(METATYPE_FEATURE_ID_PREFIX)) {
-                //@formatter:off
-                allFeatures.put(pid, toFeature(ad.getID(),
-                                               ad.getName(),
-                                               ad.getDescription(),
-                                               ad.getDefaultValue(),
-                                               bundle.getBundleId()));
-                //@formatter:on
+                allFeatures.put(pid, toFeature(ad, bundle.getBundleId()));
             }
         }
         return allFeatures;
