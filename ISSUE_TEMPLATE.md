@@ -22,7 +22,7 @@
 
 
 
-* **What is the motivation / use case for changing the behavior?**
+* **What is the motivation/use case for changing the behavior?**
 
 
 
