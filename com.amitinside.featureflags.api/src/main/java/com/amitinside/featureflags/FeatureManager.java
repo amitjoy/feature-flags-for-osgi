@@ -85,7 +85,7 @@ public interface FeatureManager {
 
     /**
      * Updates the specified feature. If there exists multiple features with the same
-     * identifier, all feature instances will therefore be updated to teh specified
+     * identifier, all feature instances will therefore be updated to the specified
      * enablement flag.
      *
      * @param featureID The feature ID

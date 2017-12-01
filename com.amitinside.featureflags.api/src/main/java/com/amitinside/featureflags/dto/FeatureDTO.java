@@ -18,15 +18,18 @@ import com.amitinside.featureflags.FeatureManager;
  *
  * <p>
  * A feature is defined by its identifier, name, description, flag denoting whether
- * the feature is enabled and the bundle identifier in which the feature is
+ * the feature is enabled and the bundle's unique identifier in which the feature is
  * specified.
  * </p>
  *
  * <p>
  * A feature is specified in OSGi configuration with an identifier format of
- * {@code osgi.feature.X} where X is the id of your feature and {@code osgi.feature.}
+ * {@code osgi.feature.X} where {@code X} is the ID of your feature and {@code osgi.feature.}
  * ({@link FeatureManager#METATYPE_FEATURE_ID_PREFIX}) is a standard prefix to specify the
- * features. Note that, a feature identifier is case sensitive as well.
+ * features.
+ * <br/>
+ * <br/>
+ * <b>Note that</b>, a feature identifier is case sensitive as well.
  * </p>
  *
  * @noextend This class is not intended to be extended by consumers.
