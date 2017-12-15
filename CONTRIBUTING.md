@@ -24,7 +24,7 @@ A proper header must be in place for any file contributed to the project. For a 
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- *******************************************************************************/
+ ******************************************************************************/
  ```
 
  Please ensure \<year\> is replaced with the current year or range (e.g. 2017 or 2015, 2017).
