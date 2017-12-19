@@ -8,7 +8,7 @@
 
 
 
-* **What is the current behavior?** (You can also link to an open issue here)
+* **What is the current behaviour?** (You can also link to an open issue here)
 
 
 
