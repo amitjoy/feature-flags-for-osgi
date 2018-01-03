@@ -13,6 +13,7 @@ import static com.amitinside.featureflags.provider.ManagerHelper.getConfiguredFe
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.service.cm.ConfigurationEvent.CM_UPDATED;
+import static org.osgi.service.log.LogService.LOG_INFO;
 
 import java.util.Collection;
 import java.util.Hashtable;
@@ -145,6 +146,8 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         requireNonNull(featureID, "Feature ID cannot be null");
         checkArgument(!featureID.isEmpty(), "Feature ID cannot be empty");
 
+        logger.log(LOG_INFO, String.format("Updating feature [%s] to [%b]", featureID, isEnabled));
+
         final Map<String, Object> props = Maps.newHashMap();
         props.put(METATYPE_FEATURE_ID_PREFIX + featureID, isEnabled);
         final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
@@ -185,6 +188,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 //@formatter:off
                 features.stream()
                         .filter(f -> f.id.equalsIgnoreCase(featureID))
+                        .peek(f -> logger.log(LOG_INFO, String.format("Updated feature [%s] to [%b]", f.toString(), isEnabled)))
                         .forEach(f -> f.isEnabled = isEnabled);
                 //@formatter:on
             }
