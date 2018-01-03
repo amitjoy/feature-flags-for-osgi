@@ -89,7 +89,7 @@ public final class ManagerHelper {
 
     public static List<String> getPIDs(final Bundle bundle, final MetaTypeService metaTypeService) {
         requireNonNull(bundle, "Bundle Instance cannot be null");
-        requireNonNull(metaTypeService, "Metatype Service Instance cannot be null");
+        requireNonNull(metaTypeService, "MetaType Service Instance cannot be null");
 
         final MetaTypeInformation metatypeInfo = metaTypeService.getMetaTypeInformation(bundle);
         return ManagerHelper.asList(metatypeInfo.getPids());

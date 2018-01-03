@@ -110,6 +110,10 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         this.metaTypeService = null;
     }
 
+    /**
+     * Returns the internal {@link MetaTypeExtender} instance.
+     * This is required for unit testing purposes.
+     */
     protected MetaTypeExtender getExtender() {
         return extender;
     }
