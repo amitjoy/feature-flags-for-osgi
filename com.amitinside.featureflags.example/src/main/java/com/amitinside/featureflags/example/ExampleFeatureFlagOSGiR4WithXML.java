@@ -29,7 +29,7 @@ public final class ExampleFeatureFlagOSGiR4WithXML {
     protected void modified(final Map<String, Object> properties) {
         final Object value = properties.get("osgi.feature.myfeature");
         if (value instanceof Boolean) {
-            isFeatureEnabled = Boolean.valueOf(value.toString());
+            isFeatureEnabled = (boolean) value;
         }
         doStuff();
     }

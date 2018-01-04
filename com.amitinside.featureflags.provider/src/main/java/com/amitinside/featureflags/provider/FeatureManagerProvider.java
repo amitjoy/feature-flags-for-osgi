@@ -158,9 +158,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                                                            .stream()
                                                            .filter(e -> e.getValue()
                                                                          .stream()
-                                                                         .filter(f -> f.id.equals(featureID))
-                                                                         .findAny()
-                                                                         .isPresent())
+                                                                         .anyMatch(f -> f.id.equals(featureID)))
                                                            .map(Entry::getKey)
                                                            .collect(Collectors.toList());
             //@formatter:on
