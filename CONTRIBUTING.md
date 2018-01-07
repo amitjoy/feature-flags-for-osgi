@@ -1,13 +1,13 @@
-# How to contribute
+# How to Contribute
 
-First of all, thanks for considering to contribute. We really appreciate the time and effort you want to
+First of all, thanks for considering to contribute. We appreciate the time and effort you want to
 spend helping to improve things around here. And help we can use :-)
 
 Here is a (non-exclusive, non-prioritized) list of things you might be able to help us with:
 
 * bug reports
 * bug fixes
-* improvements regarding code quality e.g. improving readability, performance, modularity etc.
+* improvements regarding code quality, e.g. improving readability, performance, modularity etc.
 * documentation
 * features (both ideas and code are welcome)
 * tests
@@ -50,7 +50,7 @@ The easiest way to contribute code/patches/whatever is by creating a GitHub pull
 
 You do this by adding the `-s` flag when you make the commit(s), e.g.
 
-    $> git commit -s -m "Let's do it"
+    $> git commit -s -m "Let's do it."
 
 ## Making your Changes
 
@@ -61,7 +61,7 @@ You do this by adding the `-s` flag when you make the commit(s), e.g.
 * Make your changes
 * Make sure copyright headers are included in (all) files including updated year(s)
 * Make sure proper headers are in place for each file (see above Legal Requirements)
-* Commit your changes into that branch
+* Commit your changes to that branch
 * Use descriptive and meaningful commit messages
 * If you have a lot of commits squash them into a single commit
 * Make sure you use the `-s` flag when committing as explained above
