@@ -19,7 +19,7 @@
 
 	<licenses>
 		<license>
-			<name>Eclipse Public License - v 1.0</name>
+			<name>Eclipse Public License - v1.0</name>
 			<url>https://www.eclipse.org/legal/epl-v10.html</url>
 		</license>
 	</licenses>
@@ -27,7 +27,7 @@
 	<developers>
 		<developer>
 			<name>Amit Kumar Mondal</name>
-			<email>admin@amitinside.com</email>
+			<email>amit@amitinside.com</email>
 			<organization>Deutsche Telekom AG</organization>
 			<organizationUrl>http://www.telekom.de</organizationUrl>
 		</developer>
