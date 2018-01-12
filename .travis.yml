@@ -9,7 +9,7 @@ branches:
   only:
     - master
       
-install: mvn install -Dgpg.skip
+install: mvn clean install -Dgpg.skip
 
 after_success:
   - mvn clean test jacoco:report coveralls:report
