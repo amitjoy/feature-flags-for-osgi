@@ -14,7 +14,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.tomgibara/github.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-for-osgi/)
 
------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
 ### Requirements
 
