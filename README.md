@@ -45,7 +45,7 @@ As test dependencies, the following test libraries are used:
 
 The REST bundle requires [OSGi JAX-RS Connector](https://github.com/hstaudacher/osgi-jax-rs-connector).
 
--------------------------------------------------------------------------
+--------------------------------------------------------------------------
 
 ### Installation
 
