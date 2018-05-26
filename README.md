@@ -76,7 +76,7 @@ Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> 
 
 Run `mvn clean install -Dgpg.skip` in the project root directory
 
---------------------------------------------------------------------
+----------------------------------------------------------------------
 
 ### License
 
