@@ -127,4 +127,4 @@ or provide a metatype XML with the required configuration in your bundle's `OSGI
 
 For more information, have a look at the [example project](https://github.com/amitjoy/feature-flags-for-osgi/tree/master/com.amitinside.featureflags.example/src/main/java/com/amitinside/featureflags/example).
 
------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
