@@ -56,7 +56,7 @@ The REST bundle requires [OSGi JAX-RS Connector](https://github.com/hstaudacher/
 
 You don't need to install all four bundles. To use feature flags in OSGi environment, you could only use the API and provider bundles.
 
-------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
 
 ### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/feature-flags-osgi/issues)
 
