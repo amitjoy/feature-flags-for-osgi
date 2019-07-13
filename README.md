@@ -4,7 +4,7 @@
 
 This is an implementation of the Feature Toggles pattern (also known as Feature Flags) for OSGi Service Platform. Feature Flags (also known as Feature Toggles and Feature Controls) is a software development practice that facilitates the easy enablement and disablement of deployed functionalities. Besides, feature flags ease the management of the feature's entire lifecycle. These allow you to manage components and compartmentalise risk. We can also roll out the features to a specific group of users or exclude the group from accessing it, perform A/B test and much more. It’s also the way to test how your features function in the real world and not just in an artificial test environment. Therefore, feature toggle is a widespread agile development practice in the context of continuous deployment and delivery.
 
---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
 
 **Continuous Integration** ![Build Status](https://travis-ci.org/amitjoy/feature-flags-for-osgi.svg?branch=master)
 
