@@ -32,12 +32,6 @@ This project comprises four bundles -
 3. `com.amitinside.featureflags.rest` - REST Services to manage features
 4. `com.amitinside.featureflags.example` - Example project showing how to use core feature flags in codebase
 
-The implementation provider bundle does require the following open source libraries:
-
-1. [Google Guava 15+](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.google.guava%22%20AND%20a%3A%22guava%22)
-2. [OSGi DTO](http://search.maven.org/#artifactdetails%7Corg.osgi%7Corg.osgi.dto%7C1.0.0%7Cjar) (**Required** if and only if **OSGi Version prior to R6**)
-3. [Apache Felix Utilities](http://search.maven.org/#artifactdetails%7Corg.everit.osgi.bundles%7Corg.everit.osgi.bundles.org.apache.felix.utils%7C1.6.0%7Cjar)
-
 As test dependencies, the following test libraries are used:
 
 1. JUnit 4.12

@@ -190,7 +190,8 @@
 						<Bundle-SCM>https://github.com/amitjoy/feature-flags-osgi</Bundle-SCM>
 						<Bundle-DocURL>https://github.com/amitjoy/feature-flags-osgi</Bundle-DocURL>
 						<Bundle-Icon>logo.png</Bundle-Icon>
-						<Conditional-Package>org.apache.felix.utils.*</Conditional-Package>
+						<_conditionalpackage>org.apache.felix.utils.*</_conditionalpackage>
+						<Export-Package>com.amitinside.featureflags, com.amitinside.featureflags.dto</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

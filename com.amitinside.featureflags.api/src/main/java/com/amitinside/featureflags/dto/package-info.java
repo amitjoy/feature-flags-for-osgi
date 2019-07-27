@@ -27,7 +27,5 @@
  *
  * @since 1.0
  */
-@Version("1.0")
+@org.osgi.annotation.versioning.Version("1.0")
 package com.amitinside.featureflags.dto;
-
-import org.osgi.annotation.versioning.Version;

@@ -9,25 +9,22 @@
  *******************************************************************************/
 package com.amitinside.featureflags.dto;
 
-import org.osgi.dto.DTO;
-
 import com.amitinside.featureflags.FeatureManager;
 
 /**
  * Data Transfer Object for a feature.
  *
  * <p>
- * A feature is defined by its identifier, name, description, flag denoting whether
- * the feature is enabled and the bundle's unique identifier in which the feature is
- * specified.
+ * A feature is defined by its identifier, name, description, flag denoting
+ * whether the feature is enabled and the bundle's unique identifier in which
+ * the feature is specified.
  * </p>
  *
  * <p>
  * A feature is specified in OSGi configuration with an identifier format of
- * {@code osgi.feature.X} where {@code X} is the ID of your feature and {@code osgi.feature.}
- * ({@link FeatureManager#METATYPE_FEATURE_ID_PREFIX}) is a standard prefix to specify the
- * features.
- * <br/>
+ * {@code osgi.feature.X} where {@code X} is the ID of your feature and
+ * {@code osgi.feature.} ({@link FeatureManager#METATYPE_FEATURE_ID_PREFIX}) is
+ * a standard prefix to specify the features. <br/>
  * <br/>
  * <b>Note that</b>, a feature identifier is case sensitive as well.
  * </p>
@@ -38,32 +35,32 @@ import com.amitinside.featureflags.FeatureManager;
  *
  * @NotThreadSafe
  */
-public class FeatureDTO extends DTO {
+public class FeatureDTO {
 
-    /**
-     * The identifier of the feature
-     */
-    public String id;
+	/**
+	 * The identifier of the feature
+	 */
+	public String id;
 
-    /**
-     * The bundle identifier containing the feature
-     */
-    public long bundleId;
+	/**
+	 * The bundle identifier containing the feature
+	 */
+	public long bundleId;
 
-    /**
-     * The name of the feature
-     */
-    public String name;
+	/**
+	 * The name of the feature
+	 */
+	public String name;
 
-    /**
-     * The description of the feature
-     */
-    public String description;
+	/**
+	 * The description of the feature
+	 */
+	public String description;
 
-    /**
-     * The enablement flag of the feature that denotes whether the feature
-     * is enabled or not
-     */
-    public boolean isEnabled;
+	/**
+	 * The enablement flag of the feature that denotes whether the feature is
+	 * enabled or not
+	 */
+	public boolean isEnabled;
 
 }
