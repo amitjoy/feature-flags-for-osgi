@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017-2018 Amit Kumar Mondal
+ * Copyright (c) 2017-2019 Amit Kumar Mondal
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -24,33 +24,33 @@ import com.amitinside.featureflags.example.ExampleFeatureFlagOSGiR4.MyConfig;
 @Component(name = "ExampleFeatureFlagOSGiR4", immediate = true)
 public final class ExampleFeatureFlagOSGiR4 {
 
-    private boolean isFeatureEnabled;
+	private boolean isFeatureEnabled;
 
-    @ObjectClassDefinition(id = "feature.flag.example2")
-    @interface MyConfig {
-        @AttributeDefinition(name = "My First Feature", description = "My Feature Description")
-        boolean osgi_feature_myfeature() default true;
-    }
+	@ObjectClassDefinition(id = "feature.flag.example2")
+	@interface MyConfig {
+		@AttributeDefinition(name = "My First Feature", description = "My Feature Description")
+		boolean osgi_feature_myfeature() default true;
+	}
 
-    @Activate
-    protected void activate(final Map<String, Object> properties) {
-        modified(properties);
-    }
+	@Activate
+	protected void activate(final Map<String, Object> properties) {
+		modified(properties);
+	}
 
-    @Modified
-    protected void modified(final Map<String, Object> properties) {
-        final Object value = properties.get("osgi.feature.myfeature");
-        if (value instanceof Boolean) {
-            isFeatureEnabled = (boolean) value;
-        }
-        doStuff();
-    }
+	@Modified
+	protected void modified(final Map<String, Object> properties) {
+		final Object value = properties.get("osgi.feature.myfeature");
+		if (value instanceof Boolean) {
+			isFeatureEnabled = (boolean) value;
+		}
+		doStuff();
+	}
 
-    private void doStuff() {
-        if (isFeatureEnabled) {
-            System.out.println("[R4] Example Feature is >>Enabled<<");
-        } else {
-            System.out.println("[R4] Example Feature is >>Disabled<<");
-        }
-    }
+	private void doStuff() {
+		if (isFeatureEnabled) {
+			System.out.println("[R4] Example Feature is >>Enabled<<");
+		} else {
+			System.out.println("[R4] Example Feature is >>Disabled<<");
+		}
+	}
 }

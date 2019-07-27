@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017-2018 Amit Kumar Mondal
+ * Copyright (c) 2017-2019 Amit Kumar Mondal
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -22,30 +22,30 @@ import com.amitinside.featureflags.example.ExampleFeatureFlagOSGiR5.MyConfig;
 @Component(name = "ExampleFeatureFlagOSGiR5", immediate = true)
 public final class ExampleFeatureFlagOSGiR5 {
 
-    private MyConfig config;
+	private MyConfig config;
 
-    @ObjectClassDefinition(id = "feature.flag.example1")
-    @interface MyConfig {
-        @AttributeDefinition(name = "My First Feature", description = "My Feature Description")
-        boolean osgi_feature_myfeature() default true;
-    }
+	@ObjectClassDefinition(id = "feature.flag.example1")
+	@interface MyConfig {
+		@AttributeDefinition(name = "My First Feature", description = "My Feature Description")
+		boolean osgi_feature_myfeature() default true;
+	}
 
-    @Activate
-    protected void activate(final MyConfig config) {
-        modified(config);
-    }
+	@Activate
+	protected void activate(final MyConfig config) {
+		modified(config);
+	}
 
-    @Modified
-    protected void modified(final MyConfig config) {
-        this.config = config;
-        doStuff();
-    }
+	@Modified
+	protected void modified(final MyConfig config) {
+		this.config = config;
+		doStuff();
+	}
 
-    private void doStuff() {
-        if (config.osgi_feature_myfeature()) {
-            System.out.println("[R5] Example Feature is >>Enabled<<");
-        } else {
-            System.out.println("[R5] Example Feature is >>Disabled<<");
-        }
-    }
+	private void doStuff() {
+		if (config.osgi_feature_myfeature()) {
+			System.out.println("[R5] Example Feature is >>Enabled<<");
+		} else {
+			System.out.println("[R5] Example Feature is >>Disabled<<");
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017-2018 Amit Kumar Mondal
+ * Copyright (c) 2017-2019 Amit Kumar Mondal
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,8 @@
  *******************************************************************************/
 package com.amitinside.featureflags.rest;
 
-import static javax.ws.rs.core.MediaType.*;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,42 +44,42 @@ import com.amitinside.featureflags.dto.FeatureDTO;
 @Component(name = "FeatureFlagsRESTResource", immediate = true, service = FeatureFlagsRESTResource.class)
 public final class FeatureFlagsRESTResource {
 
-    private FeatureManager featureManager;
+	private FeatureManager featureManager;
 
-    @GET
-    @Path("/features")
-    @Produces(APPLICATION_JSON)
-    public List<FeatureDTO> getFeatures() {
-        return featureManager.getFeatures().collect(Collectors.toList());
-    }
+	@GET
+	@Path("/features")
+	@Produces(APPLICATION_JSON)
+	public List<FeatureDTO> getFeatures() {
+		return featureManager.getFeatures().collect(Collectors.toList());
+	}
 
-    @GET
-    @Path("/features/{featureID}")
-    @Produces(APPLICATION_JSON)
-    public List<FeatureDTO> getFeatures(@PathParam("featureID") final String featureID) {
-        return featureManager.getFeatures(featureID).collect(Collectors.toList());
-    }
+	@GET
+	@Path("/features/{featureID}")
+	@Produces(APPLICATION_JSON)
+	public List<FeatureDTO> getFeatures(@PathParam("featureID") final String featureID) {
+		return featureManager.getFeatures(featureID).collect(Collectors.toList());
+	}
 
-    @PUT
-    @Path("/features/{featureID}")
-    @Consumes(TEXT_PLAIN)
-    public void updateFeature(@PathParam("featureID") final String featureID, final boolean isEnabled) {
-        featureManager.updateFeature(featureID, isEnabled);
-    }
+	@PUT
+	@Path("/features/{featureID}")
+	@Consumes(TEXT_PLAIN)
+	public void updateFeature(@PathParam("featureID") final String featureID, final boolean isEnabled) {
+		featureManager.updateFeature(featureID, isEnabled);
+	}
 
-    /**
-     * {@link FeatureManager} service binding callback
-     */
-    @Reference
-    protected void setFeatureService(final FeatureManager featureManager) {
-        this.featureManager = featureManager;
-    }
+	/**
+	 * {@link FeatureManager} service binding callback
+	 */
+	@Reference
+	protected void setFeatureService(final FeatureManager featureManager) {
+		this.featureManager = featureManager;
+	}
 
-    /**
-     * {@link FeatureManager} service unbinding callback
-     */
-    protected void unsetFeatureService(final FeatureManager featureManager) {
-        this.featureManager = null;
-    }
+	/**
+	 * {@link FeatureManager} service unbinding callback
+	 */
+	protected void unsetFeatureService(final FeatureManager featureManager) {
+		this.featureManager = null;
+	}
 
 }
