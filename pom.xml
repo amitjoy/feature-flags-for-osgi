@@ -1,5 +1,5 @@
 <!--  
- Copyright (c) 2017-2018 Amit Kumar Mondal
+ Copyright (c) 2017-2019 Amit Kumar Mondal
   
   All rights reserved. This program and the accompanying materials 
   are made available under the terms of the Eclipse Public License v1.0 
@@ -104,11 +104,6 @@
 			<version>${felix.compendium.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${guava.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.dto</artifactId>
 			<version>${osgi.dto.version}</version>
@@ -191,10 +186,11 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-Copyright>Copyright (c) 2017 Amit Kumar Mondal</Bundle-Copyright>
+						<Bundle-Copyright>Copyright (c) 2017-2019 Amit Kumar Mondal</Bundle-Copyright>
 						<Bundle-SCM>https://github.com/amitjoy/feature-flags-osgi</Bundle-SCM>
 						<Bundle-DocURL>https://github.com/amitjoy/feature-flags-osgi</Bundle-DocURL>
 						<Bundle-Icon>logo.png</Bundle-Icon>
+						<Conditional-Package>org.apache.felix.utils.*</Conditional-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -259,7 +255,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+			<!-- plugin>
 				<artifactId>maven-gpg-plugin</artifactId>
 				<version>${maven-gpg-plugin.version}</version>
 				<executions>
@@ -271,7 +267,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>

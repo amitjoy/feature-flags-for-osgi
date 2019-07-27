@@ -14,6 +14,10 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,121 +31,129 @@ import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.service.metatype.ObjectClassDefinition;
 
 import com.amitinside.featureflags.dto.FeatureDTO;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Multimap;
 
 /**
  * Feature Manager Helper class
  */
 public final class ManagerHelper {
 
-    /** Constructor */
-    private ManagerHelper() {
-        throw new IllegalAccessError("Non-Instantiable");
-    }
+	/** Constructor */
+	private ManagerHelper() {
+		throw new IllegalAccessError("Non-Instantiable");
+	}
 
-    /**
-     * Placeholder for Feature DTO. Used for internal purposes.
-     */
-    public static class Feature {
-        public String id;
-        public long bundleId;
-        public String name;
-        public String description;
-        public boolean isEnabled;
-    }
+	public static void checkArgument(boolean expression, String message) {
+		if (!expression) {
+			throw new IllegalArgumentException(message);
+		}
+	}
 
-    public static String getFeatureID(final String id) {
-        requireNonNull(id, "Feature ID cannot be null");
-        return id.substring(METATYPE_FEATURE_ID_PREFIX.length(), id.length());
-    }
+	/**
+	 * Placeholder for Feature DTO. Used for internal purposes.
+	 */
+	public static class Feature {
+		public String id;
+		public long bundleId;
+		public String name;
+		public String description;
+		public boolean isEnabled;
+	}
 
-    public static FeatureDTO toFeatureDTO(final Feature f) {
-        requireNonNull(f, "Feature cannot be null");
-        final FeatureDTO feature = new FeatureDTO();
-        feature.id = f.id;
-        feature.bundleId = f.bundleId;
-        feature.name = f.name;
-        feature.description = f.description;
-        feature.isEnabled = f.isEnabled;
-        return feature;
-    }
+	public static String getFeatureID(final String id) {
+		requireNonNull(id, "Feature ID cannot be null");
+		return id.substring(METATYPE_FEATURE_ID_PREFIX.length(), id.length());
+	}
 
-    public static Feature toFeature(final AttributeDefinition ad, final long bundleId) {
-        requireNonNull(ad, "Attribute Definition cannot be null");
+	public static FeatureDTO toFeatureDTO(final Feature f) {
+		requireNonNull(f, "Feature cannot be null");
+		final FeatureDTO feature = new FeatureDTO();
+		feature.id = f.id;
+		feature.bundleId = f.bundleId;
+		feature.name = f.name;
+		feature.description = f.description;
+		feature.isEnabled = f.isEnabled;
+		return feature;
+	}
 
-        final Feature feature = new Feature();
-        feature.id = getFeatureID(ad.getID());
+	public static Feature toFeature(final AttributeDefinition ad, final long bundleId) {
+		requireNonNull(ad, "Attribute Definition cannot be null");
 
-        final String name = ad.getName();
-        feature.name = name != null ? name : feature.id;
+		final Feature feature = new Feature();
+		feature.id = getFeatureID(ad.getID());
 
-        feature.description = ad.getDescription();
+		final String name = ad.getName();
+		feature.name = name != null ? name : feature.id;
 
-        final String[] defaultValue = ad.getDefaultValue();
-        feature.isEnabled = defaultValue == null ? false : Boolean.valueOf(defaultValue[0]);
+		feature.description = ad.getDescription();
 
-        feature.bundleId = bundleId;
-        return feature;
-    }
+		final String[] defaultValue = ad.getDefaultValue();
+		feature.isEnabled = defaultValue == null ? false : Boolean.valueOf(defaultValue[0]);
 
-    public static List<String> getPIDs(final Bundle bundle, final MetaTypeService metaTypeService) {
-        requireNonNull(bundle, "Bundle Instance cannot be null");
-        requireNonNull(metaTypeService, "MetaType Service Instance cannot be null");
+		feature.bundleId = bundleId;
+		return feature;
+	}
 
-        final MetaTypeInformation metatypeInfo = metaTypeService.getMetaTypeInformation(bundle);
-        return ManagerHelper.asList(metatypeInfo.getPids());
-    }
+	public static List<String> getPIDs(final Bundle bundle, final MetaTypeService metaTypeService) {
+		requireNonNull(bundle, "Bundle Instance cannot be null");
+		requireNonNull(metaTypeService, "MetaType Service Instance cannot be null");
 
-    public static List<AttributeDefinition> getAttributeDefinitions(final Bundle bundle, final String pid,
-            final MetaTypeService metaTypeService) {
-        requireNonNull(bundle, "Bundle Instance cannot be null");
-        requireNonNull(pid, "Configuration PID cannot be null");
-        requireNonNull(metaTypeService, "MetaType Service Instance cannot be null");
+		final MetaTypeInformation metatypeInfo = metaTypeService.getMetaTypeInformation(bundle);
+		return ManagerHelper.asList(metatypeInfo.getPids());
+	}
 
-        final MetaTypeInformation metaTypeInformation = metaTypeService.getMetaTypeInformation(bundle);
-        final ObjectClassDefinition ocd = metaTypeInformation.getObjectClassDefinition(pid, null);
-        return asList(ocd.getAttributeDefinitions(ALL));
-    }
+	public static List<AttributeDefinition> getAttributeDefinitions(final Bundle bundle, final String pid,
+			final MetaTypeService metaTypeService) {
+		requireNonNull(bundle, "Bundle Instance cannot be null");
+		requireNonNull(pid, "Configuration PID cannot be null");
+		requireNonNull(metaTypeService, "MetaType Service Instance cannot be null");
 
-    public static Multimap<String, Feature> getFeaturesFromAttributeDefinitions(final Bundle bundle, final String pid,
-            final MetaTypeService metaTypeService) {
-        requireNonNull(bundle, "Bundle Instance cannot be null");
-        requireNonNull(pid, "Configuration PID cannot be null");
-        requireNonNull(metaTypeService, "MetaType Service Instance cannot be null");
+		final MetaTypeInformation metaTypeInformation = metaTypeService.getMetaTypeInformation(bundle);
+		final ObjectClassDefinition ocd = metaTypeInformation.getObjectClassDefinition(pid, null);
+		return asList(ocd.getAttributeDefinitions(ALL));
+	}
 
-        final Multimap<String, Feature> allFeatures = ArrayListMultimap.create();
-        for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {
-            if (ad.getID().startsWith(METATYPE_FEATURE_ID_PREFIX)) {
-                allFeatures.put(pid, toFeature(ad, bundle.getBundleId()));
-            }
-        }
-        return allFeatures;
-    }
+	public static Map<String, List<Feature>> getFeaturesFromAttributeDefinitions(final Bundle bundle, final String pid,
+			final MetaTypeService metaTypeService) {
+		requireNonNull(bundle, "Bundle Instance cannot be null");
+		requireNonNull(pid, "Configuration PID cannot be null");
+		requireNonNull(metaTypeService, "MetaType Service Instance cannot be null");
 
-    public static Map<String, Boolean> getConfiguredFeatures(final String configurationPID,
-            final ConfigurationAdmin configurationAdmin) {
-        try {
-            final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> properties = new DictionaryAsMap<>(configuration.getProperties());
-            //@formatter:off
-            return properties.entrySet().stream()
-                                        .filter(e -> e.getKey().startsWith(METATYPE_FEATURE_ID_PREFIX))
-                                        .filter(e -> e.getValue() instanceof Boolean)
-                                        .collect(toMap(e -> getFeatureID(e.getKey()),
-                                                       e -> (Boolean) e.getValue()));
-            //@formatter:on
-        } catch (final Exception e) {
-            // cannot do anything
-        }
-        return ImmutableMap.of();
-    }
+		final Map<String, List<Feature>> allFeatures = new HashMap<>();
+		for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {
+			if (ad.getID().startsWith(METATYPE_FEATURE_ID_PREFIX)) {
+				List<Feature> features = null;
+				if (allFeatures.get(pid) != null) {
+					features = allFeatures.get(pid);
+				} else {
+					features = new ArrayList<>();
+					allFeatures.put(pid, features);
+				}
+				features.add(toFeature(ad, bundle.getBundleId()));
+			}
+		}
+		return allFeatures;
+	}
 
-    public static <T> List<T> asList(final T[] elements) {
-        return elements == null ? ImmutableList.of() : ImmutableList.copyOf(elements);
-    }
+	public static Map<String, Boolean> getConfiguredFeatures(final String configurationPID,
+			final ConfigurationAdmin configurationAdmin) {
+		try {
+			final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
+			@SuppressWarnings("unchecked")
+			final Map<String, Object> properties = new DictionaryAsMap<>(configuration.getProperties());
+			// @formatter:off
+			return properties.entrySet().stream()
+										.filter(e -> e.getKey().startsWith(METATYPE_FEATURE_ID_PREFIX))
+										.filter(e -> e.getValue() instanceof Boolean)
+										.collect(toMap(e -> getFeatureID(e.getKey()), e -> (Boolean) e.getValue()));
+			// @formatter:on
+		} catch (final Exception e) {
+			// cannot do anything
+		}
+		return Collections.emptyMap();
+	}
+
+	public static <T> List<T> asList(final T[] elements) {
+		return elements == null ? Collections.emptyList() : Collections.unmodifiableList(Arrays.asList(elements));
+	}
 
 }

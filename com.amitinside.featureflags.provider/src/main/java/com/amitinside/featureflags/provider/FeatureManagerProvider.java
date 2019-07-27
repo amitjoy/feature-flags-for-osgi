@@ -9,18 +9,18 @@
  *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
+import static com.amitinside.featureflags.provider.ManagerHelper.checkArgument;
 import static com.amitinside.featureflags.provider.ManagerHelper.getConfiguredFeatures;
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.service.cm.ConfigurationEvent.CM_UPDATED;
 import static org.osgi.service.log.LogService.LOG_INFO;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,9 +40,6 @@ import org.osgi.service.metatype.MetaTypeService;
 import com.amitinside.featureflags.FeatureManager;
 import com.amitinside.featureflags.dto.FeatureDTO;
 import com.amitinside.featureflags.provider.ManagerHelper.Feature;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 
 /**
  * This implements the {@link FeatureManager}.
@@ -51,148 +48,141 @@ import com.google.common.collect.Multimap;
 @Component(name = "FeatureManager", immediate = true)
 public final class FeatureManagerProvider implements FeatureManager, ConfigurationListener {
 
-    /** Data container -> Key: Configuration PID Value: Feature DTOs */
-    private final Multimap<String, Feature> allFeatures = ArrayListMultimap.create();
+	/** Data container -> Key: Configuration PID Value: Feature DTOs */
+	private final Map<String, List<Feature>> allFeatures = new HashMap<>();
 
-    /** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
-    private final Multimap<Bundle, String> bundlePids = ArrayListMultimap.create();
+	/** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
+	private final Map<Bundle, List<String>> bundlePids = new HashMap<>();
 
-    /** Configuration Admin Service Instance Reference */
-    private ConfigurationAdmin configurationAdmin;
+	/** Configuration Admin Service Instance Reference */
+	private ConfigurationAdmin configurationAdmin;
 
-    /** Metatype Service Instance Reference */
-    private MetaTypeService metaTypeService;
+	/** Metatype Service Instance Reference */
+	private MetaTypeService metaTypeService;
 
-    /** Metatype Extender Instance Reference */
-    private MetaTypeExtender extender;
+	/** Metatype Extender Instance Reference */
+	private MetaTypeExtender extender;
 
-    /** Logger Instance */
-    private Logger logger;
+	/** Logger Instance */
+	private Logger logger;
 
-    @Activate
-    protected void activate(final BundleContext bundleContext) throws Exception {
-        logger = new Logger(bundleContext);
-        extender = new MetaTypeExtender(metaTypeService, logger, bundlePids, allFeatures);
-        extender.start(bundleContext);
-    }
+	@Activate
+	protected void activate(final BundleContext bundleContext) throws Exception {
+		logger = new Logger(bundleContext);
+		extender = new MetaTypeExtender(metaTypeService, logger, bundlePids, allFeatures);
+		extender.start(bundleContext);
+	}
 
-    @Deactivate
-    protected void deactivate(final BundleContext bundleContext) throws Exception {
-        extender.stop(bundleContext);
-    }
+	@Deactivate
+	protected void deactivate(final BundleContext bundleContext) throws Exception {
+		extender.stop(bundleContext);
+	}
 
-    /**
-     * {@link ConfigurationAdmin} service binding callback
-     */
-    @Reference
-    protected void setConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
-        this.configurationAdmin = configurationAdmin;
-    }
+	/**
+	 * {@link ConfigurationAdmin} service binding callback
+	 */
+	@Reference
+	protected void setConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
+		this.configurationAdmin = configurationAdmin;
+	}
 
-    /**
-     * {@link ConfigurationAdmin} service unbinding callback
-     */
-    protected void unsetConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
-        this.configurationAdmin = null;
-    }
+	/**
+	 * {@link ConfigurationAdmin} service unbinding callback
+	 */
+	protected void unsetConfigurationAdmin(final ConfigurationAdmin configurationAdmin) {
+		this.configurationAdmin = null;
+	}
 
-    /**
-     * {@link MetaTypeService} service binding callback
-     */
-    @Reference
-    protected void setMetaTypeService(final MetaTypeService metaTypeService) {
-        this.metaTypeService = metaTypeService;
-    }
+	/**
+	 * {@link MetaTypeService} service binding callback
+	 */
+	@Reference
+	protected void setMetaTypeService(final MetaTypeService metaTypeService) {
+		this.metaTypeService = metaTypeService;
+	}
 
-    /**
-     * {@link MetaTypeService} service unbinding callback
-     */
-    protected void unsetMetaTypeService(final MetaTypeService metaTypeService) {
-        this.metaTypeService = null;
-    }
+	/**
+	 * {@link MetaTypeService} service unbinding callback
+	 */
+	protected void unsetMetaTypeService(final MetaTypeService metaTypeService) {
+		this.metaTypeService = null;
+	}
 
-    /**
-     * Returns the internal {@link MetaTypeExtender} instance.
-     * This is required for unit testing purposes.
-     */
-    protected MetaTypeExtender getExtender() {
-        return extender;
-    }
+	/**
+	 * Returns the internal {@link MetaTypeExtender} instance. This is required for
+	 * unit testing purposes.
+	 */
+	protected MetaTypeExtender getExtender() {
+		return extender;
+	}
 
-    @Override
-    public Stream<FeatureDTO> getFeatures() {
-        //@formatter:off
-        return allFeatures.values()
-                          .stream()
-                          .map(ManagerHelper::toFeatureDTO);
-        //@formatter:on
-    }
+	@Override
+	public Stream<FeatureDTO> getFeatures() {
+		return allFeatures.values().stream().flatMap(List::stream).map(ManagerHelper::toFeatureDTO);
+	}
 
-    @Override
-    public Stream<FeatureDTO> getFeatures(final String featureID) {
-        requireNonNull(featureID, "Feature ID cannot be null");
-        checkArgument(!featureID.isEmpty(), "Feature ID cannot be empty");
+	@Override
+	public Stream<FeatureDTO> getFeatures(final String featureID) {
+		requireNonNull(featureID, "Feature ID cannot be null");
+		checkArgument(!featureID.isEmpty(), "Feature ID cannot be empty");
 
-        //@formatter:off
-        return allFeatures.values()
-                          .stream()
-                          .filter(f -> f.id.equals(featureID))
-                          .map(ManagerHelper::toFeatureDTO);
-        //@formatter:on
-    }
+		// @formatter:off
+		return allFeatures.values().stream()
+								   .flatMap(List::stream)
+								   .filter(f -> f.id.equals(featureID))
+								   .map(ManagerHelper::toFeatureDTO);
+		// @formatter:on
+	}
 
-    @Override
-    public void updateFeature(final String featureID, final boolean isEnabled) {
-        requireNonNull(featureID, "Feature ID cannot be null");
-        checkArgument(!featureID.isEmpty(), "Feature ID cannot be empty");
+	@Override
+	public void updateFeature(final String featureID, final boolean isEnabled) {
+		requireNonNull(featureID, "Feature ID cannot be null");
+		checkArgument(!featureID.isEmpty(), "Feature ID cannot be empty");
 
-        logger.log(LOG_INFO, String.format("Updating feature [%s] to [%b]", featureID, isEnabled));
+		logger.log(LOG_INFO, String.format("Updating feature [%s] to [%b]", featureID, isEnabled));
 
-        final Map<String, Object> props = Maps.newHashMap();
-        props.put(METATYPE_FEATURE_ID_PREFIX + featureID, isEnabled);
-        final Map<String, Object> filteredProps = Maps.filterValues(props, Objects::nonNull);
-        try {
-            //@formatter:off
-            final List<String> configurations = allFeatures.asMap()
-                                                           .entrySet()
-                                                           .stream()
-                                                           .filter(e -> e.getValue()
-                                                                         .stream()
-                                                                         .anyMatch(f -> f.id.equals(featureID)))
-                                                           .map(Entry::getKey)
-                                                           .collect(Collectors.toList());
-            //@formatter:on
-            for (final String configurationPID : configurations) {
-                final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
-                if (configuration != null) {
-                    configuration.update(new Hashtable<>(filteredProps));
-                }
-            }
-        } catch (final Exception e) {
-            // not required
-        }
-    }
+		final Map<String, Object> props = new HashMap<>();
+		props.put(METATYPE_FEATURE_ID_PREFIX + featureID, isEnabled);
+		try {
+			// @formatter:off
+			final List<String> configurations =
+					allFeatures.entrySet().stream()
+										  .filter(e -> e.getValue().stream()
+												  				   .anyMatch(f -> f.id.equals(featureID)))
+										  						   .map(Entry::getKey)
+										  						   .collect(Collectors.toList());
+			// @formatter:on
+			for (final String configurationPID : configurations) {
+				final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
+				if (configuration != null) {
+					configuration.update(new Hashtable<>(props));
+				}
+			}
+		} catch (final Exception e) {
+			// not required
+		}
+	}
 
-    @Override
-    public void configurationEvent(final ConfigurationEvent event) {
-        final int type = event.getType();
-        final String pid = event.getPid();
-        if (type == CM_UPDATED) {
-            final Map<String, Boolean> configuredFeatures = getConfiguredFeatures(pid, configurationAdmin);
-            for (final Entry<String, Boolean> entry : configuredFeatures.entrySet()) {
-                final String featureID = entry.getKey();
-                final boolean isEnabled = entry.getValue();
-                final Collection<Feature> features = allFeatures.get(pid);
-                //@formatter:off
-                features.stream()
-                        .filter(f -> f.id.equalsIgnoreCase(featureID))
-                        .peek(f -> logger.log(LOG_INFO, String.format("Updated feature [%s] to [%b]", f.toString(), isEnabled)))
-                        .forEach(f -> f.isEnabled = isEnabled);
-                //@formatter:on
-            }
-        } else {
-            allFeatures.removeAll(pid);
-        }
-    }
+	@Override
+	public void configurationEvent(final ConfigurationEvent event) {
+		final int type = event.getType();
+		final String pid = event.getPid();
+		if (type == CM_UPDATED) {
+			final Map<String, Boolean> configuredFeatures = getConfiguredFeatures(pid, configurationAdmin);
+			for (final Entry<String, Boolean> entry : configuredFeatures.entrySet()) {
+				final String featureID = entry.getKey();
+				final boolean isEnabled = entry.getValue();
+				final Collection<Feature> features = allFeatures.get(pid);
+				// @formatter:off
+				features.stream().filter(f -> f.id.equalsIgnoreCase(featureID))
+						.peek(f -> logger.log(LOG_INFO,
+								String.format("Updated feature [%s] to [%b]", f.toString(), isEnabled)))
+						.forEach(f -> f.isEnabled = isEnabled);
+				// @formatter:on
+			}
+		} else {
+			allFeatures.remove(pid);
+		}
+	}
 
 }
