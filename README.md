@@ -56,7 +56,7 @@ You don't need to install all four bundles. To use feature flags in OSGi environ
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/feature-flags-osgi/blob/master/CONTRIBUTING.md)
 
------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------
 
 #### Project Import
 
