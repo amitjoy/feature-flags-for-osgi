@@ -56,7 +56,7 @@ You don't need to install all four bundles. To use feature flags in OSGi environ
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/feature-flags-osgi/blob/master/CONTRIBUTING.md)
 
---------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------
 
 #### Project Import
 
@@ -64,13 +64,13 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> Existing Maven Projects`)
 
-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 
 #### Building from Source
 
 Run `mvn clean install -Dgpg.skip` in the project root directory
 
------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
 ### License
 
 This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/license-EPL-blue.svg)](http://www.eclipse.org/legal/epl-v10.html)
