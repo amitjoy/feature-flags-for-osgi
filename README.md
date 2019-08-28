@@ -70,7 +70,7 @@ Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> 
 
 Run `mvn clean install -Dgpg.skip` in the project root directory
 
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 ### License
 
 This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/license-EPL-blue.svg)](http://www.eclipse.org/legal/epl-v10.html)
