@@ -75,7 +75,7 @@ Run `mvn clean install -Dgpg.skip` in the project root directory
 
 This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/license-EPL-blue.svg)](http://www.eclipse.org/legal/epl-v10.html)
 
----------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------
 
 ### Usage
 
