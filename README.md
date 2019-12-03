@@ -4,7 +4,7 @@
 
 This is an implementation of the Feature Toggles pattern (also known as Feature Flags) for OSGi Service Platform. Feature Flags (also known as Feature Toggles and Feature Controls) is a software development practice that facilitates the easy enablement and disablement of deployed functionalities. Besides, feature flags ease the management of the feature's entire lifecycle. These allow you to manage components and compartmentalise risk. We can also roll out the features to a specific group of users or exclude the group from accessing it, perform A/B test and much more. It’s also the way to test how your features function in the real world and not just in an artificial test environment. Therefore, feature toggle is a widespread agile development practice in the context of continuous deployment and delivery.
 
-----------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 
 **Continuous Integration** ![Build Status](https://travis-ci.org/amitjoy/feature-flags-for-osgi.svg?branch=master)
 
@@ -14,14 +14,14 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 **Javadoc** [![javadoc](http://javadoc-badge.appspot.com/com.tomgibara/github.svg?label=javadoc)](http://amitjoy.github.io/feature-flags-for-osgi/)
 
--------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 
 ### Requirements
 
 1. Java 8+
-2. OSGi R4+
+2. OSGi R4.3+
 
------—----------------——--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 
 ### Dependencies
 
@@ -29,53 +29,46 @@ This project comprises four bundles -
 
 1. `com.amitinside.featureflags.api` - The core feature flags API
 2. `com.amitinside.featureflags.provider` - The core feature flags implementation
-3. `com.amitinside.featureflags.rest` - REST Services to manage features
-4. `com.amitinside.featureflags.example` - Example project showing how to use core feature flags in codebase
+3. `com.amitinside.featureflags.example` - Example project showing how to use core feature flags in codebase
 
 As test dependencies, the following test libraries are used:
 
 1. JUnit 4.12
 3. Mockito Core 2.10
 
-The REST bundle requires [OSGi JAX-RS Connector](https://github.com/hstaudacher/osgi-jax-rs-connector).
-
--------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 
 ### Installation
 
-1. `com.amitinside.featureflags.api`
-2. `com.amitinside.featureflags.provider`
-3. `com.amitinside.featureflags.rest`
-4. `com.amitinside.featureflags.example`
+To use feature flags in OSGi environment, you only need to install `com.amitinside.featureflags.provider`.
 
-You don't need to install all four bundles. To use feature flags in OSGi environment, you could only use the API and provider bundles.
-
-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 ### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/feature-flags-osgi/issues)
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/feature-flags-osgi/blob/master/CONTRIBUTING.md)
 
---------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 #### Project Import
 
-**Import as Maven Project**
+**Import as Eclipse Projects**
 
-Import all the projects as Existing Maven Projects (`File -> Import -> Maven -> Existing Maven Projects`)
+1. Install bndtools
+2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace`)
 
--------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 
 #### Building from Source
 
-Run `mvn clean install -Dgpg.skip` in the project root directory
+Run `./gradlew clean build` in the project root directory
+------------------------------------------------------------------------------------------------
 
-----------------------------------------------------------------------------------------------------------------
 ### License
 
-This project is licensed under EPL-1.0 [![License](http://img.shields.io/badge/license-EPL-blue.svg)](http://www.eclipse.org/legal/epl-v10.html)
+This project is licensed under Apache License [![License](http://img.shields.io/badge/license-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 
 ### Usage
 
@@ -116,8 +109,8 @@ or provide a metatype XML with the required configuration in your bundle's `OSGI
 
 3. The primary contract of using feature flags in your codebase is to introduce boolean attribute definitions to existing or new object class definitions in metatype. The IDs of the attribute definitions must be **osgi.feature.X** where X is the name of your feature. And don't forget to add the aforementioned requirement capability to your manifest.
 
-#### The primary benefit of this approach is that developers can use feature flags without having any dependency to any external API.
+##### The primary benefit of this approach is that developers can use feature flags without having any dependency to any external API.
 
 For more information, have a look at the [example project](https://github.com/amitjoy/feature-flags-for-osgi/tree/master/com.amitinside.featureflags.example/src/main/java/com/amitinside/featureflags/example).
 
-------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------

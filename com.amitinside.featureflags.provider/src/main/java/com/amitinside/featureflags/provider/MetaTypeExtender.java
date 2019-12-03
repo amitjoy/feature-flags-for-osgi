@@ -1,20 +1,11 @@
-/*******************************************************************************
- * Copyright (c) 2017-2018 Amit Kumar Mondal
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- *******************************************************************************/
 package com.amitinside.featureflags.provider;
 
 import static com.amitinside.featureflags.provider.ManagerHelper.getFeaturesFromAttributeDefinitions;
 import static com.amitinside.featureflags.provider.ManagerHelper.getPIDs;
 import static java.util.Objects.requireNonNull;
-import static org.osgi.service.log.LogService.LOG_DEBUG;
-import static org.osgi.service.log.LogService.LOG_ERROR;
-import static org.osgi.service.log.LogService.LOG_WARNING;
+import static org.apache.felix.utils.log.Logger.LOG_DEBUG;
+import static org.apache.felix.utils.log.Logger.LOG_ERROR;
+import static org.apache.felix.utils.log.Logger.LOG_WARNING;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,88 +34,88 @@ import com.amitinside.featureflags.provider.ManagerHelper.Feature;
  */
 public final class MetaTypeExtender extends AbstractExtender {
 
-	/** Logger Instance */
-	private final Logger logger;
+    /** Logger Instance */
+    private final Logger logger;
 
-	/** Metatype Service Instance Reference */
-	private final MetaTypeService metaTypeService;
+    /** Metatype Service Instance Reference */
+    private final MetaTypeService metaTypeService;
 
-	/** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
-	private final Map<Bundle, List<String>> bundlePids;
+    /** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
+    private final Map<Bundle, List<String>> bundlePids;
 
-	/** Data container -> Key: Configuration PID Value: Feature DTOs */
-	private final Map<String, List<Feature>> allFeatures;
+    /** Data container -> Key: Configuration PID Value: Feature DTOs */
+    private final Map<String, List<Feature>> allFeatures;
 
-	/**
-	 * Constructor
-	 *
-	 * @param metaTypeService {@link MetaTypeService} instance
-	 * @param bundlePids      container to store all configuration PIDs associated
-	 *                        in a bundle's metatype
-	 * @param allFeatures     container to store all configuration PIDs in the
-	 *                        runtime
-	 *
-	 * @throws NullPointerException if any of the specified arguments is
-	 *                              {@code null}
-	 */
-	public MetaTypeExtender(final MetaTypeService metaTypeService, final Logger logger,
-			final Map<Bundle, List<String>> bundlePids, final Map<String, List<Feature>> allFeatures) {
-		this.logger = requireNonNull(logger, "Logger instance cannot be null");
-		this.metaTypeService = requireNonNull(metaTypeService, "MetaTypeService instance cannot be null");
-		this.bundlePids = requireNonNull(bundlePids, "Multimap instance cannot be null");
-		this.allFeatures = requireNonNull(allFeatures, "Multimap instance cannot be null");
-	}
+    /**
+     * Constructor
+     *
+     * @param metaTypeService {@link MetaTypeService} instance
+     * @param bundlePids container to store all configuration PIDs associated
+     *            in a bundle's metatype
+     * @param allFeatures container to store all configuration PIDs in the
+     *            runtime
+     *
+     * @throws NullPointerException if any of the specified arguments is
+     *             {@code null}
+     */
+    public MetaTypeExtender(final MetaTypeService metaTypeService, final Logger logger,
+            final Map<Bundle, List<String>> bundlePids, final Map<String, List<Feature>> allFeatures) {
+        this.logger          = requireNonNull(logger, "Logger instance cannot be null");
+        this.metaTypeService = requireNonNull(metaTypeService, "MetaTypeService instance cannot be null");
+        this.bundlePids      = requireNonNull(bundlePids, "Multimap instance cannot be null");
+        this.allFeatures     = requireNonNull(allFeatures, "Multimap instance cannot be null");
+    }
 
-	@Override
-	protected Extension doCreateExtension(final Bundle bundle) throws Exception {
-		return new MetaTypeExtension(bundle);
-	}
+    @Override
+    protected Extension doCreateExtension(final Bundle bundle) throws Exception {
+        return new MetaTypeExtension(bundle);
+    }
 
-	@Override
-	protected void debug(final Bundle bundle, final String msg) {
-		logger.log(LOG_DEBUG, " [" + bundle.getSymbolicName() + "] " + msg);
-	}
+    @Override
+    protected void debug(final Bundle bundle, final String msg) {
+        logger.log(LOG_DEBUG, " [" + bundle.getSymbolicName() + "] " + msg);
+    }
 
-	@Override
-	protected void warn(final Bundle bundle, final String msg, final Throwable t) {
-		logger.log(LOG_WARNING, " [" + bundle.getSymbolicName() + "] " + msg);
-	}
+    @Override
+    protected void warn(final Bundle bundle, final String msg, final Throwable t) {
+        logger.log(LOG_WARNING, " [" + bundle.getSymbolicName() + "] " + msg);
+    }
 
-	@Override
-	protected void error(final String msg, final Throwable t) {
-		logger.log(LOG_ERROR, msg, t);
-	}
+    @Override
+    protected void error(final String msg, final Throwable t) {
+        logger.log(LOG_ERROR, msg, t);
+    }
 
-	private class MetaTypeExtension extends SimpleExtension {
-		private final Bundle bundle;
+    private class MetaTypeExtension extends SimpleExtension {
+        private final Bundle bundle;
 
-		public MetaTypeExtension(final Bundle bundle) {
-			super(bundle);
-			this.bundle = bundle;
-		}
+        public MetaTypeExtension(final Bundle bundle) {
+            super(bundle);
+            this.bundle = bundle;
+        }
 
-		@Override
-		protected void doStart() throws Exception {
-			for (final String pid : getPIDs(bundle, metaTypeService)) {
-				final Map<String, List<Feature>> featuresFromADs = getFeaturesFromAttributeDefinitions(bundle, pid,
-						metaTypeService);
-				allFeatures.putAll(featuresFromADs);
-				if (bundlePids.containsKey(bundle)) {
-					bundlePids.get(bundle).add(pid);
-				} else {
-					bundlePids.put(bundle, Arrays.asList(pid));
-				}
-			}
-		}
+        @Override
+        protected void doStart() throws Exception {
+            for (final String pid : getPIDs(bundle, metaTypeService)) {
+                final Map<String, List<Feature>> featuresFromADs = getFeaturesFromAttributeDefinitions(bundle, pid,
+                        metaTypeService);
+                allFeatures.putAll(featuresFromADs);
+                if (bundlePids.containsKey(bundle)) {
+                    bundlePids.get(bundle).add(pid);
+                } else {
+                    bundlePids.put(bundle, Arrays.asList(pid));
+                }
+            }
+        }
 
-		@Override
-		protected void doDestroy() throws Exception {
-			final Collection<String> pids = bundlePids.get(bundle);
-			for (final String pid : pids) {
-				allFeatures.remove(pid);
-			}
-			bundlePids.remove(bundle);
-		}
-	}
+        @Override
+        protected void doDestroy() throws Exception {
+            final Collection<String> pids = bundlePids.get(bundle);
+            for (final String pid : pids) {
+                allFeatures.remove(pid);
+            }
+            bundlePids.remove(bundle);
+        }
+    }
 
 }

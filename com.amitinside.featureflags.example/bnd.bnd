@@ -1,0 +1,2 @@
+-privatepackage     : com.amitinside.featureflags.example
+-buildpath          : com.amitinside.featureflags.api

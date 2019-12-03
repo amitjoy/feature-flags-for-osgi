@@ -1,0 +1,5 @@
+-runrequires: \
+	bnd.identity;id='com.amitinside.featureflags.example',\
+	bnd.identity;id='com.amitinside.featureflags.provider'
+
+-resolve: beforelaunch

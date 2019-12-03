@@ -1,0 +1,12 @@
+-conditionalpackage : org.apache.felix.utils.*
+-privatepackage     : com.amitinside.featureflags.*
+
+-buildpath          : \
+	com.amitinside.featureflags.api,\
+	org.apache.felix:org.apache.felix.utils;packages=*,\
+	org.apache.felix.gogo.runtime
+
+-testpath           : \
+	osgi.enroute.junit.wrapper,\
+	osgi.enroute.hamcrest.wrapper,\
+	org.mockito.mockito-all

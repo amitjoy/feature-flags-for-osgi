@@ -1,0 +1,10 @@
+-runfw                          =         org.apache.felix.framework
+-runee                          =         JavaSE-1.8
+-runvm                          =         -ea
+-runtrace                       =         true
+-runrepos                       =         Workspace, Maven Central
+
+-runblacklist                   =         com.amitinside.featureflags.api
+
+-runrequires.gogo               =         bnd.identity;id='org.apache.felix.gogo.command',\
+                                          bnd.identity;id='org.apache.felix.gogo.shell'
