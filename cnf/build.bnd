@@ -24,6 +24,8 @@ Bundle-SCM              : url=https://github.com/amitjoy/feature-flags-for-osgi,
                             connection=scm:git:https://github.com/amitjoy/feature-flags-for-osgi.git,\
                             developerConnection=scm:git:git@github.com:amitjoy/feature-flags-for-osgi.git
 
+Bundle-Icon             : logo.png 
+
 Bundle-Developers       : Amit;\
                             name="Amit Kumar Mondal";\
                             email="admin@amitinside.com";\
