@@ -54,7 +54,7 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 **Import as Eclipse Projects**
 
-1. Install bndtools
+1. Install Bndtools
 2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace`)
 
 --------------------------------------------------------------------------------------------------------
