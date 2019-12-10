@@ -25,7 +25,7 @@ This is an implementation of the Feature Toggles pattern (also known as Feature 
 
 ### Dependencies
 
-This project comprises four bundles - 
+This project comprises three bundles - 
 
 1. `com.amitinside.featureflags.api` - The core feature flags API
 2. `com.amitinside.featureflags.provider` - The core feature flags implementation
