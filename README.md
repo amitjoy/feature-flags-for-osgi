@@ -57,7 +57,7 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 1. Install Bndtools
 2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace`)
 
---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
 
 #### Building from Source
 
