@@ -37,33 +37,33 @@ import com.amitinside.featureflags.api.FeatureManager;
 @RunWith(MockitoJUnitRunner.class)
 public final class FeatureManagerProviderTest {
 
-    private static final String FEATURE_NAME = "My Feature";
-    private static final String FEATURE_DESC = "My First Feature Description";
-    private static final String FEATURE_ID   = "myfeature";
+    private static final String    FEATURE_NAME = "My Feature";
+    private static final String    FEATURE_DESC = "My First Feature Description";
+    private static final String    FEATURE_ID   = "myfeature";
 
     @Mock
-    private BundleContext         bundleContext1;
+    private BundleContext          bundleContext1;
     @Mock
-    private ConfigurationAdmin    configurationAdmin;
+    private ConfigurationAdmin     configurationAdmin;
     @Mock
-    private MetaTypeService       metaTypeService;
+    private MetaTypeService        metaTypeService;
     @Mock
-    private Bundle                bundle;
+    private Bundle                 bundle;
     @Mock
-    private Bundle                systemBundle;
+    private Bundle                 systemBundle;
     @Mock
-    private BundleContext         bundleContext2;
+    private BundleContext          bundleContext2;
     @Mock
-    private MetaTypeInformation   metaTypeInfo;
+    private MetaTypeInformation    metaTypeInfo;
     @Mock
-    private ObjectClassDefinition ocd;
+    private ObjectClassDefinition  ocd;
     @Mock
-    private AttributeDefinition   ad;
+    private AttributeDefinition    ad;
     @Mock
-    private Configuration         configuration;
+    private Configuration          configuration;
     @SuppressWarnings("rawtypes")
     @Mock
-    private ServiceReference      reference;
+    private ServiceReference       reference;
 
     @InjectMocks
     private FeatureManagerProvider manager;

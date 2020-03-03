@@ -48,7 +48,7 @@ public interface FeatureManager {
      *  filter:="(&amp;(osgi.extender=osgi.feature)(version&gt;=1.0)(!(version&gt;=2.0)))"
      * </pre>
      */
-    String FEATURE_CAPABILITY_NAME = "osgi.feature";
+    String FEATURE_CAPABILITY_NAME    = "osgi.feature";
 
     /**
      * Retrieve all (known) {@link FeatureDTO} instances registered in the runtime

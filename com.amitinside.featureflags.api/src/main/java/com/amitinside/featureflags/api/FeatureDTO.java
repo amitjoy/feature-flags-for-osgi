@@ -31,22 +31,22 @@ public class FeatureDTO extends DTO {
     /**
      * The identifier of the feature
      */
-    public String id;
+    public String  id;
 
     /**
      * The bundle identifier containing the feature
      */
-    public long bundleId;
+    public long    bundleId;
 
     /**
      * The name of the feature
      */
-    public String name;
+    public String  name;
 
     /**
      * The description of the feature
      */
-    public String description;
+    public String  description;
 
     /**
      * The enablement flag of the feature that denotes whether the feature is

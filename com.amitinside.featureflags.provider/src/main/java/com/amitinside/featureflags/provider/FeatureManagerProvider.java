@@ -44,21 +44,21 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     private final Map<String, List<Feature>> allFeatures = new HashMap<>();
 
     /** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
-    private final Map<Bundle, List<String>> bundlePids = new HashMap<>();
+    private final Map<Bundle, List<String>>  bundlePids  = new HashMap<>();
 
     /** Configuration Admin Service Instance Reference */
     @Reference
-    private ConfigurationAdmin configurationAdmin;
+    private ConfigurationAdmin               configurationAdmin;
 
     /** Metatype Service Instance Reference */
     @Reference
-    private MetaTypeService metaTypeService;
+    private MetaTypeService                  metaTypeService;
 
     /** Metatype Extender Instance Reference */
-    private MetaTypeExtender extender;
+    private MetaTypeExtender                 extender;
 
     /** Logger Instance */
-    private Logger logger;
+    private Logger                           logger;
 
     @Activate
     protected void activate(final BundleContext bundleContext) throws Exception {

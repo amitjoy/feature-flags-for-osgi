@@ -75,14 +75,14 @@ public final class ManagerHelper {
         feature.id = getFeatureID(ad.getID());
 
         final String name = ad.getName();
-        feature.name = name != null ? name : feature.id;
+        feature.name        = name != null ? name : feature.id;
 
         feature.description = ad.getDescription();
 
         final String[] defaultValue = ad.getDefaultValue();
         feature.isEnabled = defaultValue == null ? false : Boolean.valueOf(defaultValue[0]);
 
-        feature.bundleId = bundleId;
+        feature.bundleId  = bundleId;
         return feature;
     }
 

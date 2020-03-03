@@ -35,13 +35,13 @@ import com.amitinside.featureflags.provider.ManagerHelper.Feature;
 public final class MetaTypeExtender extends AbstractExtender {
 
     /** Logger Instance */
-    private final Logger logger;
+    private final Logger                     logger;
 
     /** Metatype Service Instance Reference */
-    private final MetaTypeService metaTypeService;
+    private final MetaTypeService            metaTypeService;
 
     /** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
-    private final Map<Bundle, List<String>> bundlePids;
+    private final Map<Bundle, List<String>>  bundlePids;
 
     /** Data container -> Key: Configuration PID Value: Feature DTOs */
     private final Map<String, List<Feature>> allFeatures;
