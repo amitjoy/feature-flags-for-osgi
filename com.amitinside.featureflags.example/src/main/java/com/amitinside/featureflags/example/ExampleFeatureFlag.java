@@ -7,9 +7,11 @@ import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
+import com.amitinside.featureflags.annotations.RequireFeatureFlags;
 import com.amitinside.featureflags.example.ExampleFeatureFlag.MyConfig;
 
 @Component
+@RequireFeatureFlags
 @Designate(ocd = MyConfig.class)
 public final class ExampleFeatureFlag {
 

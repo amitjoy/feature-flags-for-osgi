@@ -1,5 +1,4 @@
 -runrequires: \
-	bnd.identity;id='com.amitinside.featureflags.example',\
-	bnd.identity;id='com.amitinside.featureflags.provider'
+	bnd.identity;id='com.amitinside.featureflags.example'
 
 -resolve: beforelaunch
