@@ -30,18 +30,19 @@ public final class FeatureFlagsGogoCommand {
     private FeatureManager featureManager;
 
     public List<FeatureDTO> features() {
-        return featureManager.getFeatures().collect(toList());
+        return featureManager.getFeatures()
+                .collect(toList());
     }
 
-    public void updatefeature(String featureID, boolean isEnabled) {
+    public void updatefeature(final String featureID, final boolean isEnabled) {
         featureManager.updateFeature(featureID, isEnabled);
     }
 
-    public void enablefeature(String featureID) {
+    public void enablefeature(final String featureID) {
         updatefeature(featureID, true);
     }
 
-    public void disablefeature(String featureID) {
+    public void disablefeature(final String featureID) {
         updatefeature(featureID, false);
     }
 }

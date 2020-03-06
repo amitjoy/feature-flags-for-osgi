@@ -82,7 +82,10 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
 
     @Override
     public Stream<FeatureDTO> getFeatures() {
-        return allFeatures.values().stream().flatMap(List::stream).map(ManagerHelper::toFeatureDTO);
+        return allFeatures.values()
+                .stream()
+                .flatMap(List::stream)
+                .map(ManagerHelper::toFeatureDTO);
     }
 
     @Override
@@ -90,12 +93,11 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         requireNonNull(featureID, "Feature ID cannot be null");
         checkArgument(!featureID.isEmpty(), "Feature ID cannot be empty");
 
-        // @formatter:off
-		return allFeatures.values().stream()
-								   .flatMap(List::stream)
-								   .filter(f -> f.id.equals(featureID))
-								   .map(ManagerHelper::toFeatureDTO);
-		// @formatter:on
+        return allFeatures.values()
+                .stream()
+                .flatMap(List::stream)
+                .filter(f -> f.id.equals(featureID))
+                .map(ManagerHelper::toFeatureDTO);
     }
 
     @Override
@@ -106,14 +108,13 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
         logger.log(LOG_INFO, String.format("Updating feature [%s] to [%b]", featureID, isEnabled));
 
         try {
-            // @formatter:off
-			final List<String> configurations =
-					allFeatures.entrySet().stream()
-										  .filter(e -> e.getValue().stream()
-												  				   .anyMatch(f -> f.id.equals(featureID)))
-										  						   .map(Entry::getKey)
-										  						   .collect(Collectors.toList());
-			// @formatter:on
+            final List<String> configurations = allFeatures.entrySet()
+                    .stream()
+                    .filter(e -> e.getValue()
+                            .stream()
+                            .anyMatch(f -> f.id.equals(featureID)))
+                    .map(Entry::getKey)
+                    .collect(Collectors.toList());
             for (final String configurationPID : configurations) {
                 final Configuration configuration = configurationAdmin.getConfiguration(configurationPID, "?");
                 if (configuration != null) {
@@ -138,12 +139,11 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 final String              featureID = entry.getKey();
                 final boolean             isEnabled = entry.getValue();
                 final Collection<Feature> features  = allFeatures.get(pid);
-                // @formatter:off
-				features.stream().filter(f -> f.id.equalsIgnoreCase(featureID))
-						.peek(f -> logger.log(LOG_INFO,
-								String.format("Updated feature [%s] to [%b]", f.toString(), isEnabled)))
-						.forEach(f -> f.isEnabled = isEnabled);
-				// @formatter:on
+                features.stream()
+                        .filter(f -> f.id.equalsIgnoreCase(featureID))
+                        .peek(f -> logger.log(LOG_INFO,
+                                String.format("Updated feature [%s] to [%b]", f.toString(), isEnabled)))
+                        .forEach(f -> f.isEnabled = isEnabled);
             }
         } else {
             allFeatures.remove(pid);

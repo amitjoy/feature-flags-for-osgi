@@ -35,7 +35,7 @@ public final class ManagerHelper {
         throw new IllegalAccessError("Non-Instantiable");
     }
 
-    public static void checkArgument(boolean expression, String message) {
+    public static void checkArgument(final boolean expression, final String message) {
         if (!expression) {
             throw new IllegalArgumentException(message);
         }
@@ -113,7 +113,8 @@ public final class ManagerHelper {
 
         final Map<String, List<Feature>> allFeatures = new HashMap<>();
         for (final AttributeDefinition ad : getAttributeDefinitions(bundle, pid, metaTypeService)) {
-            if (ad.getID().startsWith(METATYPE_FEATURE_ID_PREFIX)) {
+            if (ad.getID()
+                    .startsWith(METATYPE_FEATURE_ID_PREFIX)) {
                 List<Feature> features = null;
                 if (allFeatures.get(pid) != null) {
                     features = allFeatures.get(pid);
@@ -132,24 +133,25 @@ public final class ManagerHelper {
         try {
             final Configuration       configuration = configurationAdmin.getConfiguration(configurationPID, "?");
             final Map<String, Object> properties    = new DictionaryAsMap<>(configuration.getProperties());
-            // @formatter:off
-			return properties.entrySet().stream()
-										.filter(e -> e.getKey().startsWith(METATYPE_FEATURE_ID_PREFIX))
-										.filter(e -> e.getValue() instanceof Boolean)
-										.collect(toMap(e -> getFeatureID(e.getKey()), e -> (Boolean) e.getValue()));
-			// @formatter:on
+            return properties.entrySet()
+                    .stream()
+                    .filter(e -> e.getKey()
+                            .startsWith(METATYPE_FEATURE_ID_PREFIX))
+                    .filter(e -> e.getValue() instanceof Boolean)
+                    .collect(toMap(e -> getFeatureID(e.getKey()), e -> (Boolean) e.getValue()));
         } catch (final Exception e) {
             // cannot do anything
         }
         return Collections.emptyMap();
     }
 
-    public static Map<String, Object> asMap(Dictionary<String, Object> dictionary) {
+    public static Map<String, Object> asMap(final Dictionary<String, Object> dictionary) {
         if (dictionary == null) {
             return new HashMap<>();
         }
         final List<String> keys = Collections.list(dictionary.keys());
-        return keys.stream().collect(toMap(Function.identity(), dictionary::get));
+        return keys.stream()
+                .collect(toMap(Function.identity(), dictionary::get));
     }
 
     public static <T> List<T> asList(final T[] elements) {
