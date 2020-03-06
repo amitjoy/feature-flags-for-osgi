@@ -14,7 +14,7 @@ import com.amitinside.featureflags.api.FeatureManager;
 
 //@formatter:off
 @Component(
-         service = Object.class,
+         service = FeatureFlagsGogoCommand.class,
          property = {
               COMMAND_SCOPE + "=featureflags",
               COMMAND_FUNCTION + "=features",

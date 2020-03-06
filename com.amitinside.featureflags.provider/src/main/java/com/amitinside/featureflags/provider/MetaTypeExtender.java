@@ -7,7 +7,7 @@ import static org.apache.felix.utils.log.Logger.LOG_DEBUG;
 import static org.apache.felix.utils.log.Logger.LOG_ERROR;
 import static org.apache.felix.utils.log.Logger.LOG_WARNING;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public final class MetaTypeExtender extends AbstractExtender {
     private final MetaTypeService            metaTypeService;
 
     /** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
-    private final Map<Bundle, List<String>>  bundlePids;
+    private final Map<Bundle, List<String>>  bundlePIDs;
 
     /** Data container -> Key: Configuration PID Value: Feature DTOs */
     private final Map<String, List<Feature>> allFeatures;
@@ -50,7 +50,7 @@ public final class MetaTypeExtender extends AbstractExtender {
      * Constructor
      *
      * @param metaTypeService {@link MetaTypeService} instance
-     * @param bundlePids container to store all configuration PIDs associated
+     * @param bundlePIDs container to store all configuration PIDs associated
      *            in a bundle's metatype
      * @param allFeatures container to store all configuration PIDs in the
      *            runtime
@@ -59,11 +59,11 @@ public final class MetaTypeExtender extends AbstractExtender {
      *             {@code null}
      */
     public MetaTypeExtender(final MetaTypeService metaTypeService, final Logger logger,
-            final Map<Bundle, List<String>> bundlePids, final Map<String, List<Feature>> allFeatures) {
+            final Map<Bundle, List<String>> bundlePIDs, final Map<String, List<Feature>> allFeatures) {
         this.logger          = requireNonNull(logger, "Logger instance cannot be null");
         this.metaTypeService = requireNonNull(metaTypeService, "MetaTypeService instance cannot be null");
-        this.bundlePids      = requireNonNull(bundlePids, "Multimap instance cannot be null");
-        this.allFeatures     = requireNonNull(allFeatures, "Multimap instance cannot be null");
+        this.bundlePIDs      = requireNonNull(bundlePIDs, "Bundle PIDs map instance cannot be null");
+        this.allFeatures     = requireNonNull(allFeatures, "All features map instance cannot be null");
     }
 
     @Override
@@ -100,21 +100,16 @@ public final class MetaTypeExtender extends AbstractExtender {
                 final Map<String, List<Feature>> featuresFromADs = getFeaturesFromAttributeDefinitions(bundle, pid,
                         metaTypeService);
                 allFeatures.putAll(featuresFromADs);
-                if (bundlePids.containsKey(bundle)) {
-                    bundlePids.get(bundle).add(pid);
-                } else {
-                    bundlePids.put(bundle, Arrays.asList(pid));
-                }
+                bundlePIDs.computeIfAbsent(bundle, p -> new ArrayList<>())
+                        .add(pid);
             }
         }
 
         @Override
         protected void doDestroy() throws Exception {
-            final Collection<String> pids = bundlePids.get(bundle);
-            for (final String pid : pids) {
-                allFeatures.remove(pid);
-            }
-            bundlePids.remove(bundle);
+            final Collection<String> pids = bundlePIDs.get(bundle);
+            pids.forEach(allFeatures::remove);
+            bundlePIDs.remove(bundle);
         }
     }
 

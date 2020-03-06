@@ -116,12 +116,7 @@ public final class ManagerHelper {
             if (ad.getID()
                     .startsWith(METATYPE_FEATURE_ID_PREFIX)) {
                 List<Feature> features = null;
-                if (allFeatures.get(pid) != null) {
-                    features = allFeatures.get(pid);
-                } else {
-                    features = new ArrayList<>();
-                    allFeatures.put(pid, features);
-                }
+                features = allFeatures.computeIfAbsent(pid, f -> new ArrayList<>());
                 features.add(toFeature(ad, bundle.getBundleId()));
             }
         }
@@ -140,7 +135,7 @@ public final class ManagerHelper {
                     .filter(e -> e.getValue() instanceof Boolean)
                     .collect(toMap(e -> getFeatureID(e.getKey()), e -> (Boolean) e.getValue()));
         } catch (final Exception e) {
-            // cannot do anything
+            // never occur since configuration location check has been ignored
         }
         return Collections.emptyMap();
     }
@@ -149,8 +144,8 @@ public final class ManagerHelper {
         if (dictionary == null) {
             return new HashMap<>();
         }
-        final List<String> keys = Collections.list(dictionary.keys());
-        return keys.stream()
+        return Collections.list(dictionary.keys())
+                .stream()
                 .collect(toMap(Function.identity(), dictionary::get));
     }
 

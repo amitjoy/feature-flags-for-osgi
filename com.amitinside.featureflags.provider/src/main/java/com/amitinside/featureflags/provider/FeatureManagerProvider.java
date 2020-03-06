@@ -44,26 +44,26 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
     private final Map<String, List<Feature>> allFeatures = new HashMap<>();
 
     /** Data container -> Key: Bundle Instance Value: Configuration PID(s) */
-    private final Map<Bundle, List<String>>  bundlePids  = new HashMap<>();
+    private final Map<Bundle, List<String>>  bundlePIDs  = new HashMap<>();
 
-    /** Configuration Admin Service Instance Reference */
-    @Reference
-    private ConfigurationAdmin               configurationAdmin;
+    /** Logger Instance */
+    private Logger                           logger;
+
+    /** Metatype Extender Instance Reference */
+    private MetaTypeExtender                 extender;
 
     /** Metatype Service Instance Reference */
     @Reference
     private MetaTypeService                  metaTypeService;
 
-    /** Metatype Extender Instance Reference */
-    private MetaTypeExtender                 extender;
-
-    /** Logger Instance */
-    private Logger                           logger;
+    /** Configuration Admin Service Instance Reference */
+    @Reference
+    private ConfigurationAdmin               configurationAdmin;
 
     @Activate
     protected void activate(final BundleContext bundleContext) throws Exception {
         logger   = new Logger(bundleContext);
-        extender = new MetaTypeExtender(metaTypeService, logger, bundlePids, allFeatures);
+        extender = new MetaTypeExtender(metaTypeService, logger, bundlePIDs, allFeatures);
         extender.start(bundleContext);
     }
 
@@ -125,7 +125,7 @@ public final class FeatureManagerProvider implements FeatureManager, Configurati
                 }
             }
         } catch (final Exception e) {
-            // not required
+            // never occur since configuration location check has been ignored
         }
     }
 
