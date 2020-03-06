@@ -38,6 +38,11 @@ Bundle-Developers       : Amit;\
           osgi.core,\
           osgi.annotation
 
+-testpath           : \
+	osgi.enroute.junit.wrapper,\
+	osgi.enroute.hamcrest.wrapper,\
+	org.mockito.mockito-all
+
 -plugin.1.R7.API        : \
 	aQute.bnd.repository.maven.pom.provider.BndPomRepository; \
           snapshotUrls       = https://oss.sonatype.org/content/repositories/osgi/; \
