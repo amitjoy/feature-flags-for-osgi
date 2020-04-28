@@ -42,13 +42,13 @@ As test dependencies, the following test libraries are used:
 
 To use feature flags in OSGi environment, you only need to install `com.amitinside.featureflags.provider`.
 
--------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
 
 ### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/feature-flags-osgi/issues)
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/feature-flags-osgi/blob/master/CONTRIBUTING.md)
 
--------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
 
 #### Project Import
 
