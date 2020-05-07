@@ -36,13 +36,13 @@ As test dependencies, the following test libraries are used:
 1. JUnit 4.12
 3. Mockito Core 2.10
 
----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
 ### Installation
 
 To use feature flags in OSGi environment, you only need to install `com.amitinside.featureflags.provider`.
 
----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
 ### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/feature-flags-osgi/issues)
 
