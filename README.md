@@ -62,7 +62,7 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 #### Building from Source
 
 Run `./gradlew clean build` in the project root directory
-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 ### License
 
