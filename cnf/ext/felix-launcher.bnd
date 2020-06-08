@@ -4,7 +4,7 @@
 -runtrace                       =         true
 -runrepos                       =         Workspace, Maven Central
 
--runblacklist                   =         com.amitinside.featureflags.api
+-runblacklist                   =         bnd.identity;id='com.amitinside.featureflags.api'
 
 -runrequires.gogo               =         bnd.identity;id='org.apache.felix.gogo.command',\
                                           bnd.identity;id='org.apache.felix.gogo.shell'
